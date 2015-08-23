@@ -128,7 +128,6 @@ namespace YamuiFramework.Controls
         public DataGridHelper(YamuiScrollBar scrollbar, DataGridView grid, bool vertical = true)
         {
             _scrollbar = scrollbar;
-            _scrollbar.UseBarColor = true;
             _grid = grid;
             _ishorizontal = !vertical;
 

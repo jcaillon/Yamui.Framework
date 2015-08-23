@@ -22,7 +22,8 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DocumentationFile>bin\Debug\YamuiFramework.xml</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -128,6 +129,9 @@
     <Compile Include="Controls\YamuiProgressSpinner.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\YamuiColorRadioButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\YamuiRadioButton.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -141,9 +145,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\YamuiTextBox.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\YamuiTile.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\YamuiToggle.cs">

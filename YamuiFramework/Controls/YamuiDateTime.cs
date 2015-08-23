@@ -1,13 +1,12 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
-namespace YamuiFramework.Controls
-{
+namespace YamuiFramework.Controls {
     [ToolboxBitmap(typeof(DateTimePicker))]
-    public class YamuiDateTime : DateTimePicker
-    {
+    public class YamuiDateTime : DateTimePicker {
         #region Fields
         [DefaultValue(false)]
         [Category("Yamui")]
@@ -24,24 +23,43 @@ namespace YamuiFramework.Controls
         #endregion
 
         #region Constructor
-        public YamuiDateTime()
-        {
+        public YamuiDateTime() {
             SetStyle(ControlStyles.SupportsTransparentBackColor |
-                  ControlStyles.OptimizedDoubleBuffer |
-                  ControlStyles.ResizeRedraw |
-                  ControlStyles.UserPaint, true);
+                ControlStyles.OptimizedDoubleBuffer |
+                ControlStyles.ResizeRedraw |
+                ControlStyles.UserPaint |
+                ControlStyles.Selectable |
+                ControlStyles.AllPaintingInWmPaint, true);
 
         }
         #endregion
 
         #region Paint Methods
-
+        protected void PaintTransparentBackground(Graphics graphics, Rectangle clipRect) {
+            graphics.Clear(Color.Transparent);
+            if ((Parent != null)) {
+                clipRect.Offset(Location);
+                PaintEventArgs e = new PaintEventArgs(graphics, clipRect);
+                GraphicsState state = graphics.Save();
+                graphics.SmoothingMode = SmoothingMode.HighSpeed;
+                try {
+                    graphics.TranslateTransform(-Location.X, -Location.Y);
+                    InvokePaintBackground(Parent, e);
+                    InvokePaint(Parent, e);
+                } finally {
+                    graphics.Restore(state);
+                    clipRect.Offset(-Location.X, -Location.Y);
+                }
+            }
+        }
 
         protected override void OnPaintBackground(PaintEventArgs e) {
             try {
                 Color backColor = ThemeManager.ButtonColors.BackGround(BackColor, UseCustomBackColor, _isFocused, _isHovered, _isPressed, Enabled);
-                if (backColor == Color.Transparent) return;
-                e.Graphics.Clear(backColor);
+                if (backColor != Color.Transparent)
+                    e.Graphics.Clear(backColor);
+                else
+                    PaintTransparentBackground(e.Graphics, DisplayRectangle);
             } catch {
                 Invalidate();
             }
@@ -49,8 +67,7 @@ namespace YamuiFramework.Controls
 
         protected override void OnPaint(PaintEventArgs e) {
             try {
-                if (GetStyle(ControlStyles.AllPaintingInWmPaint))
-                    OnPaintBackground(e);
+                OnPaintBackground(e);
                 OnPaintForeground(e);
             } catch {
                 Invalidate();
@@ -96,15 +113,14 @@ namespace YamuiFramework.Controls
             TextRenderer.DrawText(e.Graphics, Text, FontManager.GetStandardFont(), textRect, foreColor, TextFormatFlags.Left | TextFormatFlags.VerticalCenter);
         }
 
-        protected override void OnValueChanged(EventArgs eventargs)
-        {
+        protected override void OnValueChanged(EventArgs eventargs) {
             base.OnValueChanged(eventargs);
             Invalidate();
         }
 
         #endregion
 
-        #region "Managing isHovered, isPressed, isFocused"
+        #region Managing isHovered, isPressed, isFocused
 
         #region Focus Methods
 
@@ -192,13 +208,11 @@ namespace YamuiFramework.Controls
 
         #region Overridden Methods
 
-        public override Size GetPreferredSize(Size proposedSize)
-        {
+        public override Size GetPreferredSize(Size proposedSize) {
             Size preferredSize;
             base.GetPreferredSize(proposedSize);
 
-            using (var g = CreateGraphics())
-            {
+            using (var g = CreateGraphics()) {
                 string measureText = Text.Length > 0 ? Text : "MeasureText";
                 proposedSize = new Size(int.MaxValue, int.MaxValue);
                 preferredSize = TextRenderer.MeasureText(g, measureText, FontManager.GetStandardFont(), proposedSize, TextFormatFlags.Left | TextFormatFlags.LeftAndRightPadding | TextFormatFlags.VerticalCenter);

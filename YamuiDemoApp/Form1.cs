@@ -9,39 +9,41 @@ using System.Windows.Forms;
 using MetroFramework.Demo;
 using YamuiFramework;
 using YamuiFramework.Animations.Transitions;
+using YamuiFramework.Controls;
 using YamuiFramework.Forms;
 
 namespace YamuiDemoApp {
     public partial class Form1 : YamuiForm {
         public Form1() {
             InitializeComponent();
-        }
-
-        private void yamuiComboBox1_SelectedIndexChanged(object sender, EventArgs e) {
-
-        }
-        //ThemeManager.Theme = ThemeManager.Theme == MetroThemeStyle.Light ? MetroThemeStyle.Dark : MetroThemeStyle.Light;
-        private void yamuiButton5_Click(object sender, EventArgs e) {
-            if (!Transition.IsTransitionRunning())
-                Transition.run(yamuiButton4, "IsPressed", true, new TransitionType_Flash(3, 300));
-        }
-
-        private void yamuiButton3_Click(object sender, EventArgs e) {
-            yamuiContextMenu1.Show(yamuiButton3, new Point(0, yamuiButton3.Height));
+            yamuiTabControlMain.ApplyHideThisSettings(); //TODO: replace this by a onLoad event in yamuiLoad, foreach yamuitabControl do apply
         }
 
         private void yamuiTabControl1_SelectedIndexChanged(object sender, EventArgs e) {
 
         }
 
-        private void yamuiButton6_Click(object sender, EventArgs e) {
-            YamuiTaskWindow.ShowTaskWindow(this, "SubControl in TaskWindow", new TaskWindowControl(), 5);
+        private void yamuiTabPage9_Click(object sender, EventArgs e) {
+
         }
 
-        private void yamuiToggle3_CheckedChanged(object sender, EventArgs e) {
-            ThemeManager.Theme = (yamuiToggle3.Checked) ? Themes.Dark : Themes.Light;
-            yamuiContextMenu1.UpdateTheme();
-            Refresh();
+        private void Form1_Load(object sender, EventArgs e) {
+            //ApplyHideSettingGlobally(this);
+        }
+
+        private void ApplyHideSettingGlobally(Control parent) {
+            foreach (Control c in parent.Controls) {
+                if (c.GetType() == typeof(YamuiTabControl)) {
+                    YamuiTabControl fuu = (YamuiTabControl)c;
+                    //fuu.ApplyHideThisSettings();
+                    MessageBox.Show(fuu.Name);
+                }
+                ApplyHideSettingGlobally(c); // recurvise
+            }
+        }
+
+        private void yamuiLink6_Click(object sender, EventArgs e) {
+            GoToPage(yamuiTabControlMain, yamuiTabMainSetting, yamuiTabControlSecSetting, yamuiTabSecAppearance);
         }
     }
 }

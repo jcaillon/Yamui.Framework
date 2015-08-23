@@ -2,6 +2,7 @@
 using System.Collections;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 
@@ -180,7 +181,12 @@ namespace YamuiFramework.Controls {
         #region Constructor
 
         public YamuiTextBox() {
-            SetStyle(ControlStyles.DoubleBuffer | ControlStyles.OptimizedDoubleBuffer, true);
+            SetStyle(ControlStyles.SupportsTransparentBackColor |
+                ControlStyles.OptimizedDoubleBuffer |
+                ControlStyles.ResizeRedraw |
+                ControlStyles.UserPaint |
+                ControlStyles.Selectable |
+                ControlStyles.AllPaintingInWmPaint, true);
 
             base.TabStop = false;
             GotFocus += YamuiTextBox_GotFocus;
@@ -275,13 +281,7 @@ namespace YamuiFramework.Controls {
             try {
                 Color backColor = ThemeManager.ButtonColors.BackGround(BackColor, UseCustomBackColor, _isFocused, _isHovered, false, Enabled);
                 _baseTextBox.BackColor = backColor;
-                if (backColor.A == 255) {
-                    e.Graphics.Clear(backColor);
-                    return;
-                }
-
-                base.OnPaintBackground(e);
-
+                e.Graphics.Clear(backColor);
             } catch {
                 Invalidate();
             }
@@ -289,9 +289,7 @@ namespace YamuiFramework.Controls {
 
         protected override void OnPaint(PaintEventArgs e) {
             try {
-                if (GetStyle(ControlStyles.AllPaintingInWmPaint)) {
-                    OnPaintBackground(e);
-                }
+                OnPaintBackground(e);
                 OnPaintForeground(e);
             } catch {
                 Invalidate();
@@ -321,7 +319,6 @@ namespace YamuiFramework.Controls {
                 UpdateBaseTextBox();
             }
         }
-
         #endregion
 
         #region Overridden Methods
@@ -419,15 +416,14 @@ namespace YamuiFramework.Controls {
         #region PromptedTextBox
 
         private class PromptedTextBox : TextBox {
+            #region fields
             private const int OcmCommand = 0x2111;
             private const int WM_PAINT = 15;
 
             private bool _drawPrompt;
 
             private string _waterMark = "";
-            [Browsable(true)]
-            [EditorBrowsable(EditorBrowsableState.Always)]
-            [DefaultValue("")]
+
             public string WaterMark {
                 get { return _waterMark; }
                 set {
@@ -435,11 +431,17 @@ namespace YamuiFramework.Controls {
                     Invalidate();
                 }
             }
+            #endregion
+
+            #region constructor
 
             public PromptedTextBox() {
                 _drawPrompt = (Text.Trim().Length == 0);
             }
 
+            #endregion
+
+            #region Paint
             private void DrawTextPrompt() {
                 using (Graphics graphics = CreateGraphics()) {
                     DrawTextPrompt(graphics);
@@ -466,14 +468,7 @@ namespace YamuiFramework.Controls {
                         break;
                 }
 
-                TextRenderer.DrawText(g, _waterMark, FontManager.GetStandardWaterMarkFont(), clientRectangle, ThemeManager.ButtonColors.Disabled.ForeColor(), BackColor, flags);
-            }
-
-            protected override void OnPaint(PaintEventArgs e) {
-                base.OnPaint(e);
-                if (_drawPrompt) {
-                    DrawTextPrompt(e.Graphics);
-                }
+                TextRenderer.DrawText(g, _waterMark, FontManager.GetStandardWaterMarkFont(), clientRectangle, ThemeManager.ButtonColors.Disabled.ForeColor(), flags);
             }
 
             protected override void OnTextAlignChanged(EventArgs e) {
@@ -485,6 +480,9 @@ namespace YamuiFramework.Controls {
                 base.OnTextChanged(e);
                 _drawPrompt = (Text.Trim().Length == 0);
             }
+
+            #endregion
+
 
             protected override void WndProc(ref Message m) {
                 base.WndProc(ref m);
@@ -498,6 +496,7 @@ namespace YamuiFramework.Controls {
         #endregion
     }
 
+    #region Designer
 
     internal class YamuiTextBoxDesigner : ControlDesigner {
         public override SelectionRules SelectionRules {
@@ -505,7 +504,7 @@ namespace YamuiFramework.Controls {
                 PropertyDescriptor propDescriptor = TypeDescriptor.GetProperties(Component)["Multiline"];
 
                 if (propDescriptor != null) {
-                    bool isMultiline = (bool)propDescriptor.GetValue(Component);
+                    bool isMultiline = (bool) propDescriptor.GetValue(Component);
 
                     if (isMultiline) {
                         return SelectionRules.Visible | SelectionRules.Moveable | SelectionRules.AllSizeable;
@@ -528,4 +527,6 @@ namespace YamuiFramework.Controls {
             base.PreFilterProperties(properties);
         }
     }
+
+    #endregion
 }

@@ -3,9 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Security;
 using System.Web.UI.Design.WebControls;
 using System.Windows.Forms;
+using YamuiFramework.Controls;
 using YamuiFramework.Native;
 
 namespace YamuiFramework.Forms {
@@ -23,21 +25,6 @@ namespace YamuiFramework.Forms {
 
     public class YamuiForm : Form {
 
-        #region Constructor
-
-        public YamuiForm() {
-            SetStyle(ControlStyles.AllPaintingInWmPaint |
-                     ControlStyles.OptimizedDoubleBuffer |
-                     ControlStyles.ResizeRedraw |
-                     ControlStyles.UserPaint, true);
-
-            FormBorderStyle = FormBorderStyle.None;
-            StartPosition = FormStartPosition.CenterScreen;
-            TransparencyKey = Color.Fuchsia;
-        }
-
-        #endregion
-
         #region Fields
 
         private bool _isMovable = true;
@@ -51,13 +38,13 @@ namespace YamuiFramework.Forms {
         public new Padding Padding {
             get { return base.Padding; }
             set {
-                value.Top = Math.Max(value.Top, 35);
+                value.Top = Math.Max(value.Top, 40);
                 base.Padding = value;
             }
         }
 
         protected override Padding DefaultPadding {
-            get { return new Padding(20, 35, 20, 20); }
+            get { return new Padding(20, 40, 20, 20); }
         }
 
         private bool _isResizable = true;
@@ -69,6 +56,22 @@ namespace YamuiFramework.Forms {
         }
 
         private const int BorderWidth = 1;
+
+        private Action _toDoOnGoToPageAction;
+        #endregion
+
+        #region Constructor
+
+        public YamuiForm() {
+            SetStyle(ControlStyles.AllPaintingInWmPaint |
+                     ControlStyles.OptimizedDoubleBuffer |
+                     ControlStyles.ResizeRedraw |
+                     ControlStyles.UserPaint, true);
+
+            FormBorderStyle = FormBorderStyle.None;
+            StartPosition = FormStartPosition.CenterScreen;
+            TransparencyKey = Color.Fuchsia;
+        }
 
         #endregion
 
@@ -88,6 +91,18 @@ namespace YamuiFramework.Forms {
                 e.Graphics.FillRectangle(b, topRect);
             }
             */
+            /*
+             * Color.FromArgb(40,
+                ((basic.R / 255 * diluant.R) + diluant.R) / 2,
+                ((basic.G / 255 * diluant.G) + diluant.G) / 2,
+                ((basic.B / 255 * diluant.B) + diluant.B) / 2);
+             * 
+            // gradient
+            Rectangle headeRectangle = new Rectangle(0, 0, ClientRectangle.Width, 20);
+            using (LinearGradientBrush brush = new LinearGradientBrush(headeRectangle, MergeColors(backColor, MetroPaint.GetStyleColor(Style)), backColor, LinearGradientMode.Vertical)) {
+                e.Graphics.FillRectangle(brush, headeRectangle);
+            }
+             * */
 
             // draw the border with Style color
             var rect = new Rectangle(new Point(0, 0), new Size(Width - BorderWidth, Height - BorderWidth));
@@ -108,10 +123,6 @@ namespace YamuiFramework.Forms {
             //e.Graphics.DrawImage(Properties.Resources.bull_ant, ClientRectangle.Right - (100 + Properties.Resources.bull_ant.Width), 0 + 5);
             */
 
-            // title
-            var bounds = new Rectangle(10, 10, ClientRectangle.Width - 2*20, 25);
-            TextRenderer.DrawText(e.Graphics, Text, FontManager.GetLabelFont(LabelFunction.FormTitle), bounds, foreColor, TextFormatFlags.EndEllipsis | TextFormatFlags.Left);
-
             // draw the resize pixel stuff on the bottom right
             if (Resizable && (SizeGripStyle == SizeGripStyle.Auto || SizeGripStyle == SizeGripStyle.Show)) {
                 using (var b = new SolidBrush(ThemeManager.FormColor.ForeColor())) {
@@ -129,6 +140,53 @@ namespace YamuiFramework.Forms {
         }
 
         #endregion
+
+        #region For the user
+
+        public void GoToPageByUserSelection() {
+            if (_toDoOnGoToPageAction != null) {
+                _toDoOnGoToPageAction();
+                _toDoOnGoToPageAction = null;
+            }
+        }
+
+        public void GoToPage(YamuiTabControl tabMain, YamuiTabPage pageMain, YamuiTabControl tabSecondary, YamuiTabPage pageSecondary) {
+
+            // cancel the eventual changes to the pages visibility made last time we were there
+            // (only if we changed the main tab!!!)
+            if (_toDoOnGoToPageAction != null && tabMain.SelectedTab != pageMain) {
+                _toDoOnGoToPageAction();
+                _toDoOnGoToPageAction = null;
+            }
+
+            var pagesToHide = new List<YamuiTabPage>();
+            var pagesToUnHide = new List<YamuiTabPage>();
+
+            // if we want to display a hidden page            
+            if (pageMain.HideThis) {
+                //TODO: when the history goback is coded, hide every tab but this and do tabMain.ismirorred!
+                pageMain.HideThis = false;
+                pagesToHide.Add(pageMain);
+                tabMain.ApplyHideThisSettings();
+            }
+
+            tabSecondary.SelectTab(pageSecondary);
+            tabMain.SelectTab(pageMain);
+
+            _toDoOnGoToPageAction = () => {
+                foreach (var page in pagesToHide) {
+                    page.HideThis = true;
+                }
+                foreach (var page in pagesToUnHide) {
+                    page.HideThis = false;
+                }
+                if (pagesToHide.Count > 0 || pagesToUnHide.Count > 0) {
+                    tabMain.ApplyHideThisSettings();
+                }
+            };
+        }
+        #endregion
+
 
         #region Management Methods
 
@@ -179,7 +237,6 @@ namespace YamuiFramework.Forms {
 
         protected override void OnEnabledChanged(EventArgs e) {
             base.OnEnabledChanged(e);
-
             Invalidate();
         }
 
@@ -265,11 +322,6 @@ namespace YamuiFramework.Forms {
             pmmi->ptMaxSize.y = s.WorkingArea.Height;
             pmmi->ptMaxPosition.x = Math.Abs(s.WorkingArea.Left - s.Bounds.Left);
             pmmi->ptMaxPosition.y = Math.Abs(s.WorkingArea.Top - s.Bounds.Top);
-
-            //if (MinimumSize.Width > 0) pmmi->ptMinTrackSize.x = MinimumSize.Width;
-            //if (MinimumSize.Height > 0) pmmi->ptMinTrackSize.y = MinimumSize.Height;
-            //if (MaximumSize.Width > 0) pmmi->ptMaxTrackSize.x = MaximumSize.Width;
-            //if (MaximumSize.Height > 0) pmmi->ptMaxTrackSize.y = MaximumSize.Height;
         }
 
         private WinApi.HitTest HitTestNca(IntPtr hwnd, IntPtr wparam, IntPtr lparam) {
@@ -416,15 +468,34 @@ namespace YamuiFramework.Forms {
             #endregion
 
             #region Paint Methods
+            protected void PaintTransparentBackground(Graphics graphics, Rectangle clipRect) {
+                graphics.Clear(Color.Transparent);
+                if ((Parent != null)) {
+                    clipRect.Offset(Location);
+                    PaintEventArgs e = new PaintEventArgs(graphics, clipRect);
+                    GraphicsState state = graphics.Save();
+                    graphics.SmoothingMode = SmoothingMode.HighSpeed;
+                    try {
+                        graphics.TranslateTransform(-Location.X, -Location.Y);
+                        InvokePaintBackground(Parent, e);
+                        InvokePaint(Parent, e);
+                    } finally {
+                        graphics.Restore(state);
+                        clipRect.Offset(-Location.X, -Location.Y);
+                    }
+                }
+            }
 
             protected override void OnPaint(PaintEventArgs e) {
-                Color backColor = ThemeManager.ButtonColors.BackGround(ThemeManager.FormColor.BackColor(), true, false, _isHovered, _isPressed, Enabled);
+                if (_isPressed)
+                    e.Graphics.Clear(ThemeManager.AccentColor);
+                else if (_isHovered)
+                    e.Graphics.Clear(ThemeManager.ButtonColors.Hover.BackColor());
+                else
+                    PaintTransparentBackground(e.Graphics, DisplayRectangle);
+
                 Color foreColor = ThemeManager.ButtonColors.ForeGround(ForeColor, false, false, _isHovered, _isPressed, Enabled);
-
-                e.Graphics.Clear(backColor);
-
-                var buttonFont = new Font("Webdings", 9.25f);
-                TextRenderer.DrawText(e.Graphics, Text, buttonFont, ClientRectangle, foreColor, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
+                TextRenderer.DrawText(e.Graphics, Text, new Font("Webdings", 9.25f), ClientRectangle, foreColor, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
             }
 
             #endregion
@@ -540,7 +611,7 @@ namespace YamuiFramework.Forms {
     internal class YamuiFormDesigner : FormViewDesigner {
         protected override void PreFilterProperties(IDictionary properties) {
             properties.Remove("Font");
-
+            properties.Remove("Text");
             base.PreFilterProperties(properties);
         }
     }

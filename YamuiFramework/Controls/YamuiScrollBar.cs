@@ -2,6 +2,7 @@
 using System.Collections;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Security;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
@@ -88,14 +89,6 @@ namespace YamuiFramework.Controls {
 
         private bool _isHovered;
         private bool _isPressed;
-
-        private bool _useBarColor;
-        [DefaultValue(false)]
-        [Category("Yamui")]
-        public bool UseBarColor {
-            get { return _useBarColor; }
-            set { _useBarColor = value; }
-        }
 
         [Category("Yamui")]
         public int ScrollbarSize {
@@ -281,11 +274,12 @@ namespace YamuiFramework.Controls {
         #region Constructor
 
         public YamuiScrollBar() {
-            SetStyle(ControlStyles.OptimizedDoubleBuffer |
-                     ControlStyles.ResizeRedraw |
-                     ControlStyles.Selectable |
-                     ControlStyles.SupportsTransparentBackColor |
-                     ControlStyles.UserPaint, true);
+            SetStyle(ControlStyles.SupportsTransparentBackColor |
+                ControlStyles.OptimizedDoubleBuffer |
+                ControlStyles.ResizeRedraw |
+                ControlStyles.UserPaint |
+                ControlStyles.Selectable |
+                ControlStyles.AllPaintingInWmPaint, true);
 
             Width = 10;
             Height = 200;
@@ -312,6 +306,64 @@ namespace YamuiFramework.Controls {
 
         #endregion
 
+        #region Paint Methods
+        protected void PaintTransparentBackground(Graphics graphics, Rectangle clipRect) {
+            graphics.Clear(Color.Transparent);
+            if ((Parent != null)) {
+                clipRect.Offset(Location);
+                PaintEventArgs e = new PaintEventArgs(graphics, clipRect);
+                GraphicsState state = graphics.Save();
+                graphics.SmoothingMode = SmoothingMode.HighSpeed;
+                try {
+                    graphics.TranslateTransform(-Location.X, -Location.Y);
+                    InvokePaintBackground(Parent, e);
+                    InvokePaint(Parent, e);
+                } finally {
+                    graphics.Restore(state);
+                    clipRect.Offset(-Location.X, -Location.Y);
+                }
+            }
+        }
+
+        protected override void OnPaintBackground(PaintEventArgs e) {
+            try {
+                PaintTransparentBackground(e.Graphics, DisplayRectangle);
+            } catch {
+                Invalidate();
+            }
+        }
+
+        protected override void OnPaint(PaintEventArgs e) {
+            try {
+                OnPaintBackground(e);
+                OnPaintForeground(e);
+            } catch {
+                Invalidate();
+            }
+        }
+
+        protected virtual void OnPaintForeground(PaintEventArgs e) {
+            Color thumbColor = ThemeManager.ScrollBarsColors.ForeGround(false, _isHovered, _isPressed, Enabled);
+            Color barColor = ThemeManager.ScrollBarsColors.BackGround(false, _isHovered, _isPressed, Enabled);
+
+            DrawScrollBar(e.Graphics, thumbColor, barColor);
+        }
+
+        private void DrawScrollBar(Graphics g, Color thumbColor, Color barColor) {
+            if (barColor != Color.Transparent) {
+                using (var b = new SolidBrush(barColor)) {
+                    g.FillRectangle(b, ClientRectangle);
+                }
+            }
+
+            using (var b = new SolidBrush(thumbColor)) {
+                var thumbRect = new Rectangle(_thumbRectangle.X + 2, _thumbRectangle.Y + 2, _thumbRectangle.Width - 4, _thumbRectangle.Height - 4);
+                g.FillRectangle(b, thumbRect);
+            }
+        }
+
+        #endregion
+
         #region Update Methods
 
         [SecuritySafeCritical]
@@ -326,67 +378,6 @@ namespace YamuiFramework.Controls {
             _inUpdate = false;
             SetupScrollBar();
             Refresh();
-        }
-
-        #endregion
-
-        #region Paint Methods
-
-        protected override void OnPaintBackground(PaintEventArgs e) {
-            try {
-                Color backColor = ThemeManager.FormColor.BackColor();
-
-                //if (Parent != null)
-                //    backColor = Parent.BackColor;
-
-                if (backColor.A == 255) {
-                    e.Graphics.Clear(backColor);
-                    return;
-                }
-
-                base.OnPaintBackground(e);
-            } catch {
-                Invalidate();
-            }
-        }
-
-        protected override void OnPaint(PaintEventArgs e) {
-            try {
-                if (GetStyle(ControlStyles.AllPaintingInWmPaint)) 
-                    OnPaintBackground(e);
-                OnPaintForeground(e);
-            } catch {
-                Invalidate();
-            }
-        }
-
-        protected virtual void OnPaintForeground(PaintEventArgs e) {
-            Color backColor = ThemeManager.FormColor.BackColor();
-            //if (Parent != null) 
-            //    backColor = Parent.BackColor;
-
-            Color thumbColor = ThemeManager.ScrollBarsColors.ForeGround(false, _isHovered, _isPressed, Enabled);
-            Color barColor = ThemeManager.ScrollBarsColors.BackGround(false, _isHovered, _isPressed, Enabled);
-
-            DrawScrollBar(e.Graphics, backColor, thumbColor, barColor);
-        }
-
-        private void DrawScrollBar(Graphics g, Color backColor, Color thumbColor, Color barColor) {
-            if (_useBarColor) {
-                using (var b = new SolidBrush(barColor)) {
-                    g.FillRectangle(b, ClientRectangle);
-                }
-            }
-
-            using (var b = new SolidBrush(backColor)) {
-                var thumbRect = new Rectangle(_thumbRectangle.X - 1, _thumbRectangle.Y - 1, _thumbRectangle.Width + 2, _thumbRectangle.Height + 2);
-                g.FillRectangle(b, thumbRect);
-            }
-
-            using (var b = new SolidBrush(thumbColor)) {
-                var thumbRect = new Rectangle(_thumbRectangle.X - 1, _thumbRectangle.Y - 1, _thumbRectangle.Width + 2, _thumbRectangle.Height + 2);
-                g.FillRectangle(b, thumbRect);
-            }
         }
 
         #endregion

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Security;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
@@ -55,16 +56,16 @@ namespace YamuiFramework.Controls {
             get { return _wrapToLine; }
             set { _wrapToLine = value; Refresh(); }
         }
-
         #endregion
 
         #region Constructor
 
         public YamuiLabel() {
             SetStyle(ControlStyles.SupportsTransparentBackColor |
-                     ControlStyles.OptimizedDoubleBuffer |
-                     ControlStyles.ResizeRedraw |
-                     ControlStyles.UserPaint, true);
+                ControlStyles.OptimizedDoubleBuffer |
+                ControlStyles.ResizeRedraw |
+                ControlStyles.UserPaint |
+                ControlStyles.AllPaintingInWmPaint, true);
 
             _baseTextBox = new DoubleBufferedTextBox();
             _baseTextBox.Visible = false;
@@ -75,11 +76,32 @@ namespace YamuiFramework.Controls {
 
         #region Paint Methods
 
+        protected void PaintTransparentBackground(Graphics graphics, Rectangle clipRect) {
+            graphics.Clear(Color.Transparent);
+            if ((Parent != null)) {
+                clipRect.Offset(Location);
+                PaintEventArgs e = new PaintEventArgs(graphics, clipRect);
+                GraphicsState state = graphics.Save();
+                graphics.SmoothingMode = SmoothingMode.HighSpeed;
+                try {
+                    graphics.TranslateTransform(-Location.X, -Location.Y);
+                    InvokePaintBackground(Parent, e);
+                    InvokePaint(Parent, e);
+                } finally {
+                    graphics.Restore(state);
+                    clipRect.Offset(-Location.X, -Location.Y);
+                }
+            }
+        }
+
         protected override void OnPaintBackground(PaintEventArgs e) {
             try {
-                Color backColor = ThemeManager.LinksColors.BackGround(BackColor, UseCustomBackColor);
-                if (backColor != Color.Transparent)
+                Color backColor = ThemeManager.LabelsColors.BackGround(BackColor, UseCustomBackColor);
+                if (backColor != Color.Transparent) {
                     e.Graphics.Clear(backColor);
+                    _baseTextBox.BackColor = backColor;
+                } else
+                    PaintTransparentBackground(e.Graphics, DisplayRectangle);
             } catch {
                 Invalidate();
             }
@@ -87,8 +109,7 @@ namespace YamuiFramework.Controls {
 
         protected override void OnPaint(PaintEventArgs e) {
             try {
-                if (GetStyle(ControlStyles.AllPaintingInWmPaint))
-                    OnPaintBackground(e);
+                OnPaintBackground(e);
                 OnPaintForeground(e);
             } catch {
                 Invalidate();
@@ -97,7 +118,7 @@ namespace YamuiFramework.Controls {
 
         protected virtual void OnPaintForeground(PaintEventArgs e) {
 
-            Color foreColor = ThemeManager.LinksColors.ForeGround(ForeColor, UseCustomForeColor, false, false, false, Enabled);
+            Color foreColor = ThemeManager.LabelsColors.ForeGround(ForeColor, UseCustomForeColor, false, false, false, Enabled);
 
             if (SelectionMode == LabelMode.Selectable) {
                 CreateBaseTextBox();
@@ -182,14 +203,11 @@ namespace YamuiFramework.Controls {
                 }
             }
 
-            _baseTextBox.BackColor = Color.Transparent;
-            _baseTextBox.Visible = true;
             _baseTextBox.BorderStyle = BorderStyle.None;
             _baseTextBox.Font = FontManager.GetLabelFont(Function);
             _baseTextBox.Location = new Point(1, 0);
             _baseTextBox.Text = Text;
             _baseTextBox.ReadOnly = true;
-
             _baseTextBox.Size = GetPreferredSize(Size.Empty);
             _baseTextBox.Multiline = true;
 
@@ -225,8 +243,8 @@ namespace YamuiFramework.Controls {
             SuspendLayout();
             _baseTextBox.SuspendLayout();
 
-            _baseTextBox.BackColor = ThemeManager.LinksColors.BackGround(BackColor, UseCustomBackColor);
-            _baseTextBox.ForeColor = ThemeManager.LinksColors.ForeGround(ForeColor, UseCustomForeColor, false, false, false, Enabled);
+            _baseTextBox.BackColor = ThemeManager.LabelsColors.BackGround(BackColor, UseCustomBackColor);
+            _baseTextBox.ForeColor = ThemeManager.LabelsColors.ForeGround(ForeColor, UseCustomForeColor, false, false, false, Enabled);
 
             _baseTextBox.Font = FontManager.GetLabelFont(Function);
             _baseTextBox.Text = Text;

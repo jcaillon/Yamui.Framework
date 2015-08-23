@@ -8,5 +8,13 @@ C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.pdb
 C:\Work\YamuiFramework\YamuiDemoApp\bin\Debug\YamuiFramework.dll
 C:\Work\YamuiFramework\YamuiDemoApp\bin\Debug\YamuiFramework.pdb
 C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.Form1.resources
-C:\Work\YamuiFramework\YamuiDemoApp\bin\Debug\YamuiFramework.xml
 C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\MetroFramework.Demo.TaskWindowControl.resources
+C:\Work\YamuiFramework\YamuiDemoApp\bin\Debug\MetroFramework.dll
+C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.Pages.Navigation.resources
+C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.Pages.SettingAppearance.resources
+C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.Pages.PageTemplate.resources
+C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.Pages.Classic.resources
+C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.Pages.Progress.resources
+C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.Pages.Text.resources
+C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.Pages.ItemControl.resources
+C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.Pages.Other.resources

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 
@@ -45,18 +46,38 @@ namespace YamuiFramework.Controls {
                 ControlStyles.OptimizedDoubleBuffer |
                 ControlStyles.ResizeRedraw |
                 ControlStyles.UserPaint |
-                ControlStyles.Selectable, true);
+                ControlStyles.Selectable |
+                ControlStyles.AllPaintingInWmPaint, true);
         }
 
         #endregion
 
         #region Paint Methods
+        protected void PaintTransparentBackground(Graphics graphics, Rectangle clipRect) {
+            graphics.Clear(Color.Transparent);
+            if ((Parent != null)) {
+                clipRect.Offset(Location);
+                PaintEventArgs e = new PaintEventArgs(graphics, clipRect);
+                GraphicsState state = graphics.Save();
+                graphics.SmoothingMode = SmoothingMode.HighSpeed;
+                try {
+                    graphics.TranslateTransform(-Location.X, -Location.Y);
+                    InvokePaintBackground(Parent, e);
+                    InvokePaint(Parent, e);
+                } finally {
+                    graphics.Restore(state);
+                    clipRect.Offset(-Location.X, -Location.Y);
+                }
+            }
+        }
 
         protected override void OnPaintBackground(PaintEventArgs e) {
             try {
                 Color backColor = ThemeManager.ButtonColors.BackGround(BackColor, UseCustomBackColor, _isFocused, _isHovered, _isPressed, Enabled);
-                if (backColor == Color.Transparent) return;
-                e.Graphics.Clear(backColor);
+                if (backColor != Color.Transparent)
+                    e.Graphics.Clear(backColor);
+                else
+                    PaintTransparentBackground(e.Graphics, DisplayRectangle);
             } catch {
                 Invalidate();
             }
@@ -64,8 +85,7 @@ namespace YamuiFramework.Controls {
 
         protected override void OnPaint(PaintEventArgs e) {
             try {
-                if (GetStyle(ControlStyles.AllPaintingInWmPaint))
-                    OnPaintBackground(e);
+                OnPaintBackground(e);
                 OnPaintForeground(e);
             } catch {
                 Invalidate();
@@ -95,7 +115,7 @@ namespace YamuiFramework.Controls {
 
         #endregion
 
-        #region "Managing isHovered, isPressed, isFocused"
+        #region Managing isHovered, isPressed, isFocused
 
         #region Focus Methods
 

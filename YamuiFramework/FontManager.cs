@@ -18,7 +18,8 @@ namespace YamuiFramework {
 
     public enum TabFunction {
         Main,
-        Secondary
+        Secondary,
+        SecondaryNotSelected
     }
 
     class FontManager {
@@ -49,9 +50,11 @@ namespace YamuiFramework {
         public static Font GetTabControlFont(TabFunction tabFunction) {
             switch (tabFunction) {
                 case TabFunction.Main:
-                    return GetFont(FontStyle.Regular, 21f);
-                default:
+                    return GetFont(FontStyle.Regular, 24f);
+                case TabFunction.Secondary:
                     return GetFont(FontStyle.Bold, 11f);
+                default:
+                    return GetFont(FontStyle.Regular, 11f);
             }
         }
 

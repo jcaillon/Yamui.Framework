@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Drawing;
@@ -11,6 +12,7 @@ using System.Security.Permissions;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 using YamuiFramework.Animations.Animator;
+using YamuiFramework.Forms;
 using YamuiFramework.Native;
 
 namespace YamuiFramework.Controls {
@@ -22,7 +24,6 @@ namespace YamuiFramework.Controls {
         public YamuiTabPageCollection(YamuiTabControl owner)
             : base(owner) { }
     }
-
     #endregion
 
     [Designer("YamuiFramework.Controls.YamuiTabControlDesigner")]
@@ -33,11 +34,12 @@ namespace YamuiFramework.Controls {
 
         private SubClass _scUpDown;
         private bool _bUpDown;
+        private bool _reloadingTabs;
 
         private const int TabBottomBorderHeight = 2;
 
-        private ContentAlignment _textAlign = ContentAlignment.MiddleLeft;
-        [DefaultValue(ContentAlignment.MiddleLeft)]
+        private ContentAlignment _textAlign = ContentAlignment.TopLeft;
+        [DefaultValue(ContentAlignment.TopLeft)]
         [Category("Yamui")]
         public ContentAlignment TextAlign {
             get {
@@ -54,7 +56,6 @@ namespace YamuiFramework.Controls {
                 return base.TabPages;
             }
         }
-
 
         private bool _isMirrored;
         [DefaultValue(false)]
@@ -77,20 +78,30 @@ namespace YamuiFramework.Controls {
         [Category("Yamui")]
         public TabFunction Function {
             get { return _function; }
-            set { _function = value; }
+            set {
+                _function = value;
+                SetStuff();
+                Font = FontManager.GetTabControlFont(Function);
+            }
         }
+
+        /// <summary>
+        /// Use this to hide/show the desired tab, use example :
+        /// OnlyShowTab((tab) => tab.Text != "CONFIG");
+        /// </summary>
+        [Browsable(false)]
+        public Action<Func<YamuiTabPage, bool>> OnlyShowTab;
         #endregion
 
         #region Constructor
 
         public YamuiTabControl() {
-            SetStyle(ControlStyles.UserPaint |
-                     ControlStyles.AllPaintingInWmPaint |
-                     ControlStyles.ResizeRedraw |
-                     ControlStyles.OptimizedDoubleBuffer |
-                     ControlStyles.SupportsTransparentBackColor, true);
-
-            Padding = new Point(7, 6);
+            SetStyle(ControlStyles.SupportsTransparentBackColor |
+                ControlStyles.OptimizedDoubleBuffer |
+                ControlStyles.ResizeRedraw |
+                ControlStyles.UserPaint |
+                ControlStyles.Selectable |
+                ControlStyles.AllPaintingInWmPaint, true);
 
             HotTrack = true;
             MouseMove += (sender, args) => UpdateHotTrack();
@@ -118,27 +129,46 @@ namespace YamuiFramework.Controls {
             _animator.TimeStep = 0.04f;
             _animator.MaxAnimationTime = 500;
 
-            ItemSize = new Size(5, (Function == TabFunction.Main) ? 30 : 15);
+            SetStuff();
         }
 
+        private void SetStuff() {
+            ItemSize = new Size(5, (Function == TabFunction.Main) ? 30 : 18);
+            Padding = new Point((Function == TabFunction.Main) ? 8 : 6, 0);
+        }
+        #endregion
+
+        #region User function
+        /// <summary>
+        /// This function is to be called on your form constructor to use the HideThis attribute of each tabPage
+        /// of this tabControl 
+        /// </summary>
+        public void ApplyHideThisSettings() {
+            if (OnlyShowTab == null)
+                OnlyShowTab = GetTabHider(this);
+
+            // to reduce flickering, we deactivate events during the updating of tabs
+            _reloadingTabs = true;
+            // hide pages with the attribute HideThis == true (only for Main tabs)
+            OnlyShowTab((page) => (!page.HideThis || page.Function != TabFunction.Main));
+            _reloadingTabs = false;
+
+            Invalidate();
+        }
         #endregion
 
         #region "tab animator"
         Animator _animator;
 
-        private bool _notFirst;
-        
         protected override void OnSelecting(TabControlCancelEventArgs e) {
             base.OnSelecting(e);
-            try {
-                if (!_notFirst) {
-                    _notFirst = true;
-                    return;
+            if (!_reloadingTabs) {
+                try {
+                    _animator.BeginUpdate(this, false, null, new Rectangle(0, ItemSize.Height, Width, Height - ItemSize.Height));
+                    BeginInvoke(new MethodInvoker(() => _animator.EndUpdate(this)));
+                } catch (Exception) {
+                    // ignored
                 }
-                _animator.BeginUpdate(this, false, null, new Rectangle(0, ItemSize.Height, Width, Height - ItemSize.Height));
-                BeginInvoke(new MethodInvoker(() => _animator.EndUpdate(this)));
-            } catch (Exception) {
-                // ignored
             }
         }
         #endregion
@@ -179,10 +209,31 @@ namespace YamuiFramework.Controls {
         #endregion
 
         #region Paint Methods
+        protected void PaintTransparentBackground(Graphics graphics, Rectangle clipRect) {
+            graphics.Clear(Color.Transparent);
+            if ((Parent != null)) {
+                clipRect.Offset(Location);
+                PaintEventArgs e = new PaintEventArgs(graphics, clipRect);
+                GraphicsState state = graphics.Save();
+                graphics.SmoothingMode = SmoothingMode.HighSpeed;
+                try {
+                    graphics.TranslateTransform(-Location.X, -Location.Y);
+                    InvokePaintBackground(Parent, e);
+                    InvokePaint(Parent, e);
+                } finally {
+                    graphics.Restore(state);
+                    clipRect.Offset(-Location.X, -Location.Y);
+                }
+            }
+        }
 
         protected override void OnPaintBackground(PaintEventArgs e) {
             try {
-                e.Graphics.Clear(ThemeManager.FormColor.BackColor());
+                Color backColor = ThemeManager.TabsColors.Normal.BackColor();
+                if (backColor != Color.Transparent)
+                    e.Graphics.Clear(backColor);
+                else
+                    PaintTransparentBackground(e.Graphics, DisplayRectangle);
             } catch {
                 Invalidate();
             }
@@ -190,8 +241,7 @@ namespace YamuiFramework.Controls {
 
         protected override void OnPaint(PaintEventArgs e) {
             try {
-                if (GetStyle(ControlStyles.AllPaintingInWmPaint))
-                    OnPaintBackground(e);
+                OnPaintBackground(e);
                 OnPaintForeground(e);
             } catch {
                 Invalidate();
@@ -208,17 +258,7 @@ namespace YamuiFramework.Controls {
                 return;
             }
 
-            //DrawTabBottomBorder(SelectedIndex, e.Graphics);
             DrawTab(SelectedIndex, e.Graphics);
-            //DrawTabSelected(SelectedIndex, e.Graphics);
-        }
-
-        private void DrawTabSelected(int index, Graphics graphics) {
-            using (Brush selectionBrush = new SolidBrush(ThemeManager.AccentColor)) {
-                Rectangle selectedTabRect = GetTabRect(index);
-                Rectangle borderRectangle = new Rectangle(selectedTabRect.X + ((index == 0) ? 2 : 0), GetTabRect(index).Bottom + 2 - TabBottomBorderHeight, selectedTabRect.Width + ((index == 0) ? 0 : 2), TabBottomBorderHeight);
-                graphics.FillRectangle(selectionBrush, borderRectangle);
-            }
         }
 
         private Size MeasureText(string text) {
@@ -234,8 +274,8 @@ namespace YamuiFramework.Controls {
         }
 
         private void DrawTab(int index, Graphics graphics) {
-            Color foreColor = ThemeManager.TabsColors.ForeGround(index == _hotTrackTab, index == SelectedIndex, Enabled);
-
+            Color foreColor = ThemeManager.TabsColors.ForeGround(Focused, index == _hotTrackTab, index == SelectedIndex, Enabled);
+            
             TabPage tabPage = TabPages[index];
             Rectangle tabRect = GetTabRect(index);
 
@@ -243,11 +283,10 @@ namespace YamuiFramework.Controls {
                 tabRect.X = DisplayRectangle.X;
             }
 
-            tabRect.Width += 20;
-
-            TextRenderer.DrawText(graphics, tabPage.Text, FontManager.GetTabControlFont(Function), tabRect, foreColor, FontManager.GetTextFormatFlags(TextAlign));
+            TextRenderer.DrawText(graphics, tabPage.Text, FontManager.GetTabControlFont((Function == TabFunction.Secondary && index != SelectedIndex) ? TabFunction.SecondaryNotSelected : Function), tabRect, foreColor, FontManager.GetTextFormatFlags(TextAlign));
         }
 
+        // Draw < > symbol to switch tabs
         [SecuritySafeCritical]
         private void DrawUpDown(Graphics graphics) {
 
@@ -282,6 +321,34 @@ namespace YamuiFramework.Controls {
         #endregion
 
         #region Overridden Methods
+        public override Rectangle DisplayRectangle {
+            get {
+                if (!Enabled)
+                    return new Rectangle(0, 0, Width, Height);
+                int tabStripHeight, itemHeight;
+
+                if (Alignment <= TabAlignment.Bottom)
+                    itemHeight = ItemSize.Height;
+                else
+                    itemHeight = ItemSize.Width;
+
+                if (Appearance == TabAppearance.Normal)
+                    tabStripHeight = 5 + (itemHeight * RowCount);
+                else
+                    tabStripHeight = (3 + itemHeight) * RowCount;
+
+                switch (Alignment) {
+                    case TabAlignment.Bottom:
+                        return new Rectangle(4, 4, Width - 8, Height - tabStripHeight - 4);
+                    case TabAlignment.Left:
+                        return new Rectangle(tabStripHeight, 4, Width - tabStripHeight - 4, Height - 8);
+                    case TabAlignment.Right:
+                        return new Rectangle(4, 4, Width - tabStripHeight - 4, Height - 8);
+                    default:
+                        return new Rectangle(4, tabStripHeight, Width - 8, Height - tabStripHeight - 4);
+                }
+            }
+        }
 
         protected override void OnEnabledChanged(EventArgs e) {
             base.OnEnabledChanged(e);
@@ -323,7 +390,6 @@ namespace YamuiFramework.Controls {
         private new Rectangle GetTabRect(int index) {
             if (index < 0)
                 return new Rectangle();
-
             Rectangle baseRect = base.GetTabRect(index);
             return baseRect;
         }
@@ -358,20 +424,32 @@ namespace YamuiFramework.Controls {
 
         protected override void OnControlAdded(ControlEventArgs e) {
             base.OnControlAdded(e);
-            FindUpDown();
-            UpdateUpDown();
+            if (!_reloadingTabs) {
+                FindUpDown();
+                UpdateUpDown();
+            }
         }
 
         protected override void OnControlRemoved(ControlEventArgs e) {
             base.OnControlRemoved(e);
-            FindUpDown();
-            UpdateUpDown();
+            if (!_reloadingTabs) {
+                FindUpDown();
+                UpdateUpDown();
+            }
         }
 
         protected override void OnSelectedIndexChanged(EventArgs e) {
             base.OnSelectedIndexChanged(e);
-            UpdateUpDown();
-            Invalidate();
+            if (!_reloadingTabs) {
+                UpdateUpDown();
+                try {
+                    YamuiForm ownerForm = (YamuiForm) FindForm();
+                    if (ownerForm != null) ownerForm.GoToPageByUserSelection();
+                } catch (Exception) {
+                    throw new Exception("derp");
+                }
+                //Invalidate();
+            }
         }
 
         //send font change to properly resize tab page header rects
@@ -393,6 +471,28 @@ namespace YamuiFramework.Controls {
         #endregion
 
         #region Helper Methods
+        private static Action<Func<YamuiTabPage, bool>> GetTabHider(YamuiTabControl container) {
+            if (container == null) throw new ArgumentNullException("container");
+
+            var orderedCache = new List<YamuiTabPage>();
+            var orderedEnumerator = container.TabPages.GetEnumerator();
+            while (orderedEnumerator.MoveNext()) {
+                var current = orderedEnumerator.Current as YamuiTabPage;
+                if (current != null) {
+                    orderedCache.Add(current);
+                }
+            }
+
+            return (where) => {
+                if (where == null) throw new ArgumentNullException("where");
+                container.TabPages.Clear();
+                foreach (YamuiTabPage page in orderedCache) {
+                    if (where(page)) {
+                        container.TabPages.Add(page);
+                    }
+                }
+            };
+        }
 
         [SecuritySafeCritical]
         private void FindUpDown() {
@@ -615,7 +715,6 @@ namespace YamuiFramework.Controls {
         
         protected override void PreFilterProperties(IDictionary properties) {
             properties.Remove("ImeMode");
-            properties.Remove("Padding");
             properties.Remove("FlatAppearance");
             properties.Remove("FlatStyle");
             properties.Remove("AutoEllipsis");
@@ -632,6 +731,7 @@ namespace YamuiFramework.Controls {
             properties.Remove("BackgroundImageLayout");
             properties.Remove("UseVisualStyleBackColor");
 
+            //properties.Remove("ItemSize");
             properties.Remove("Font");
             properties.Remove("RightToLeft");
 

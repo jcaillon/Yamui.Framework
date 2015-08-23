@@ -7,28 +7,21 @@ using System.Windows.Forms;
 using System.Windows.Forms.Design;
 
 namespace YamuiFramework.Controls {
-    [Designer("YamuiFramework.Controls.YamuiCheckBoxDesigner")]
-    [ToolboxBitmap(typeof(CheckBox))]
-
-    public class YamuiCheckBox : CheckBox {
+    [Designer("YamuiFramework.Controls.YamuiColorRadioButtonDesigner")]
+    [ToolboxBitmap(typeof(RadioButton))]
+    public class YamuiColorRadioButton : RadioButton {
         #region Fields
         [DefaultValue(false)]
         [Category("Yamui")]
-        public bool UseCustomBackColor { get; set; }
-
-        [DefaultValue(false)]
-        [Category("Yamui")]
-        public bool UseCustomForeColor { get; set; }
+        public bool UseBorder { get; set; }
 
         private bool _isHovered;
         private bool _isPressed;
         private bool _isFocused;
-
         #endregion
 
         #region Constructor
-
-        public YamuiCheckBox() {
+        public YamuiColorRadioButton() {
             SetStyle(ControlStyles.SupportsTransparentBackColor |
                 ControlStyles.OptimizedDoubleBuffer |
                 ControlStyles.ResizeRedraw |
@@ -36,7 +29,6 @@ namespace YamuiFramework.Controls {
                 ControlStyles.Selectable |
                 ControlStyles.AllPaintingInWmPaint, true);
         }
-
         #endregion
 
         #region Paint Methods
@@ -76,41 +68,23 @@ namespace YamuiFramework.Controls {
         }
 
         protected virtual void OnPaintForeground(PaintEventArgs e) {
-            Color borderColor = ThemeManager.ButtonColors.BorderColor(_isFocused, _isHovered, _isPressed, Enabled);
-            Color foreColor = ThemeManager.ButtonColors.ForeGround(ForeColor, UseCustomForeColor, _isFocused, _isHovered, _isPressed, Enabled);
-            Color backColor = ThemeManager.ButtonColors.BackGround(BackColor, UseCustomBackColor, _isFocused, _isHovered, _isPressed, Enabled);
+
+            if (!Checked && _isHovered)
+                using (SolidBrush b = new SolidBrush(ThemeManager.ButtonColors.Hover.BackColor()))
+                    e.Graphics.FillRectangle(b, new Rectangle(0, 0, Width, Height));
+
+            Rectangle boxRect = (!Checked) ? new Rectangle(5, 5, Width - 10, Height - 10) : new Rectangle(0, 0, Width, Height);
+
+            if (UseBorder) {
+                using (SolidBrush b = new SolidBrush(ThemeManager.AccentColor))
+                    e.Graphics.FillRectangle(b, boxRect);
+                boxRect = (!Checked) ? new Rectangle(10, 10, Width - 20, Height - 20) : new Rectangle(5, 5, Width - 10, Height - 10);
+            }
 
             // Paint the back + border of the checkbox
-            using (SolidBrush b = new SolidBrush(backColor)) {
-                Rectangle boxRect = new Rectangle(0, Height / 2 - 6, 12, 12);
+            using (SolidBrush b = new SolidBrush(BackColor))
                 e.Graphics.FillRectangle(b, boxRect);
-            }
-
-            if (borderColor != Color.Transparent)
-                using (Pen p = new Pen(borderColor)) {
-                    Rectangle boxRect = new Rectangle(0, Height / 2 - 6, 12, 12);
-                    e.Graphics.DrawRectangle(p, boxRect);
-                }
-
-            // paint the form inside
-            if (Checked) {
-                if (CheckState != CheckState.Indeterminate) {
-                    using (Pen p = new Pen(ThemeManager.AccentColor, 2)) {
-                        e.Graphics.DrawLines(p, new[] { new Point(2, Height / 2 - 1), new Point(6, Height / 2 + 3), new Point(10, Height / 2 - 4) });
-                    }
-                } else {
-                    using (SolidBrush b = new SolidBrush(ThemeManager.AccentColor)) {
-                        Rectangle boxRect = new Rectangle(4, Height / 2 - 2, 5, 5);
-                        e.Graphics.FillRectangle(b, boxRect);
-                    }
-                }
-
-            }
-
-            Rectangle textRect = new Rectangle(16, 0, Width - 16, Height);
-            TextRenderer.DrawText(e.Graphics, Text, FontManager.GetStandardFont(), textRect, foreColor, FontManager.GetTextFormatFlags(TextAlign));
         }
-
         #endregion
 
         #region Managing isHovered, isPressed, isFocused
@@ -212,22 +186,14 @@ namespace YamuiFramework.Controls {
         }
 
         public override Size GetPreferredSize(Size proposedSize) {
-            Size preferredSize;
-            base.GetPreferredSize(proposedSize);
-
-            using (var g = CreateGraphics()) {
-                proposedSize = new Size(int.MaxValue, int.MaxValue);
-                preferredSize = TextRenderer.MeasureText(g, Text, FontManager.GetStandardFont(), proposedSize, FontManager.GetTextFormatFlags(TextAlign));
-                preferredSize.Width += 16;
-            }
-
-            return preferredSize;
+            AutoSize = false;
+            return new Size(50, 50);
         }
 
         #endregion
     }
 
-    internal class YamuiCheckBoxDesigner : ControlDesigner {
+    internal class YamuiColorRadioButtonDesigner : ControlDesigner {
         protected override void PreFilterProperties(IDictionary properties) {
             properties.Remove("ImeMode");
             properties.Remove("Padding");
@@ -245,6 +211,7 @@ namespace YamuiFramework.Controls {
             properties.Remove("UseVisualStyleBackColor");
 
             properties.Remove("Font");
+            properties.Remove("Text");
             properties.Remove("RightToLeft");
 
             base.PreFilterProperties(properties);

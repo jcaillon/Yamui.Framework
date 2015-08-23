@@ -10,7 +10,7 @@ namespace YamuiFramework {
 
     public static class ThemeManager {
 
-        private static Color _accentColor = Color.FromArgb(162, 0, 37);
+        private static Color _accentColor = GetAccentColors[13];
         private static Themes _modernTheme = Themes.Dark;
 
         public static Themes Theme {
@@ -21,6 +21,38 @@ namespace YamuiFramework {
         public static Color AccentColor {
             get { return _accentColor; }
             set { _accentColor = value; }
+        }
+
+        public static Color[] GetAccentColors  {
+            get {
+                return new[] 
+                {
+                    Color.FromArgb(164, 196, 0),
+                    Color.FromArgb(96, 169, 23),
+                    Color.FromArgb(0, 138, 0),
+                    Color.FromArgb(0, 171, 169),
+                    Color.FromArgb(27, 161, 226),
+                    Color.FromArgb(0, 80, 239),
+                    Color.FromArgb(106, 0, 255),
+                    Color.FromArgb(170, 0, 255),
+                    Color.FromArgb(244, 114, 208),
+                    Color.FromArgb(216, 0, 115),
+                    Color.FromArgb(162, 0, 37),
+                    Color.FromArgb(229, 20, 0),
+                    Color.FromArgb(250, 104, 0),
+                    Color.FromArgb(240, 163, 10),
+                    Color.FromArgb(227, 200, 0),
+                    Color.FromArgb(130, 90, 44),
+                    Color.FromArgb(109, 135, 100),
+                    Color.FromArgb(100, 118, 135),
+                    Color.FromArgb(118, 96, 138),
+                    Color.FromArgb(135, 121, 78)
+                };
+            }
+        }
+
+        public static Color[] GetThemeBackColors {
+            get { return new[] { Color.FromArgb(230, 230, 230), Color.FromArgb(37, 37, 38)}; }
         }
 
         /// <summary>
@@ -103,7 +135,7 @@ namespace YamuiFramework {
         /// <summary>
         ///  This class is used for labels as well as links
         /// </summary>
-        public static class LinksColors {
+        public static class LabelsColors {
 
             public static Color ForeGround(Color controlForeColor, bool useCustomForeColor, bool isFocused, bool isHovered, bool isPressed, bool enabled) {
                 Color foreColor;
@@ -115,13 +147,13 @@ namespace YamuiFramework {
                 else if (isHovered || isFocused)
                     foreColor = AccentColor;
                 else
-                    foreColor = Normal.ForeColor();
+                    foreColor = useCustomForeColor ? controlForeColor : Normal.ForeColor();
 
                 return foreColor;
             }
 
             public static Color BackGround(Color controlBackColor, bool useCustomBackColor) {
-                return !useCustomBackColor ? FormColor.BackColor() : controlBackColor;;
+                return !useCustomBackColor ? Color.Transparent : controlBackColor; ;
             }
 
             public static class Normal {
@@ -150,11 +182,13 @@ namespace YamuiFramework {
         /// </summary>
         public static class TabsColors {
 
-            public static Color ForeGround(bool isHovered, bool isPressed, bool enabled) {
+            public static Color ForeGround(bool isFocused, bool isHovered, bool isPressed, bool enabled) {
                 Color foreColor;
 
                 if (!enabled)
                     foreColor = Disabled.ForeColor();
+                else if (isFocused && isPressed)
+                    foreColor = AccentColor;
                 else if (isPressed)
                     foreColor = Press.ForeColor();
                 else if (isHovered)
@@ -165,15 +199,21 @@ namespace YamuiFramework {
                 return foreColor;
             }
 
+            public static class Normal {
+                public static Color BackColor() {
+                    return (Theme == Themes.Light) ? Color.FromArgb(230, 230, 230) : Color.FromArgb(37, 37, 38);
+                }
+            }
+
             public static class Disabled {
                 public static Color ForeColor() {
-                    return (Theme == Themes.Light) ? Color.FromArgb(180, 180, 180) : Color.FromArgb(80, 80, 80);
+                    return (Theme == Themes.Light) ? Color.FromArgb(110, 110, 110) : Color.FromArgb(80, 80, 80);
                 }
             }
 
             public static class Hover {
                 public static Color ForeColor() {
-                    return (Theme == Themes.Light) ? Color.FromArgb(100, 100, 100) : Color.FromArgb(140, 140, 140);
+                    return (Theme == Themes.Light) ? Color.FromArgb(60, 60, 60) : Color.FromArgb(140, 140, 140);
                 }
             }
 
@@ -194,7 +234,7 @@ namespace YamuiFramework {
         /// </summary>
         public static class ButtonColors {
             public static Color BackGround(Color controlBackColor, bool useCustomBackColor, bool isFocused, bool isHovered, bool isPressed, bool enabled) {
-                var backColor = controlBackColor;
+                Color backColor;
 
                 if (!enabled)
                     backColor = Disabled.BackColor();
@@ -202,16 +242,14 @@ namespace YamuiFramework {
                     backColor = AccentColor;
                 else if (isHovered)
                     backColor = Hover.BackColor();
-                else if (isFocused)
-                    backColor = Normal.BackColor();
-                else if (!useCustomBackColor)
-                    backColor = Normal.BackColor();
+                else
+                    backColor = useCustomBackColor ? controlBackColor : Normal.BackColor();
 
                 return backColor;
             }
 
             public static Color ForeGround(Color controlForeColor, bool useCustomForeColor, bool isFocused, bool isHovered, bool isPressed, bool enabled) {
-                var foreColor = controlForeColor;
+                Color foreColor;
 
                 if (!enabled)
                     foreColor = Disabled.ForeColor();
@@ -219,10 +257,8 @@ namespace YamuiFramework {
                     foreColor = Press.ForeColor();
                 else if (isHovered)
                     foreColor = Hover.ForeColor();
-                else if (isFocused)
-                    foreColor = Normal.ForeColor();
-                else if (!useCustomForeColor)
-                    foreColor = Normal.ForeColor();
+                else
+                    foreColor = useCustomForeColor ? controlForeColor : Normal.ForeColor();
 
                 return foreColor;
             }
