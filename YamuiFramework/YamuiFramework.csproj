@@ -1,0 +1,198 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0A4BE330-B2BB-43A5-B392-15DCE4736E55}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>YamuiFramework</RootNamespace>
+    <AssemblyName>YamuiFramework</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>bin\Debug\YamuiFramework.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Animations\Animator\Animation.cs" />
+    <Compile Include="Animations\Animator\Animator.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Animations\Animator\Controller.cs" />
+    <Compile Include="Animations\Animator\DecorationControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Animations\Animator\DoubleBitmapControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Animations\Animator\DoubleBitmapControl.Designer.cs">
+      <DependentUpon>DoubleBitmapControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Animations\Animator\DoubleBitmapForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Animations\Animator\DoubleBitmapForm.designer.cs">
+      <DependentUpon>DoubleBitmapForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Animations\Animator\Flags.cs" />
+    <Compile Include="Animations\Animator\PointFConverter.cs" />
+    <Compile Include="Animations\Animator\TransfromHelper.cs" />
+    <Compile Include="Animations\DelayedCall.cs" />
+    <Compile Include="Animations\Transitions\IManagedType.cs" />
+    <Compile Include="Animations\Transitions\ITransitionType.cs" />
+    <Compile Include="Animations\Transitions\ManagedType_Bool.cs" />
+    <Compile Include="Animations\Transitions\ManagedType_Color.cs" />
+    <Compile Include="Animations\Transitions\ManagedType_Double.cs" />
+    <Compile Include="Animations\Transitions\ManagedType_Float.cs" />
+    <Compile Include="Animations\Transitions\ManagedType_Int.cs" />
+    <Compile Include="Animations\Transitions\ManagedType_String.cs" />
+    <Compile Include="Animations\Transitions\Transition.cs" />
+    <Compile Include="Animations\Transitions\TransitionChain.cs" />
+    <Compile Include="Animations\Transitions\TransitionElement.cs" />
+    <Compile Include="Animations\Transitions\TransitionManager.cs" />
+    <Compile Include="Animations\Transitions\TransitionType_Acceleration.cs" />
+    <Compile Include="Animations\Transitions\TransitionType_Bounce.cs" />
+    <Compile Include="Animations\Transitions\TransitionType_CriticalDamping.cs" />
+    <Compile Include="Animations\Transitions\TransitionType_Deceleration.cs" />
+    <Compile Include="Animations\Transitions\TransitionType_EaseInEaseOut.cs" />
+    <Compile Include="Animations\Transitions\TransitionType_Flash.cs" />
+    <Compile Include="Animations\Transitions\TransitionType_Linear.cs" />
+    <Compile Include="Animations\Transitions\TransitionType_ThrowAndCatch.cs" />
+    <Compile Include="Animations\Transitions\TransitionType_UserDefined.cs" />
+    <Compile Include="Animations\Transitions\Utility.cs" />
+    <Compile Include="Components\StyleExtender.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Components\YamuiToolTip.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\YamuiButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\YamuiCheckBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\YamuiComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\YamuiContextMenu.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\YamuiDateTime.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\YamuiGrid.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\YamuiGrid.designer.cs">
+      <DependentUpon>YamuiGrid.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\YamuiLabel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\YamuiLink.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\YamuiPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\YamuiProgressBar.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\YamuiProgressSpinner.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\YamuiRadioButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\YamuiScrollBar.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\YamuiTabControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\YamuiTabPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\YamuiTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\YamuiTile.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\YamuiToggle.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\YamuiTrackBar.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\YamuiUserControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="FontManager.cs" />
+    <Compile Include="Forms\YamuiForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\YamuiTaskWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Native\DwmApi.cs" />
+    <Compile Include="Native\SubClass.cs" />
+    <Compile Include="Native\Taskbar.cs" />
+    <Compile Include="Native\WinApi.cs" />
+    <Compile Include="Native\WinCaret.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ThemeManager.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Animations\Animator\DoubleBitmapForm.resx">
+      <DependentUpon>DoubleBitmapForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\YamuiGrid.resx">
+      <DependentUpon>YamuiGrid.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\YamuiForm.resx">
+      <DependentUpon>YamuiForm.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Fonts\SEGOEUI.TTF" />
+    <None Include="Fonts\SEGOEUIB.TTF" />
+    <None Include="Fonts\SEGOEUII.TTF" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

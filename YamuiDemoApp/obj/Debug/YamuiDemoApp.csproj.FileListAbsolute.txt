@@ -1,0 +1,12 @@
+C:\Work\YamuiFramework\YamuiDemoApp\bin\Debug\YamuiDemoApp.exe
+C:\Work\YamuiFramework\YamuiDemoApp\bin\Debug\YamuiDemoApp.pdb
+C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.csprojResolveAssemblyReference.cache
+C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.Properties.Resources.resources
+C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.csproj.GenerateResource.Cache
+C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.exe
+C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.pdb
+C:\Work\YamuiFramework\YamuiDemoApp\bin\Debug\YamuiFramework.dll
+C:\Work\YamuiFramework\YamuiDemoApp\bin\Debug\YamuiFramework.pdb
+C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.Form1.resources
+C:\Work\YamuiFramework\YamuiDemoApp\bin\Debug\YamuiFramework.xml
+C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\MetroFramework.Demo.TaskWindowControl.resources
