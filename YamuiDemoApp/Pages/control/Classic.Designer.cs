@@ -273,6 +273,7 @@
             this.yamuiButton1.Size = new System.Drawing.Size(123, 24);
             this.yamuiButton1.TabIndex = 20;
             this.yamuiButton1.Text = "Standard button";
+            this.yamuiButton1.Click += new System.EventHandler(this.yamuiButton1_Click);
             // 
             // Classic
             // 

@@ -16,7 +16,7 @@ namespace YamuiDemoApp {
     public partial class Form1 : YamuiForm {
         public Form1() {
             InitializeComponent();
-            yamuiTabControlMain.ApplyHideThisSettings(); //TODO: replace this by a onLoad event in yamuiLoad, foreach yamuitabControl do apply
+            //yamuiTabControlMain.ApplyHideThisSettings(); //TODO: replace this by a onLoad event in yamuiLoad, foreach yamuitabControl do apply
         }
 
         private void yamuiTabControl1_SelectedIndexChanged(object sender, EventArgs e) {

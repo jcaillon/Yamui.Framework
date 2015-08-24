@@ -71,8 +71,9 @@ namespace YamuiFramework.Forms {
             FormBorderStyle = FormBorderStyle.None;
             StartPosition = FormStartPosition.CenterScreen;
             TransparencyKey = Color.Fuchsia;
-        }
 
+            Shown += OnShown;
+        }
         #endregion
 
         #region Paint Methods
@@ -142,6 +143,13 @@ namespace YamuiFramework.Forms {
         #endregion
 
         #region For the user
+        private void OnShown(object sender, EventArgs eventArgs) {
+            // Processes all Windows messages currently in the message queue.
+            Application.DoEvents();
+
+            // only then activate the animations
+            ThemeManager.AnimationAllowed = true;
+        }
 
         public void GoToPageByUserSelection() {
             if (_toDoOnGoToPageAction != null) {
@@ -163,22 +171,22 @@ namespace YamuiFramework.Forms {
             var pagesToUnHide = new List<YamuiTabPage>();
 
             // if we want to display a hidden page            
-            if (pageMain.HideThis) {
+            if (pageMain.HiddenPage) {
                 //TODO: when the history goback is coded, hide every tab but this and do tabMain.ismirorred!
-                pageMain.HideThis = false;
+                pageMain.HiddenPage = false;
                 pagesToHide.Add(pageMain);
                 tabMain.ApplyHideThisSettings();
             }
 
-            tabSecondary.SelectTab(pageSecondary);
-            tabMain.SelectTab(pageMain);
+            tabSecondary.SelectIndex = tabSecondary.GetIndexOf(pageSecondary);
+            tabMain.SelectIndex = tabMain.GetIndexOf(pageMain);
 
             _toDoOnGoToPageAction = () => {
                 foreach (var page in pagesToHide) {
-                    page.HideThis = true;
+                    page.HiddenPage = true;
                 }
                 foreach (var page in pagesToUnHide) {
-                    page.HideThis = false;
+                    page.HiddenPage = false;
                 }
                 if (pagesToHide.Count > 0 || pagesToUnHide.Count > 0) {
                     tabMain.ApplyHideThisSettings();

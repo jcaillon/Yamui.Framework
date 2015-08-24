@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using YamuiFramework;
+using YamuiFramework.Animations.Animator;
 using YamuiFramework.Controls;
 
 namespace YamuiDemoApp.Pages {
@@ -56,7 +57,10 @@ namespace YamuiDemoApp.Pages {
                     ThemeManager.Theme = (rb.BackColor == ThemeManager.GetThemeBackColors[0]) ? Themes.Light : Themes.Dark;
                 }
                 var form = rb.FindForm();
-                if (form != null) form.Refresh();
+                if (form != null) {
+                    // anim?
+                    form.Refresh();
+                }
             }
         }
 

@@ -23,6 +23,10 @@ namespace YamuiFramework {
             set { _accentColor = value; }
         }
 
+        public static Image ImageTheme { get; set; }
+
+        public static bool AnimationAllowed { get; set; }
+
         public static Color[] GetAccentColors  {
             get {
                 return new[] 

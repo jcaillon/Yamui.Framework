@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Windows.Forms;
@@ -35,13 +36,19 @@ namespace YamuiFramework.Controls {
         /// Set this to true if the tab should be hidden on loading, you can access with 
         /// GoToPage method of the form, shouldn't be used for secondary tabs!
         /// </summary>
-        private bool _hideThis;
+        private bool _hiddenPage;
         [DefaultValue(false)]
         [Category("Yamui")]
-        public bool HideThis {
-            get { return _hideThis; }
-            set {_hideThis = value; }
+        public bool HiddenPage {
+            get { return _hiddenPage; }
+            set {
+                _hiddenPage = value;
+                NormallyHidden = _hiddenPage;
+            }
         }
+
+        [Browsable(false)]
+        public bool NormallyHidden { get; set; }
 
         private bool _showHorizontalScrollbar;
         [DefaultValue(false)]
@@ -147,9 +154,13 @@ namespace YamuiFramework.Controls {
         protected override void OnPaintBackground(PaintEventArgs e) {
             try {
                 Color backColor = ThemeManager.TabsColors.Normal.BackColor();
-                if (backColor != Color.Transparent)
+                if (backColor != Color.Transparent) {
                     e.Graphics.Clear(backColor);
-                else
+                    if (ThemeManager.ImageTheme != null) {
+                        Rectangle rect = new Rectangle(ClientRectangle.Right - ThemeManager.ImageTheme.Width, ClientRectangle.Height - ThemeManager.ImageTheme.Height, ThemeManager.ImageTheme.Width, ThemeManager.ImageTheme.Height);
+                        e.Graphics.DrawImage(ThemeManager.ImageTheme, rect, 0, 0, ThemeManager.ImageTheme.Width, ThemeManager.ImageTheme.Height, GraphicsUnit.Pixel);
+                    }
+                } else
                     PaintTransparentBackground(e.Graphics, DisplayRectangle);
             } catch {
                 Invalidate();
@@ -196,18 +207,6 @@ namespace YamuiFramework.Controls {
                 _verticalScrollbar.SmallChange = VerticalScroll.SmallChange;
                 _verticalScrollbar.LargeChange = VerticalScroll.LargeChange;
             }
-        }
-
-        protected override void OnBackColorChanged(EventArgs e) {
-            if (Parent != null) {
-                Parent.Invalidate(Bounds, true);
-            }
-            base.OnBackColorChanged(e);
-        }
-
-        protected override void OnParentBackColorChanged(EventArgs e) {
-            Invalidate();
-            base.OnParentBackColorChanged(e);
         }
         #endregion
 
