@@ -102,9 +102,6 @@
     <Compile Include="Controls\YamuiComboBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\YamuiContextMenu.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Controls\YamuiDateTime.cs">
       <SubType>Component</SubType>
     </Compile>

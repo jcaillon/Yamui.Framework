@@ -64,7 +64,9 @@ namespace YamuiFramework.Controls {
             }
         }
 
-        protected override void OnPaintBackground(PaintEventArgs e) {
+        protected override void OnPaintBackground(PaintEventArgs e) { }
+
+        protected void CustomOnPaintBackground(PaintEventArgs e) {
             try {
                 Color backColor = ThemeManager.LabelsColors.BackGround(BackColor, UseCustomBackColor);
                 if (backColor != Color.Transparent)
@@ -78,7 +80,7 @@ namespace YamuiFramework.Controls {
 
         protected override void OnPaint(PaintEventArgs e) {
             try {
-                OnPaintBackground(e);
+                CustomOnPaintBackground(e);
                 OnPaintForeground(e);
             } catch {
                 Invalidate();

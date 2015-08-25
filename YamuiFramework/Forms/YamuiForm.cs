@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 using System.Security;
 using System.Web.UI.Design.WebControls;
 using System.Windows.Forms;
@@ -57,7 +58,7 @@ namespace YamuiFramework.Forms {
 
         private const int BorderWidth = 1;
 
-        private Action _toDoOnGoToPageAction;
+        private List<int[]> _formHistory = new List<int[]>();  
         #endregion
 
         #region Constructor
@@ -150,51 +151,85 @@ namespace YamuiFramework.Forms {
             // only then activate the animations
             ThemeManager.AnimationAllowed = true;
         }
+        public IEnumerable<Control> GetAll(Control control, Type type) {
+            var controls = control.Controls.Cast<Control>();
+            return controls.SelectMany(ctrl => GetAll(ctrl, type)).Concat(controls).Where(c => c.GetType() == type);
+        }
 
-        public void GoToPageByUserSelection() {
-            if (_toDoOnGoToPageAction != null) {
-                _toDoOnGoToPageAction();
-                _toDoOnGoToPageAction = null;
+        public Control GetFirst(Control control, Type type) {
+            foreach (var control1 in control.Controls) {
+                if (control1.GetType() == type) return (Control)control1;
+            }
+            return null;
+        }
+
+
+        public void GoToPage(string pageName) {
+            try {
+                YamuiTabPage page = null;
+                foreach (var control in GetAll(this, typeof(YamuiTabPage))) {
+                    if (control.Name == pageName)
+                        page = (YamuiTabPage)control;
+                }
+                if (page == null) return;
+                YamuiTabControl secControl = (YamuiTabControl)page.Parent;
+                YamuiTabControl mainControl = (YamuiTabControl)secControl.Parent.Parent;
+                GoToPage(mainControl, (YamuiTabPage)secControl.Parent, secControl, page, true);
+            } catch (Exception) {
+                // ignored
             }
         }
 
-        public void GoToPage(YamuiTabControl tabMain, YamuiTabPage pageMain, YamuiTabControl tabSecondary, YamuiTabPage pageSecondary) {
+        public void GoToPage(int pageMainInt, int pageSecInt) {
+            YamuiTabControl mainControl = (YamuiTabControl)GetFirst(this, typeof(YamuiTabControl));
+            if (mainControl == null || mainControl.TabCount < pageMainInt || mainControl.TabPages[pageMainInt] == null) return;
+            YamuiTabControl secControl = (YamuiTabControl)GetFirst(mainControl.TabPages[pageMainInt], typeof(YamuiTabControl));
+            if (secControl == null) return;
+            GoToPage(mainControl, (YamuiTabPage)mainControl.TabPages[pageMainInt], secControl, (YamuiTabPage)secControl.TabPages[pageSecInt], false);
+        }
 
-            // cancel the eventual changes to the pages visibility made last time we were there
-            // (only if we changed the main tab!!!)
-            if (_toDoOnGoToPageAction != null && tabMain.SelectedTab != pageMain) {
-                _toDoOnGoToPageAction();
-                _toDoOnGoToPageAction = null;
-            }
-
-            var pagesToHide = new List<YamuiTabPage>();
-            var pagesToUnHide = new List<YamuiTabPage>();
+        public void GoToPage(YamuiTabControl tabMain, YamuiTabPage pageMain, YamuiTabControl tabSecondary, YamuiTabPage pageSecondary, bool histoSave) {
 
             // if we want to display a hidden page            
-            if (pageMain.HiddenPage) {
-                //TODO: when the history goback is coded, hide every tab but this and do tabMain.ismirorred!
-                pageMain.HiddenPage = false;
-                pagesToHide.Add(pageMain);
-                tabMain.ApplyHideThisSettings();
-            }
+            if (pageMain.HiddenPage)
+                pageMain.HiddenState = false;
 
-            tabSecondary.SelectIndex = tabSecondary.GetIndexOf(pageSecondary);
-            tabMain.SelectIndex = tabMain.GetIndexOf(pageMain);
+            if (pageSecondary.HiddenPage)
+                pageSecondary.HiddenState = false;
 
-            _toDoOnGoToPageAction = () => {
-                foreach (var page in pagesToHide) {
-                    page.HiddenPage = true;
-                }
-                foreach (var page in pagesToUnHide) {
-                    page.HiddenPage = false;
-                }
-                if (pagesToHide.Count > 0 || pagesToUnHide.Count > 0) {
-                    tabMain.ApplyHideThisSettings();
-                }
-            };
+            var pageMainInt = tabMain.GetIndexOf(pageMain);
+            var pageSecInt = tabSecondary.GetIndexOf(pageSecondary);
+
+            if (histoSave)
+                SaveCurrentPathInHistory();
+
+            // if we change both pages, we can't do the animation for both!
+            if (pageMainInt != tabMain.SelectIndex && pageSecInt != tabSecondary.SelectIndex) {
+                ThemeManager.AnimationAllowed = false;
+                tabSecondary.SelectIndex = pageSecInt;
+                ThemeManager.AnimationAllowed = true;
+            } else
+                tabSecondary.SelectIndex = pageSecInt;
+            tabMain.SelectIndex = pageMainInt;
+        }
+
+        public void GoBack() {
+            if (_formHistory.Count == 0) return;
+            var lastPage = _formHistory.Last();
+            GoToPage(lastPage[0], lastPage[1]);
+            _formHistory.Remove(_formHistory.Last());
+        }
+
+        public void SaveCurrentPathInHistory() {
+            YamuiTabControl mainControl = (YamuiTabControl)GetFirst(this, typeof(YamuiTabControl));
+            if (mainControl == null) return;
+            var pageMainInt = mainControl.SelectedIndex;
+            YamuiTabControl secControl = (YamuiTabControl)GetFirst(mainControl.TabPages[pageMainInt], typeof(YamuiTabControl));
+            if (secControl == null) return;
+            var pageSecInt = secControl.SelectedIndex;
+            _formHistory.Add(new[] { pageMainInt, pageSecInt });
         }
         #endregion
-
 
         #region Management Methods
 

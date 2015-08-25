@@ -186,19 +186,17 @@ namespace YamuiFramework {
         /// </summary>
         public static class TabsColors {
 
-            public static Color ForeGround(bool isFocused, bool isHovered, bool isPressed, bool enabled) {
+            public static Color ForeGround(bool isFocused, bool isHovered, bool isSelected) {
                 Color foreColor;
 
-                if (!enabled)
-                    foreColor = Disabled.ForeColor();
-                else if (isFocused && isPressed)
+                if (isFocused && isSelected)
                     foreColor = AccentColor;
-                else if (isPressed)
+                else if (isSelected)
                     foreColor = Press.ForeColor();
                 else if (isHovered)
                     foreColor = Hover.ForeColor();
                 else
-                    foreColor = Disabled.ForeColor();
+                    foreColor = Normal.ForeColor();
 
                 return foreColor;
             }
@@ -207,9 +205,6 @@ namespace YamuiFramework {
                 public static Color BackColor() {
                     return (Theme == Themes.Light) ? Color.FromArgb(230, 230, 230) : Color.FromArgb(37, 37, 38);
                 }
-            }
-
-            public static class Disabled {
                 public static Color ForeColor() {
                     return (Theme == Themes.Light) ? Color.FromArgb(110, 110, 110) : Color.FromArgb(80, 80, 80);
                 }

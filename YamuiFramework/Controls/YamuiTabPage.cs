@@ -33,8 +33,7 @@ namespace YamuiFramework.Controls {
         }
 
         /// <summary>
-        /// Set this to true if the tab should be hidden on loading, you can access with 
-        /// GoToPage method of the form, shouldn't be used for secondary tabs!
+        /// Read only after the initialisation! Set to true to hide this sheet in normal mode
         /// </summary>
         private bool _hiddenPage;
         [DefaultValue(false)]
@@ -43,12 +42,13 @@ namespace YamuiFramework.Controls {
             get { return _hiddenPage; }
             set {
                 _hiddenPage = value;
-                NormallyHidden = _hiddenPage;
+                HiddenState = _hiddenPage;
             }
         }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         [Browsable(false)]
-        public bool NormallyHidden { get; set; }
+        public bool HiddenState { get; set; }
 
         private bool _showHorizontalScrollbar;
         [DefaultValue(false)]
@@ -151,7 +151,9 @@ namespace YamuiFramework.Controls {
             }
         }
 
-        protected override void OnPaintBackground(PaintEventArgs e) {
+        protected override void OnPaintBackground(PaintEventArgs e) { }
+
+        protected void CustomOnPaintBackground(PaintEventArgs e) {
             try {
                 Color backColor = ThemeManager.TabsColors.Normal.BackColor();
                 if (backColor != Color.Transparent) {
@@ -169,7 +171,7 @@ namespace YamuiFramework.Controls {
         
         protected override void OnPaint(PaintEventArgs e) {
             try {
-                OnPaintBackground(e);
+                CustomOnPaintBackground(e);
                 OnPaintForeground(e);
             } catch {
                 Invalidate();

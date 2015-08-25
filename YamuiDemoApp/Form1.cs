@@ -43,7 +43,11 @@ namespace YamuiDemoApp {
         }
 
         private void yamuiLink6_Click(object sender, EventArgs e) {
-            GoToPage(yamuiTabControlMain, yamuiTabMainSetting, yamuiTabControlSecSetting, yamuiTabSecAppearance);
+            GoToPage("yamuiTabSecAppearance");
+        }
+
+        private void yamuiLink7_Click(object sender, EventArgs e) {
+            GoBack();
         }
     }
 }

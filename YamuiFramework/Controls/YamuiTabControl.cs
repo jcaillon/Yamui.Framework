@@ -33,12 +33,6 @@ namespace YamuiFramework.Controls {
     public class YamuiTabControl : TabControl {
 
         #region Fields
-
-        private SubClass _scUpDown;
-        private bool _bUpDown;
-
-        private const int TabBottomBorderHeight = 2;
-
         private ContentAlignment _textAlign = ContentAlignment.TopLeft;
         [DefaultValue(ContentAlignment.TopLeft)]
         [Category("Yamui")]
@@ -58,22 +52,6 @@ namespace YamuiFramework.Controls {
             }
         }
 
-        private bool _isMirrored;
-        [DefaultValue(false)]
-        [Category("Yamui")]
-        public new bool IsMirrored {
-            get {
-                return _isMirrored;
-            }
-            set {
-                if (_isMirrored == value) {
-                    return;
-                }
-                _isMirrored = value;
-                UpdateStyles();
-            }
-        }
-
         private TabFunction _function = TabFunction.Main;
         [DefaultValue(TabFunction.Main)]
         [Category("Yamui")]
@@ -86,9 +64,16 @@ namespace YamuiFramework.Controls {
             }
         }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [Browsable(false)]
+        private bool _showNormallyHiddenTabs = false;
+        public bool ShowNormallyHiddenTabs {
+            get { return _showNormallyHiddenTabs; }
+            set { _showNormallyHiddenTabs = value; }
+        }
+
         // used to remember the position of each tab
-        private Dictionary<int, Rectangle> _getRekt = new Dictionary<int, Rectangle>(); 
-        private Dictionary<int, bool> _currentlyShown = new Dictionary<int, bool>(); 
+        private Dictionary<int, Rectangle> _getRekt = new Dictionary<int, Rectangle>();
 
         // this is the actual tab index that should be display!
         private int _selectedIndex = 0;
@@ -109,6 +94,9 @@ namespace YamuiFramework.Controls {
 
         // the index of the current tab hovered by the cursor
         private int _hotTrackTab = -1;
+
+        private bool _isHovered;
+        private bool _isFocused;
         #endregion
 
         #region Constructor
@@ -121,11 +109,8 @@ namespace YamuiFramework.Controls {
                 ControlStyles.Selectable |
                 ControlStyles.AllPaintingInWmPaint, true);
 
-            MouseMove += (sender, args) => UpdateHotTrack();
-            MouseEnter += (sender, args) => UpdateHotTrack();
-            MouseLeave += (sender, args) => UpdateHotTrack();
-            MouseDown += OnMouseClick;
-            
+            MouseMove += (sender, args) => UpdateHotTrack(args.Location);
+
             _animator = new Animator();
             _animator.AnimationType = AnimationType.Custom;
             _animator.Interval = 35;
@@ -136,31 +121,11 @@ namespace YamuiFramework.Controls {
         }
 
         private void SetStuff() {
-            ItemSize = new Size(5, (Function == TabFunction.Main) ? 30 : 18);
+            var itemWidth = TabPages.Count > 0 ? Width / TabPages.Count : 5;
+            itemWidth = Math.Max(itemWidth - 5, 0);
+            // we set the item size so the scroll bars never need to appear
+            ItemSize = new Size(itemWidth, (Function == TabFunction.Main) ? 32 : 18);
             Padding = new Point((Function == TabFunction.Main) ? 8 : 6, 0);
-        }
-        #endregion
-
-        #region User function
-        /// <summary>
-        /// Called this function to refresh the tab if you changed it's "hidden" attribute
-        /// </summary>
-        public void ApplyHideThisSettings() {
-            for (int i = 0; i < TabPages.Count; i++) {
-                var tPage = (YamuiTabPage) TabPages[i];
-                if (!_currentlyShown.ContainsKey(i)) break;
-                if (_currentlyShown[i] != tPage.HiddenPage)
-                    Invalidate(GetRektOf(i));
-            }
-        }
-
-        public int GetIndexOf(YamuiTabPage page) {
-            for (int i = 0; i < TabPages.Count; i++) {
-                var tPage = (YamuiTabPage)TabPages[i];
-                if (tPage == page)
-                    return i;
-            }
-            return -1;
         }
         #endregion
 
@@ -168,17 +133,36 @@ namespace YamuiFramework.Controls {
         Animator _animator;
 
         protected override void OnSelecting(TabControlCancelEventArgs e) {
-            base.OnSelecting(e);
+            
             // cancel the tab selecting if it was not set through SelectIndex
             if (!_fromSelectIndex) {
                 e.Cancel = true;
                 return;
             }
             _fromSelectIndex = false;
+
             Application.DoEvents();
-            Invalidate(GetRektOf(e.TabPageIndex));
-            Invalidate(GetRektOf(_lastSelectedTab));
+
+            // if we switch from normallyHiddenPage, we want to show the normal menu again
+            if (ShowNormallyHiddenTabs) {
+                YamuiTabPage lastPage = (YamuiTabPage)TabPages[_lastSelectedTab];
+                lastPage.HiddenState = true;
+                ShowNormallyHiddenTabs = false;
+            } else {
+                YamuiTabPage tabPage = (YamuiTabPage)TabPages[e.TabPageIndex];
+                if (tabPage.HiddenState != tabPage.HiddenPage) {
+                    // we are selecting a hidden page
+                    _getRekt.Clear();
+                    ShowNormallyHiddenTabs = true;
+                }
+                //Invalidate(GetRektOf(e.TabPageIndex));
+                //Invalidate(GetRektOf(_lastSelectedTab));
+            }
+            Invalidate(new Rectangle(0, 0, Width, ItemSize.Height));
+            Update();
+
             _lastSelectedTab = e.TabPageIndex;
+
             if (!ThemeManager.AnimationAllowed) return;
             try {
                 Animation anim = new Animation();
@@ -192,23 +176,24 @@ namespace YamuiFramework.Controls {
             } catch (Exception) {
                 // ignored
             }
+
+            base.OnSelecting(e);
         }
         #endregion
 
         #region tabhover
         // returns the index of the tab under the cursor, or -1 if no tab is under
-        private int GetTabUnderCursor() {
-            Point cursor = PointToClient(Cursor.Position);
+        private int GetTabUnderCursor(Point loc) {
             for (int i = 0; i < TabPages.Count; i++) {
-                if (GetRektOf(i).Contains(cursor))
+                if (GetRektOf(i).Contains(loc))
                     return i;
             }
             return -1;
         }
 
         // updates hot tracking based on the current cursor position
-        private void UpdateHotTrack() {
-            int hot = GetTabUnderCursor();
+        private void UpdateHotTrack(Point loc) {
+            int hot = GetTabUnderCursor(loc);
             if (hot != _hotTrackTab) {
                 // invalidate the old hot-track item to remove hot-track effects
                 if (_hotTrackTab != -1)
@@ -223,10 +208,6 @@ namespace YamuiFramework.Controls {
                 // force the tab to redraw invalidated regions
                 Update();
             }
-        }
-
-        private void OnMouseClick(object sender, MouseEventArgs mouseEventArgs) {
-            SelectIndex = GetTabUnderCursor();
         }
         #endregion
 
@@ -249,7 +230,9 @@ namespace YamuiFramework.Controls {
             }
         }
 
-        protected override void OnPaintBackground(PaintEventArgs e) {
+        protected override void OnPaintBackground(PaintEventArgs e) {}
+
+        protected void CustomOnPaintBackground(PaintEventArgs e) {
             try {
                 Color backColor = ThemeManager.TabsColors.Normal.BackColor();
                 if (backColor != Color.Transparent)
@@ -263,7 +246,7 @@ namespace YamuiFramework.Controls {
 
         protected override void OnPaint(PaintEventArgs e) {
             try {
-                OnPaintBackground(e);
+                CustomOnPaintBackground(e);
                 OnPaintForeground(e);
             } catch {
                 Invalidate();
@@ -271,20 +254,24 @@ namespace YamuiFramework.Controls {
         }
 
         protected virtual void OnPaintForeground(PaintEventArgs e) {
+            if (_showNormallyHiddenTabs) _getRekt.Clear();
             for (var index = 0; index < TabPages.Count; index++) {
-                DrawTab(index, e.Graphics);
+                YamuiTabPage tabPage = (YamuiTabPage)TabPages[index];
+                if (_showNormallyHiddenTabs && tabPage.HiddenPage || !_showNormallyHiddenTabs && !tabPage.HiddenPage || DesignMode)
+                    DrawTab(index, e.Graphics, tabPage);
             }
         }
 
-        private void DrawTab(int index, Graphics graphics) {
-            YamuiTabPage tabPage = (YamuiTabPage)TabPages[index];
+        private void DrawTab(int index, Graphics graphics, YamuiTabPage tabPage) {
+            
             Font usedFont = FontManager.GetTabControlFont((Function == TabFunction.Secondary && index != SelectIndex) ? TabFunction.SecondaryNotSelected : Function);
             Rectangle thisTabRekt;
 
             if (!_getRekt.ContainsKey(index)) {
-                var textWidth = TextRenderer.MeasureText(graphics, tabPage.Text, usedFont, new Size(int.MaxValue, int.MaxValue), FontManager.GetTextFormatFlags(TextAlign)).Width + ((Function == TabFunction.Secondary) ? 10 : 0);
+                var textWidth = TextRenderer.MeasureText(graphics, tabPage.Text, usedFont, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.Top | TextFormatFlags.Left).Width + ((Function == TabFunction.Secondary) ? 10 : 0);
+                if (DesignMode) textWidth = ItemSize.Width;
                 if (_getRekt.Count == 0)
-                    thisTabRekt = new Rectangle(GetTabRect(index).X, GetTabRect(index).Y, textWidth, GetTabRect(index).Height);
+                    thisTabRekt = new Rectangle(0, 0, textWidth, ItemSize.Height);
                 else
                     thisTabRekt = new Rectangle(_getRekt.Last().Value.X + _getRekt.Last().Value.Width, _getRekt.Last().Value.Y, textWidth, _getRekt.Last().Value.Height);
                 _getRekt.Add(index, thisTabRekt);
@@ -300,16 +287,11 @@ namespace YamuiFramework.Controls {
             } else
                 PaintTransparentBackground(graphics, thisTabRekt);
 
-            Color foreColor = ThemeManager.TabsColors.ForeGround(Focused, index == _hotTrackTab, index == SelectIndex, Enabled);
-            if (!tabPage.HiddenPage || DesignMode)
-                TextRenderer.DrawText(graphics, tabPage.Text, usedFont, thisTabRekt, foreColor, FontManager.GetTextFormatFlags(TextAlign));
-
-            if (!_currentlyShown.ContainsKey(index)) _currentlyShown.Add(index, tabPage.HiddenPage);
-            else _currentlyShown[index] = tabPage.HiddenPage;
+            Color foreColor = ThemeManager.TabsColors.ForeGround(_isFocused, (index == _hotTrackTab && _isHovered), index == SelectIndex);
+            TextRenderer.DrawText(graphics, tabPage.Text, usedFont, thisTabRekt, foreColor, TextFormatFlags.Top | TextFormatFlags.Left);
         }
 
-        // Draw < > symbol to switch tabs
-        [SecuritySafeCritical]
+        /*
         private void DrawUpDown(Graphics graphics) {
             Color backColor = ThemeManager.FormColor.BackColor();
             Rectangle borderRect = new Rectangle();
@@ -329,43 +311,17 @@ namespace YamuiFramework.Controls {
                 gp.Dispose();
             }
         }
+         * */
         #endregion
-        
+
         #region Overridden Methods
         protected override void OnSelectedIndexChanged(EventArgs e) {
-            UpdateUpDown();
-            try {
-                YamuiForm ownerForm = (YamuiForm)FindForm();
-                if (ownerForm != null) ownerForm.GoToPageByUserSelection();
-            } catch (Exception) {
-                throw new Exception("derp");
-            }
             base.OnSelectedIndexChanged(e);
         }
 
         protected override void OnResize(EventArgs e) {
             base.OnResize(e);
             Invalidate();
-        }
-
-        [SecuritySafeCritical]
-        protected override void WndProc(ref Message m) {
-            base.WndProc(ref m);
-            //if (!DesignMode)
-                //WinApi.ShowScrollBar(Handle, (int)WinApi.ScrollBar.SB_BOTH, 0);
-        }
-
-        protected override CreateParams CreateParams {
-            [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
-            get {
-                const int wsExLayoutrtl = 0x400000;
-                const int wsExNoinheritlayout = 0x100000;
-                var cp = base.CreateParams;
-                if (_isMirrored) {
-                    cp.ExStyle = cp.ExStyle | wsExLayoutrtl | wsExNoinheritlayout;
-                }
-                return cp;
-            }
         }
 
         private new Rectangle GetTabRect(int index) {
@@ -377,109 +333,118 @@ namespace YamuiFramework.Controls {
 
         protected override void OnCreateControl() {
             base.OnCreateControl();
-            OnFontChanged(EventArgs.Empty);
-            FindUpDown();
+            SetStuff();
         }
 
         protected override void OnControlAdded(ControlEventArgs e) {
             base.OnControlAdded(e);
-            FindUpDown();
-            UpdateUpDown();
+            SetStuff();
         }
 
         protected override void OnControlRemoved(ControlEventArgs e) {
             base.OnControlRemoved(e);
-            FindUpDown();
-            UpdateUpDown();
-        }
-
-        [DllImport("user32.dll")]
-        private static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
-
-        private const int WmSetfont = 0x30;
-        private const int WmFontchange = 0x1d;
-
-        [SecuritySafeCritical]
-        protected override void OnFontChanged(EventArgs e) {
-            base.OnFontChanged(e);
-            IntPtr hFont = FontManager.GetTabControlFont(Function).ToHfont();
-            SendMessage(Handle, WmSetfont, hFont, (IntPtr)(-1));
-            SendMessage(Handle, WmFontchange, IntPtr.Zero, IntPtr.Zero);
-            UpdateStyles();
+            SetStuff();
         }
         #endregion
 
         #region Helper Methods
+        private void SaveFormCurrentPath() {
+            // try to save in the history of the form
+            try {
+                YamuiForm ownerForm = (YamuiForm)FindForm();
+                if (ownerForm != null) ownerForm.SaveCurrentPathInHistory();
+            } catch (Exception) {
+                // ignored
+            }
+        }
+
         private Rectangle GetRektOf(int index) {
             return _getRekt.ContainsKey(index) ? _getRekt[index] : new Rectangle();
         }
 
-        [SecuritySafeCritical]
-        private void FindUpDown() {
-            if (!DesignMode) {
-                bool bFound = false;
-
-                IntPtr pWnd = WinApi.GetWindow(Handle, WinApi.GW_CHILD);
-
-                while (pWnd != IntPtr.Zero) {
-                    char[] className = new char[33];
-
-                    int length = WinApi.GetClassName(pWnd, className, 32);
-
-                    string s = new string(className, 0, length);
-
-                    if (s == "msctls_updown32") {
-                        bFound = true;
-
-                        if (!_bUpDown) {
-                            _scUpDown = new SubClass(pWnd, true);
-                            _scUpDown.SubClassedWndProc += scUpDown_SubClassedWndProc;
-
-                            _bUpDown = true;
-                        }
-                        break;
-                    }
-
-                    pWnd = WinApi.GetWindow(pWnd, WinApi.GW_HWNDNEXT);
-                }
-
-                if ((!bFound) && (_bUpDown))
-                    _bUpDown = false;
+        public int GetIndexOf(YamuiTabPage page) {
+            for (int i = 0; i < TabPages.Count; i++) {
+                var tPage = (YamuiTabPage)TabPages[i];
+                if (tPage == page)
+                    return i;
             }
+            return -1;
+        }
+        #endregion
+
+        #region Managing isHovered, isPressed, isFocused
+
+        #region Focus Methods
+
+        protected override void OnGotFocus(EventArgs e) {
+            _isFocused = true;
+            Invalidate();
+
+            base.OnGotFocus(e);
         }
 
-        [SecuritySafeCritical]
-        private void UpdateUpDown() {
-            if (_bUpDown && !DesignMode) {
-                if (WinApi.IsWindowVisible(_scUpDown.Handle)) {
-                    Rectangle rect = new Rectangle();
-                    WinApi.GetClientRect(_scUpDown.Handle, ref rect);
-                    WinApi.InvalidateRect(_scUpDown.Handle, ref rect, true);
-                }
-            }
+        protected override void OnLostFocus(EventArgs e) {
+            _isFocused = false;
+            Invalidate();
+
+            base.OnLostFocus(e);
         }
 
-        [SecuritySafeCritical]
-        private int scUpDown_SubClassedWndProc(ref Message m) {
-            switch (m.Msg) {
-                case (int)WinApi.Messages.WM_PAINT:
-                    IntPtr hDc = WinApi.GetWindowDC(_scUpDown.Handle);
-                    Graphics g = Graphics.FromHdc(hDc);
-                    DrawUpDown(g);
-                    g.Dispose();
-                    WinApi.ReleaseDC(_scUpDown.Handle, hDc);
-                    m.Result = IntPtr.Zero;
-                    Rectangle rect = new Rectangle();
-                    WinApi.GetClientRect(_scUpDown.Handle, ref rect);
-                    WinApi.ValidateRect(_scUpDown.Handle, ref rect);
-                    return 1;
-            }
+        protected override void OnEnter(EventArgs e) {
+            _isFocused = true;
+            Invalidate();
 
-            return 0;
+            base.OnEnter(e);
+        }
+
+        protected override void OnLeave(EventArgs e) {
+            _isFocused = false;
+            Invalidate();
+
+            base.OnLeave(e);
         }
 
         #endregion
 
+        #region Keyboard Methods
+
+        protected override void OnKeyDown(KeyEventArgs e) {
+            if (e.KeyCode == Keys.Space) {
+                SaveFormCurrentPath();
+                SelectIndex = _hotTrackTab;
+                Invalidate();
+            }
+
+            base.OnKeyDown(e);
+        }
+        #endregion
+
+        #region Mouse Methods
+
+        protected override void OnMouseEnter(EventArgs e) {
+            _isHovered = true;
+            Invalidate();
+            base.OnMouseEnter(e);
+        }
+
+        protected override void OnMouseDown(MouseEventArgs e) {
+            if (e.Button == MouseButtons.Left) {
+                SaveFormCurrentPath();
+                SelectIndex = _hotTrackTab;
+                Invalidate();
+            }
+            base.OnMouseDown(e);
+        }
+
+        protected override void OnMouseLeave(EventArgs e) {
+            _isHovered = false;
+            Invalidate();
+            base.OnMouseLeave(e);
+        }
+
+        #endregion
+
+        #endregion
     }
 
     #region YamuiTabControlDesigner
@@ -499,7 +464,7 @@ namespace YamuiFramework.Controls {
         public override DesignerVerbCollection Verbs {
             get {
                 if (_designerVerbs.Count == 2) {
-                    var myControl = (YamuiTabControl) Control;
+                    var myControl = (YamuiTabControl)Control;
                     _designerVerbs[1].Enabled = myControl.TabCount != 0;
                 }
                 return _designerVerbs;
@@ -507,11 +472,11 @@ namespace YamuiFramework.Controls {
         }
 
         public IDesignerHost DesignerHost {
-            get { return _designerHost ?? (_designerHost = (IDesignerHost) (GetService(typeof (IDesignerHost)))); }
+            get { return _designerHost ?? (_designerHost = (IDesignerHost)(GetService(typeof(IDesignerHost)))); }
         }
 
         public ISelectionService SelectionService {
-            get { return _selectionService ?? (_selectionService = (ISelectionService) (GetService(typeof (ISelectionService)))); }
+            get { return _selectionService ?? (_selectionService = (ISelectionService)(GetService(typeof(ISelectionService)))); }
         }
 
         #endregion
@@ -521,7 +486,7 @@ namespace YamuiFramework.Controls {
         public YamuiTabControlDesigner() {
             var verb1 = new DesignerVerb("Add Tab", OnAddPage);
             var verb2 = new DesignerVerb("Remove Tab", OnRemovePage);
-            _designerVerbs.AddRange(new[] {verb1, verb2});
+            _designerVerbs.AddRange(new[] { verb1, verb2 });
         }
 
         #endregion
@@ -529,12 +494,12 @@ namespace YamuiFramework.Controls {
         #region Private Methods
 
         private void OnAddPage(Object sender, EventArgs e) {
-            var parentControl = (YamuiTabControl) Control;
+            var parentControl = (YamuiTabControl)Control;
             var oldTabs = parentControl.Controls;
 
             RaiseComponentChanging(TypeDescriptor.GetProperties(parentControl)["TabPages"]);
 
-            var p = (YamuiTabPage) (DesignerHost.CreateComponent(typeof (YamuiTabPage)));
+            var p = (YamuiTabPage)(DesignerHost.CreateComponent(typeof(YamuiTabPage)));
             p.Text = p.Name;
             parentControl.TabPages.Add(p);
 
@@ -546,7 +511,7 @@ namespace YamuiFramework.Controls {
         }
 
         private void OnRemovePage(Object sender, EventArgs e) {
-            var parentControl = (YamuiTabControl) Control;
+            var parentControl = (YamuiTabControl)Control;
             var oldTabs = parentControl.Controls;
 
             if (parentControl.SelectedIndex < 0) {
@@ -568,7 +533,7 @@ namespace YamuiFramework.Controls {
         }
 
         private void SetVerbs() {
-            var parentControl = (YamuiTabControl) Control;
+            var parentControl = (YamuiTabControl)Control;
 
             switch (parentControl.TabPages.Count) {
                 case 0:
@@ -583,18 +548,18 @@ namespace YamuiFramework.Controls {
         #endregion
 
         #region Overrides
-        
+
         protected override void WndProc(ref Message m) {
             base.WndProc(ref m);
             switch (m.Msg) {
-                case (int) WinApi.Messages.WM_NCHITTEST:
-                    if (m.Result.ToInt32() == (int) WinApi.HitTest.HTTRANSPARENT) {
-                        m.Result = (IntPtr) WinApi.HitTest.HTCLIENT;
+                case (int)WinApi.Messages.WM_NCHITTEST:
+                    if (m.Result.ToInt32() == (int)WinApi.HitTest.HTTRANSPARENT) {
+                        m.Result = (IntPtr)WinApi.HitTest.HTCLIENT;
                     }
                     break;
             }
         }
-        
+
         protected override bool GetHitTest(Point point) {
             if (SelectionService.PrimarySelection == Control) {
                 var hti = new WinApi.TCHITTESTINFO {
@@ -617,13 +582,13 @@ namespace YamuiFramework.Controls {
                 Marshal.FreeHGlobal(lparam);
 
                 if (m.Result.ToInt32() != -1) {
-                    return hti.flags != (int) WinApi.TabControlHitTest.TCHT_NOWHERE;
+                    return hti.flags != (int)WinApi.TabControlHitTest.TCHT_NOWHERE;
                 }
             }
 
             return false;
         }
-        
+
         protected override void PreFilterProperties(IDictionary properties) {
             properties.Remove("ImeMode");
             properties.Remove("FlatAppearance");
@@ -664,14 +629,14 @@ namespace YamuiFramework.Controls {
         }
 
         public YamuiTabPageCollectionEditor(Type type)
-            : base(type) {}
+            : base(type) { }
 
         protected override Type CreateCollectionItemType() {
-            return typeof (YamuiTabPage);
+            return typeof(YamuiTabPage);
         }
 
         protected override Type[] CreateNewItemTypes() {
-            return new[] {typeof (YamuiTabPage)};
+            return new[] { typeof(YamuiTabPage) };
         }
     }
 

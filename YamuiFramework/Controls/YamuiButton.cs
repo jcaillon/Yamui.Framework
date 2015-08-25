@@ -36,7 +36,6 @@ namespace YamuiFramework.Controls {
         private bool _isHovered;
         private bool _isPressed;
         private bool _isFocused;
-
         #endregion
 
         #region Constructor
@@ -71,21 +70,19 @@ namespace YamuiFramework.Controls {
             }
         }
 
-        protected override void OnPaintBackground(PaintEventArgs e) {
-            try {
-                Color backColor = ThemeManager.ButtonColors.BackGround(BackColor, UseCustomBackColor, _isFocused, _isHovered, _isPressed, Enabled);
-                if (backColor != Color.Transparent)
-                    e.Graphics.Clear(backColor);
-                else
-                    PaintTransparentBackground(e.Graphics, DisplayRectangle);
-            } catch {
-                Invalidate();
-            }
+        protected override void OnPaintBackground(PaintEventArgs e) { }
+
+        protected void CustomOnPaintBackground(PaintEventArgs e) {
+            Color backColor = ThemeManager.ButtonColors.BackGround(BackColor, UseCustomBackColor, _isFocused, _isHovered, _isPressed, Enabled);
+            if (backColor != Color.Transparent)
+                e.Graphics.Clear(backColor);
+            else
+                PaintTransparentBackground(e.Graphics, DisplayRectangle);
         }
 
         protected override void OnPaint(PaintEventArgs e) {
             try {
-                OnPaintBackground(e);
+                CustomOnPaintBackground(e);
                 OnPaintForeground(e);
             } catch {
                 Invalidate();

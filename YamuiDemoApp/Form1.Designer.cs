@@ -85,13 +85,14 @@
             this.yamuiTabControlMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.yamuiTabControlMain.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
             this.yamuiTabControlMain.HotTrack = true;
-            this.yamuiTabControlMain.ItemSize = new System.Drawing.Size(5, 32);
+            this.yamuiTabControlMain.ItemSize = new System.Drawing.Size(250, 32);
             this.yamuiTabControlMain.Location = new System.Drawing.Point(20, 40);
             this.yamuiTabControlMain.Margin = new System.Windows.Forms.Padding(0);
             this.yamuiTabControlMain.Name = "yamuiTabControlMain";
             this.yamuiTabControlMain.Padding = new System.Drawing.Point(8, 0);
-            this.yamuiTabControlMain.SelectedIndex = 2;
-            this.yamuiTabControlMain.SelectIndex = 2;
+            this.yamuiTabControlMain.SelectedIndex = 0;
+            this.yamuiTabControlMain.SelectIndex = 0;
+            this.yamuiTabControlMain.ShowNormallyHiddenTabs = false;
             this.yamuiTabControlMain.Size = new System.Drawing.Size(766, 409);
             this.yamuiTabControlMain.SizeMode = System.Windows.Forms.TabSizeMode.FillToRight;
             this.yamuiTabControlMain.TabIndex = 2;
@@ -105,7 +106,6 @@
             this.yamuiTabMainControl.HorizontalScrollbarSize = 10;
             this.yamuiTabMainControl.Location = new System.Drawing.Point(4, 36);
             this.yamuiTabMainControl.Name = "yamuiTabMainControl";
-            this.yamuiTabMainControl.NormallyHidden = false;
             this.yamuiTabMainControl.Size = new System.Drawing.Size(758, 369);
             this.yamuiTabMainControl.TabIndex = 0;
             this.yamuiTabMainControl.Text = "control";
@@ -122,12 +122,13 @@
             this.yamuiTabControl2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.yamuiTabControl2.Function = YamuiFramework.TabFunction.Secondary;
             this.yamuiTabControl2.HotTrack = true;
-            this.yamuiTabControl2.ItemSize = new System.Drawing.Size(5, 18);
+            this.yamuiTabControl2.ItemSize = new System.Drawing.Size(146, 18);
             this.yamuiTabControl2.Location = new System.Drawing.Point(0, 0);
             this.yamuiTabControl2.Name = "yamuiTabControl2";
-            this.yamuiTabControl2.Padding = new System.Drawing.Point(8, 0);
+            this.yamuiTabControl2.Padding = new System.Drawing.Point(6, 0);
             this.yamuiTabControl2.SelectedIndex = 0;
             this.yamuiTabControl2.SelectIndex = 0;
+            this.yamuiTabControl2.ShowNormallyHiddenTabs = false;
             this.yamuiTabControl2.Size = new System.Drawing.Size(758, 369);
             this.yamuiTabControl2.SizeMode = System.Windows.Forms.TabSizeMode.FillToRight;
             this.yamuiTabControl2.TabIndex = 2;
@@ -141,7 +142,6 @@
             this.yamuiTabPage2.HorizontalScrollbarSize = 10;
             this.yamuiTabPage2.Location = new System.Drawing.Point(4, 22);
             this.yamuiTabPage2.Name = "yamuiTabPage2";
-            this.yamuiTabPage2.NormallyHidden = false;
             this.yamuiTabPage2.Padding = new System.Windows.Forms.Padding(30, 25, 0, 0);
             this.yamuiTabPage2.Size = new System.Drawing.Size(750, 343);
             this.yamuiTabPage2.TabIndex = 0;
@@ -164,7 +164,6 @@
             this.yamuiTabPage6.HorizontalScrollbarSize = 10;
             this.yamuiTabPage6.Location = new System.Drawing.Point(4, 22);
             this.yamuiTabPage6.Name = "yamuiTabPage6";
-            this.yamuiTabPage6.NormallyHidden = false;
             this.yamuiTabPage6.Padding = new System.Windows.Forms.Padding(30, 25, 0, 0);
             this.yamuiTabPage6.Size = new System.Drawing.Size(750, 343);
             this.yamuiTabPage6.TabIndex = 3;
@@ -188,7 +187,6 @@
             this.yamuiTabPage7.HorizontalScrollbarSize = 10;
             this.yamuiTabPage7.Location = new System.Drawing.Point(4, 22);
             this.yamuiTabPage7.Name = "yamuiTabPage7";
-            this.yamuiTabPage7.NormallyHidden = false;
             this.yamuiTabPage7.Padding = new System.Windows.Forms.Padding(30, 25, 0, 0);
             this.yamuiTabPage7.Size = new System.Drawing.Size(750, 343);
             this.yamuiTabPage7.TabIndex = 4;
@@ -212,7 +210,6 @@
             this.yamuiTabPage4.HorizontalScrollbarSize = 10;
             this.yamuiTabPage4.Location = new System.Drawing.Point(4, 22);
             this.yamuiTabPage4.Name = "yamuiTabPage4";
-            this.yamuiTabPage4.NormallyHidden = false;
             this.yamuiTabPage4.Padding = new System.Windows.Forms.Padding(30, 25, 0, 0);
             this.yamuiTabPage4.Size = new System.Drawing.Size(750, 343);
             this.yamuiTabPage4.TabIndex = 2;
@@ -236,7 +233,6 @@
             this.yamuiTabPage3.HorizontalScrollbarSize = 10;
             this.yamuiTabPage3.Location = new System.Drawing.Point(4, 22);
             this.yamuiTabPage3.Name = "yamuiTabPage3";
-            this.yamuiTabPage3.NormallyHidden = false;
             this.yamuiTabPage3.Padding = new System.Windows.Forms.Padding(30, 25, 0, 0);
             this.yamuiTabPage3.Size = new System.Drawing.Size(750, 343);
             this.yamuiTabPage3.TabIndex = 1;
@@ -299,7 +295,6 @@
             this.yamuiTabMainNav.HorizontalScrollbarSize = 10;
             this.yamuiTabMainNav.Location = new System.Drawing.Point(4, 36);
             this.yamuiTabMainNav.Name = "yamuiTabMainNav";
-            this.yamuiTabMainNav.NormallyHidden = false;
             this.yamuiTabMainNav.Size = new System.Drawing.Size(758, 369);
             this.yamuiTabMainNav.TabIndex = 2;
             this.yamuiTabMainNav.Text = "form and navigation";
@@ -314,13 +309,14 @@
             this.yamuiTabControl4.Dock = System.Windows.Forms.DockStyle.Fill;
             this.yamuiTabControl4.Function = YamuiFramework.TabFunction.Secondary;
             this.yamuiTabControl4.HotTrack = true;
-            this.yamuiTabControl4.ItemSize = new System.Drawing.Size(5, 18);
+            this.yamuiTabControl4.ItemSize = new System.Drawing.Size(247, 18);
             this.yamuiTabControl4.Location = new System.Drawing.Point(0, 0);
             this.yamuiTabControl4.Margin = new System.Windows.Forms.Padding(0);
             this.yamuiTabControl4.Name = "yamuiTabControl4";
             this.yamuiTabControl4.Padding = new System.Drawing.Point(6, 0);
             this.yamuiTabControl4.SelectedIndex = 0;
             this.yamuiTabControl4.SelectIndex = 0;
+            this.yamuiTabControl4.ShowNormallyHiddenTabs = false;
             this.yamuiTabControl4.Size = new System.Drawing.Size(758, 369);
             this.yamuiTabControl4.SizeMode = System.Windows.Forms.TabSizeMode.FillToRight;
             this.yamuiTabControl4.TabIndex = 0;
@@ -333,7 +329,6 @@
             this.yamuiTabPage12.HorizontalScrollbarSize = 10;
             this.yamuiTabPage12.Location = new System.Drawing.Point(4, 22);
             this.yamuiTabPage12.Name = "yamuiTabPage12";
-            this.yamuiTabPage12.NormallyHidden = false;
             this.yamuiTabPage12.Padding = new System.Windows.Forms.Padding(30, 25, 0, 0);
             this.yamuiTabPage12.Size = new System.Drawing.Size(750, 343);
             this.yamuiTabPage12.TabIndex = 2;
@@ -357,9 +352,8 @@
             this.yamuiTabPage11.HorizontalScrollbarSize = 10;
             this.yamuiTabPage11.Location = new System.Drawing.Point(4, 22);
             this.yamuiTabPage11.Name = "yamuiTabPage11";
-            this.yamuiTabPage11.NormallyHidden = false;
             this.yamuiTabPage11.Padding = new System.Windows.Forms.Padding(30, 25, 0, 0);
-            this.yamuiTabPage11.Size = new System.Drawing.Size(929, 456);
+            this.yamuiTabPage11.Size = new System.Drawing.Size(750, 343);
             this.yamuiTabPage11.TabIndex = 1;
             this.yamuiTabPage11.Text = "OTHER";
             this.yamuiTabPage11.VerticalScrollbarHighlightOnWheel = false;
@@ -370,7 +364,7 @@
             this.other1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.other1.Location = new System.Drawing.Point(30, 25);
             this.other1.Name = "other1";
-            this.other1.Size = new System.Drawing.Size(899, 431);
+            this.other1.Size = new System.Drawing.Size(720, 318);
             this.other1.TabIndex = 0;
             // 
             // yamuiTabPage10
@@ -380,9 +374,8 @@
             this.yamuiTabPage10.HorizontalScrollbarSize = 10;
             this.yamuiTabPage10.Location = new System.Drawing.Point(4, 22);
             this.yamuiTabPage10.Name = "yamuiTabPage10";
-            this.yamuiTabPage10.NormallyHidden = false;
             this.yamuiTabPage10.Padding = new System.Windows.Forms.Padding(30, 25, 0, 0);
-            this.yamuiTabPage10.Size = new System.Drawing.Size(929, 456);
+            this.yamuiTabPage10.Size = new System.Drawing.Size(750, 343);
             this.yamuiTabPage10.TabIndex = 0;
             this.yamuiTabPage10.Text = "MESSAGE BOX";
             this.yamuiTabPage10.VerticalScrollbarHighlightOnWheel = false;
@@ -396,7 +389,6 @@
             this.yamuiTabMainSetting.HorizontalScrollbarSize = 10;
             this.yamuiTabMainSetting.Location = new System.Drawing.Point(4, 36);
             this.yamuiTabMainSetting.Name = "yamuiTabMainSetting";
-            this.yamuiTabMainSetting.NormallyHidden = true;
             this.yamuiTabMainSetting.Size = new System.Drawing.Size(758, 369);
             this.yamuiTabMainSetting.TabIndex = 1;
             this.yamuiTabMainSetting.Text = "setting";
@@ -409,12 +401,13 @@
             this.yamuiTabControlSecSetting.Dock = System.Windows.Forms.DockStyle.Fill;
             this.yamuiTabControlSecSetting.Function = YamuiFramework.TabFunction.Secondary;
             this.yamuiTabControlSecSetting.HotTrack = true;
-            this.yamuiTabControlSecSetting.ItemSize = new System.Drawing.Size(5, 18);
+            this.yamuiTabControlSecSetting.ItemSize = new System.Drawing.Size(0, 18);
             this.yamuiTabControlSecSetting.Location = new System.Drawing.Point(0, 0);
             this.yamuiTabControlSecSetting.Name = "yamuiTabControlSecSetting";
-            this.yamuiTabControlSecSetting.Padding = new System.Drawing.Point(8, 0);
+            this.yamuiTabControlSecSetting.Padding = new System.Drawing.Point(6, 0);
             this.yamuiTabControlSecSetting.SelectedIndex = 0;
             this.yamuiTabControlSecSetting.SelectIndex = 0;
+            this.yamuiTabControlSecSetting.ShowNormallyHiddenTabs = false;
             this.yamuiTabControlSecSetting.Size = new System.Drawing.Size(758, 369);
             this.yamuiTabControlSecSetting.TabIndex = 2;
             // 
@@ -426,7 +419,6 @@
             this.yamuiTabSecAppearance.HorizontalScrollbarSize = 10;
             this.yamuiTabSecAppearance.Location = new System.Drawing.Point(4, 22);
             this.yamuiTabSecAppearance.Name = "yamuiTabSecAppearance";
-            this.yamuiTabSecAppearance.NormallyHidden = false;
             this.yamuiTabSecAppearance.Padding = new System.Windows.Forms.Padding(30, 25, 0, 0);
             this.yamuiTabSecAppearance.Size = new System.Drawing.Size(750, 343);
             this.yamuiTabSecAppearance.TabIndex = 0;
@@ -503,6 +495,7 @@
             this.yamuiLink7.Size = new System.Drawing.Size(43, 17);
             this.yamuiLink7.TabIndex = 10;
             this.yamuiLink7.Text = "ABOUT";
+            this.yamuiLink7.Click += new System.EventHandler(this.yamuiLink7_Click);
             // 
             // yamuiLink8
             // 

@@ -277,7 +277,9 @@ namespace YamuiFramework.Controls {
 
         #region Paint Methods
 
-        protected override void OnPaintBackground(PaintEventArgs e) {
+        protected override void OnPaintBackground(PaintEventArgs e) { }
+
+        protected void CustomOnPaintBackground(PaintEventArgs e) {
             try {
                 Color backColor = ThemeManager.ButtonColors.BackGround(BackColor, UseCustomBackColor, _isFocused, _isHovered, false, Enabled);
                 _baseTextBox.BackColor = backColor;
@@ -289,7 +291,7 @@ namespace YamuiFramework.Controls {
 
         protected override void OnPaint(PaintEventArgs e) {
             try {
-                OnPaintBackground(e);
+                CustomOnPaintBackground(e);
                 OnPaintForeground(e);
             } catch {
                 Invalidate();
