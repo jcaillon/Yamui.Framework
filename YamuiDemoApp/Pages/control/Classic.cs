@@ -18,11 +18,12 @@ namespace YamuiDemoApp.Pages {
 
         private void yamuiButton5_Click(object sender, EventArgs e) {
             if (!Transition.IsTransitionRunning())
-                Transition.run(yamuiButton4, "IsPressed", true, new TransitionType_Flash(3, 300));
+                Transition.run(yamuiButton4, "DoPressed", true, new TransitionType_Flash(3, 300));
         }
 
         private void yamuiButton1_Click(object sender, EventArgs e) {
             ThemeManager.ImageTheme = Properties.Resources.hello_kitty;
+            ThemeManager.AnimationAllowed = false;
             FindForm().Refresh();
         }
     }

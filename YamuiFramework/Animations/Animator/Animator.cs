@@ -466,6 +466,17 @@ namespace YamuiFramework.Animations.Animator
         }
 
         /// <summary>
+        /// Upadates control view with animation and waits while animation will be completed. It requires to call BeginUpdate before.
+        /// </summary>
+        /// <param name="control">Target control</param>
+        /// <param name="action">do stuff after the animation</param>
+        public void EndUpdateSyncAndDo(Control control, Action action) {
+            EndUpdate(control);
+            WaitAllAnimations();
+            action();
+        }
+
+        /// <summary>
         /// Waits while all animations will completed.
         /// </summary>
         public void WaitAllAnimations()

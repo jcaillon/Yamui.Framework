@@ -128,25 +128,28 @@ namespace YamuiFramework.Controls {
         }
 
         public void SetStuff() {
-            Padding = (Function == TabFunction.Main) ? new Padding(0, 0, 0, 0) : new Padding(30, 25, 0, 0);
+            Padding = (Function == TabFunction.Main) ? new Padding(0, 0, 0, 0) : new Padding(15, 25, 0, 0);
+            UseVisualStyleBackColor = false;
         }
         #endregion
         #region Paint
         
         protected void PaintTransparentBackground(Graphics graphics, Rectangle clipRect) {
+            var myParent = (YamuiTabControl)Parent;
             graphics.Clear(Color.Transparent);
-            if ((Parent != null)) {
-                clipRect.Offset(Location);
+            if ((myParent != null)) {
+                //clipRect.Offset(myParent.Location);
+                //clipRect.Offset(0, myParent.ItemSize.Height);
                 PaintEventArgs e = new PaintEventArgs(graphics, clipRect);
                 GraphicsState state = graphics.Save();
                 graphics.SmoothingMode = SmoothingMode.HighSpeed;
                 try {
-                    graphics.TranslateTransform(-Location.X, -Location.Y);
-                    InvokePaintBackground(Parent, e);
-                    InvokePaint(Parent, e);
+                    graphics.TranslateTransform(-myParent.Location.X, -myParent.Location.Y);
+                    InvokePaintBackground(myParent, e);
+                    InvokePaint(myParent, e);
                 } finally {
                     graphics.Restore(state);
-                    clipRect.Offset(-Location.X, -Location.Y);
+                    //clipRect.Offset(-myParent.Location.X, -myParent.Location.Y);
                 }
             }
         }

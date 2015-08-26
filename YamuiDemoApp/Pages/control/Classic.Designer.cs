@@ -44,12 +44,23 @@
             this.yamuiLabel1 = new YamuiFramework.Controls.YamuiLabel();
             this.yamuiButton2 = new YamuiFramework.Controls.YamuiButton();
             this.yamuiButton1 = new YamuiFramework.Controls.YamuiButton();
+            this.yamuiCharButton1 = new YamuiFramework.Controls.YamuiCharButton();
+            this.yamuiCharButton2 = new YamuiFramework.Controls.YamuiCharButton();
+            this.yamuiCharButton3 = new YamuiFramework.Controls.YamuiCharButton();
+            this.yamuiCharButton4 = new YamuiFramework.Controls.YamuiCharButton();
+            this.yamuiCharButton5 = new YamuiFramework.Controls.YamuiCharButton();
             this.yamuiPanel1.SuspendLayout();
             this.yamuiPanel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // yamuiPanel1
             // 
+            this.yamuiPanel1.AutoScroll = true;
+            this.yamuiPanel1.Controls.Add(this.yamuiCharButton5);
+            this.yamuiPanel1.Controls.Add(this.yamuiCharButton4);
+            this.yamuiPanel1.Controls.Add(this.yamuiCharButton3);
+            this.yamuiPanel1.Controls.Add(this.yamuiCharButton2);
+            this.yamuiPanel1.Controls.Add(this.yamuiCharButton1);
             this.yamuiPanel1.Controls.Add(this.yamuiToggle3);
             this.yamuiPanel1.Controls.Add(this.yamuiToggle2);
             this.yamuiPanel1.Controls.Add(this.yamuiToggle1);
@@ -68,12 +79,14 @@
             this.yamuiPanel1.Controls.Add(this.yamuiButton2);
             this.yamuiPanel1.Controls.Add(this.yamuiButton1);
             this.yamuiPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.yamuiPanel1.HorizontalScrollbar = true;
             this.yamuiPanel1.HorizontalScrollbarHighlightOnWheel = false;
             this.yamuiPanel1.HorizontalScrollbarSize = 10;
             this.yamuiPanel1.Location = new System.Drawing.Point(0, 0);
             this.yamuiPanel1.Name = "yamuiPanel1";
-            this.yamuiPanel1.Size = new System.Drawing.Size(715, 315);
+            this.yamuiPanel1.Size = new System.Drawing.Size(715, 313);
             this.yamuiPanel1.TabIndex = 0;
+            this.yamuiPanel1.VerticalScrollbar = true;
             this.yamuiPanel1.VerticalScrollbarHighlightOnWheel = false;
             this.yamuiPanel1.VerticalScrollbarSize = 10;
             // 
@@ -275,13 +288,61 @@
             this.yamuiButton1.Text = "Standard button";
             this.yamuiButton1.Click += new System.EventHandler(this.yamuiButton1_Click);
             // 
+            // yamuiCharButton1
+            // 
+            this.yamuiCharButton1.ButtonChar = "é";
+            this.yamuiCharButton1.Location = new System.Drawing.Point(413, 22);
+            this.yamuiCharButton1.Name = "yamuiCharButton1";
+            this.yamuiCharButton1.Size = new System.Drawing.Size(30, 30);
+            this.yamuiCharButton1.TabIndex = 37;
+            this.yamuiCharButton1.Text = "yamuiCharButton1";
+            this.yamuiCharButton1.UseWingdings = true;
+            // 
+            // yamuiCharButton2
+            // 
+            this.yamuiCharButton2.ButtonChar = "Y";
+            this.yamuiCharButton2.Location = new System.Drawing.Point(449, 22);
+            this.yamuiCharButton2.Name = "yamuiCharButton2";
+            this.yamuiCharButton2.Size = new System.Drawing.Size(30, 30);
+            this.yamuiCharButton2.TabIndex = 38;
+            this.yamuiCharButton2.Text = "yamuiCharButton2";
+            // 
+            // yamuiCharButton3
+            // 
+            this.yamuiCharButton3.ButtonChar = "B";
+            this.yamuiCharButton3.Location = new System.Drawing.Point(377, 22);
+            this.yamuiCharButton3.Name = "yamuiCharButton3";
+            this.yamuiCharButton3.Size = new System.Drawing.Size(30, 30);
+            this.yamuiCharButton3.TabIndex = 39;
+            this.yamuiCharButton3.Text = "yamuiCharButton3";
+            this.yamuiCharButton3.UseWingdings = true;
+            // 
+            // yamuiCharButton4
+            // 
+            this.yamuiCharButton4.ButtonChar = "J";
+            this.yamuiCharButton4.Location = new System.Drawing.Point(485, 22);
+            this.yamuiCharButton4.Name = "yamuiCharButton4";
+            this.yamuiCharButton4.Size = new System.Drawing.Size(30, 30);
+            this.yamuiCharButton4.TabIndex = 40;
+            this.yamuiCharButton4.Text = "yamuiCharButton4";
+            this.yamuiCharButton4.UseWingdings = true;
+            // 
+            // yamuiCharButton5
+            // 
+            this.yamuiCharButton5.ButtonChar = "!";
+            this.yamuiCharButton5.Location = new System.Drawing.Point(521, 22);
+            this.yamuiCharButton5.Name = "yamuiCharButton5";
+            this.yamuiCharButton5.Size = new System.Drawing.Size(30, 30);
+            this.yamuiCharButton5.TabIndex = 41;
+            this.yamuiCharButton5.Text = "yamuiCharButton5";
+            // 
             // Classic
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.yamuiPanel1);
             this.Name = "Classic";
-            this.Size = new System.Drawing.Size(715, 315);
+            this.Size = new System.Drawing.Size(715, 313);
             this.yamuiPanel1.ResumeLayout(false);
             this.yamuiPanel1.PerformLayout();
             this.yamuiPanel2.ResumeLayout(false);
@@ -313,5 +374,10 @@
         private YamuiFramework.Controls.YamuiToggle yamuiToggle3;
         private YamuiFramework.Controls.YamuiToggle yamuiToggle2;
         private YamuiFramework.Controls.YamuiToggle yamuiToggle1;
+        private YamuiFramework.Controls.YamuiCharButton yamuiCharButton4;
+        private YamuiFramework.Controls.YamuiCharButton yamuiCharButton3;
+        private YamuiFramework.Controls.YamuiCharButton yamuiCharButton2;
+        private YamuiFramework.Controls.YamuiCharButton yamuiCharButton1;
+        private YamuiFramework.Controls.YamuiCharButton yamuiCharButton5;
     }
 }

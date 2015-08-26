@@ -182,7 +182,7 @@ namespace YamuiFramework {
         }
 
         /// <summary>
-        ///  This class is used for tab controls
+        ///  This class is used for tab controls (back color is also used for tab pages)
         /// </summary>
         public static class TabsColors {
 

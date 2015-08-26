@@ -27,6 +27,8 @@ namespace YamuiFramework.Forms {
     public class YamuiForm : Form {
 
         #region Fields
+        [Category("Yamui")]
+        public bool UseGoBackButton { get; set; }
 
         private bool _isMovable = true;
 
@@ -45,7 +47,7 @@ namespace YamuiFramework.Forms {
         }
 
         protected override Padding DefaultPadding {
-            get { return new Padding(20, 40, 20, 20); }
+            get { return new Padding(40, 40, BorderWidth + 10, BorderWidth + 10); }
         }
 
         private bool _isResizable = true;
@@ -58,16 +60,20 @@ namespace YamuiFramework.Forms {
 
         private const int BorderWidth = 1;
 
-        private List<int[]> _formHistory = new List<int[]>();  
+        private List<int[]> _formHistory = new List<int[]>();
+
+        private YamuiGoBackButton _goBackButton;
         #endregion
 
         #region Constructor
 
         public YamuiForm() {
-            SetStyle(ControlStyles.AllPaintingInWmPaint |
-                     ControlStyles.OptimizedDoubleBuffer |
-                     ControlStyles.ResizeRedraw |
-                     ControlStyles.UserPaint, true);
+            // why those styles? check here: https://sites.google.com/site/craigandera/craigs-stuff/windows-forms/flicker-free-control-drawing
+            SetStyle(
+                ControlStyles.OptimizedDoubleBuffer |
+                ControlStyles.ResizeRedraw |
+                ControlStyles.UserPaint |
+                ControlStyles.AllPaintingInWmPaint, true);
 
             FormBorderStyle = FormBorderStyle.None;
             StartPosition = FormStartPosition.CenterScreen;
@@ -78,6 +84,8 @@ namespace YamuiFramework.Forms {
         #endregion
 
         #region Paint Methods
+
+        protected override void OnPaintBackground(PaintEventArgs e) { }
 
         protected override void OnPaint(PaintEventArgs e) {
             var backColor = ThemeManager.FormColor.BackColor();
@@ -105,6 +113,11 @@ namespace YamuiFramework.Forms {
                 e.Graphics.FillRectangle(brush, headeRectangle);
             }
              * */
+            /*
+            if (ThemeManager.ImageTheme != null) {
+                Rectangle imgRectangle = new Rectangle(ClientRectangle.Right - ThemeManager.ImageTheme.Width, ClientRectangle.Height - ThemeManager.ImageTheme.Height, ThemeManager.ImageTheme.Width, ThemeManager.ImageTheme.Height);
+                e.Graphics.DrawImage(ThemeManager.ImageTheme, imgRectangle, 0, 0, ThemeManager.ImageTheme.Width, ThemeManager.ImageTheme.Height, GraphicsUnit.Pixel);
+            }*/
 
             // draw the border with Style color
             var rect = new Rectangle(new Point(0, 0), new Size(Width - BorderWidth, Height - BorderWidth));
@@ -144,26 +157,10 @@ namespace YamuiFramework.Forms {
         #endregion
 
         #region For the user
-        private void OnShown(object sender, EventArgs eventArgs) {
-            // Processes all Windows messages currently in the message queue.
-            Application.DoEvents();
-
-            // only then activate the animations
-            ThemeManager.AnimationAllowed = true;
-        }
-        public IEnumerable<Control> GetAll(Control control, Type type) {
-            var controls = control.Controls.Cast<Control>();
-            return controls.SelectMany(ctrl => GetAll(ctrl, type)).Concat(controls).Where(c => c.GetType() == type);
-        }
-
-        public Control GetFirst(Control control, Type type) {
-            foreach (var control1 in control.Controls) {
-                if (control1.GetType() == type) return (Control)control1;
-            }
-            return null;
-        }
-
-
+        /// <summary>
+        /// Go to page pagename
+        /// </summary>
+        /// <param name="pageName"></param>
         public void GoToPage(string pageName) {
             try {
                 YamuiTabPage page = null;
@@ -213,13 +210,20 @@ namespace YamuiFramework.Forms {
             tabMain.SelectIndex = pageMainInt;
         }
 
+        /// <summary>
+        /// Use the history list to go back to previous tabs
+        /// </summary>
         public void GoBack() {
             if (_formHistory.Count == 0) return;
             var lastPage = _formHistory.Last();
             GoToPage(lastPage[0], lastPage[1]);
             _formHistory.Remove(_formHistory.Last());
+            if (_formHistory.Count == 0 && _goBackButton != null) _goBackButton.Enabled = false;
         }
 
+        /// <summary>
+        /// Keep an history of the tabs visited through a list handled here
+        /// </summary>
         public void SaveCurrentPathInHistory() {
             YamuiTabControl mainControl = (YamuiTabControl)GetFirst(this, typeof(YamuiTabControl));
             if (mainControl == null) return;
@@ -228,25 +232,45 @@ namespace YamuiFramework.Forms {
             if (secControl == null) return;
             var pageSecInt = secControl.SelectedIndex;
             _formHistory.Add(new[] { pageMainInt, pageSecInt });
+            if (_goBackButton.Enabled == false) _goBackButton.Enabled = true;
+        }
+
+        private IEnumerable<Control> GetAll(Control control, Type type) {
+            var controls = control.Controls.Cast<Control>();
+            return controls.SelectMany(ctrl => GetAll(ctrl, type)).Concat(controls).Where(c => c.GetType() == type);
+        }
+
+        private Control GetFirst(Control control, Type type) {
+            foreach (var control1 in control.Controls) {
+                if (control1.GetType() == type) return (Control)control1;
+            }
+            return null;
         }
         #endregion
 
         #region Management Methods
+        /// <summary>
+        /// allows to do stuff only when everything is fully loaded
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="eventArgs"></param>
+        private void OnShown(object sender, EventArgs eventArgs) {
+            // Processes all Windows messages currently in the message queue.
+            Application.DoEvents();
 
-        protected override void OnClosing(CancelEventArgs e) {
-            if (!(this is YamuiTaskWindow))
-                YamuiTaskWindow.ForceClose();
-
-            base.OnClosing(e);
-        }
-
-        [SecuritySafeCritical]
-        public bool FocusMe() {
-            return WinApi.SetForegroundWindow(Handle);
+            // only then activate the animations
+            ThemeManager.AnimationAllowed = true;
         }
 
         protected override void OnLoad(EventArgs e) {
             base.OnLoad(e);
+
+            if (UseGoBackButton) {
+                _goBackButton = new YamuiGoBackButton();
+                Controls.Add(_goBackButton);
+                _goBackButton.Location = new Point(10, Padding.Top + 8);
+                _goBackButton.Size = new Size(25, 25);
+            }
 
             if (DesignMode) return;
 
@@ -276,6 +300,17 @@ namespace YamuiFramework.Forms {
 
                 UpdateWindowButtonPosition();
             }
+        }
+
+        protected override void OnClosing(CancelEventArgs e) {
+            if (!(this is YamuiTaskWindow))
+                YamuiTaskWindow.ForceClose();
+            base.OnClosing(e);
+        }
+
+        [SecuritySafeCritical]
+        public bool FocusMe() {
+            return WinApi.SetForegroundWindow(Handle);
         }
 
         protected override void OnEnabledChanged(EventArgs e) {
@@ -389,10 +424,7 @@ namespace YamuiFramework.Forms {
 
             if (e.Button == MouseButtons.Left && Movable) {
                 if (WindowState == FormWindowState.Maximized) return;
-                //if (Width - borderWidth > e.Location.X && e.Location.X > borderWidth && e.Location.Y > borderWidth)
-                //{
                 MoveControl();
-                //}
             }
         }
 
@@ -403,6 +435,36 @@ namespace YamuiFramework.Forms {
         }
 
         #endregion
+
+        #region go back button
+        private class YamuiGoBackButton : YamuiCharButton {
+            public YamuiGoBackButton() {
+                UseWingdings = true;
+                ButtonChar = "ç";
+                Enabled = false;
+                KeyUp += (sender, args) => {
+                    if (args.KeyCode == Keys.Space) {
+                        TryToGoBack();
+                    }
+                };
+                MouseDown += (sender, args) => {
+                    if (args.Button == MouseButtons.Left) {
+                        TryToGoBack();
+                    }
+                };
+            }
+
+            private void TryToGoBack() {
+                try {
+                    YamuiForm ownerForm = (YamuiForm) FindForm();
+                    if (ownerForm != null) ownerForm.GoBack();
+                } catch (Exception) {
+                    // ignored
+                }
+            }
+        }
+        #endregion
+
 
         #region Window Buttons
 

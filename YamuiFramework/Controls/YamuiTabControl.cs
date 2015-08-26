@@ -14,6 +14,7 @@ using System.Windows.Forms;
 using System.Windows.Forms.Design;
 using YamuiFramework.Animations.Animator;
 using YamuiFramework.Animations.Transitions;
+using YamuiFramework.Controls;
 using YamuiFramework.Forms;
 using YamuiFramework.Native;
 
@@ -64,9 +65,7 @@ namespace YamuiFramework.Controls {
             }
         }
 
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        [Browsable(false)]
-        private bool _showNormallyHiddenTabs = false;
+        private bool _showNormallyHiddenTabs;
         public bool ShowNormallyHiddenTabs {
             get { return _showNormallyHiddenTabs; }
             set { _showNormallyHiddenTabs = value; }
@@ -125,7 +124,7 @@ namespace YamuiFramework.Controls {
             itemWidth = Math.Max(itemWidth - 5, 0);
             // we set the item size so the scroll bars never need to appear
             ItemSize = new Size(itemWidth, (Function == TabFunction.Main) ? 32 : 18);
-            Padding = new Point((Function == TabFunction.Main) ? 8 : 6, 0);
+            Dock = DockStyle.Fill;
         }
         #endregion
 
@@ -142,9 +141,11 @@ namespace YamuiFramework.Controls {
             _fromSelectIndex = false;
 
             Application.DoEvents();
+            _animator.WaitAllAnimations();
 
             // if we switch from normallyHiddenPage, we want to show the normal menu again
             if (ShowNormallyHiddenTabs) {
+                _getRekt.Clear();
                 YamuiTabPage lastPage = (YamuiTabPage)TabPages[_lastSelectedTab];
                 lastPage.HiddenState = true;
                 ShowNormallyHiddenTabs = false;
@@ -170,8 +171,7 @@ namespace YamuiFramework.Controls {
                 //anim.SlideCoeff = new PointF(0.03f, 0f);
                 anim.TimeCoeff = 4F;
                 anim.TransparencyCoeff = 1F;
-                _animator.ClearQueue();
-                _animator.BeginUpdate(this, false, anim, new Rectangle(0, ItemSize.Height, Width, Height - ItemSize.Height));
+                _animator.BeginUpdate(this, false, anim, new Rectangle(0, ItemSize.Height, Width - 10, Height - ItemSize.Height - 10));
                 BeginInvoke(new MethodInvoker(() => _animator.EndUpdate(this)));
             } catch (Exception) {
                 // ignored
@@ -588,7 +588,7 @@ namespace YamuiFramework.Controls {
 
             return false;
         }
-
+        
         protected override void PreFilterProperties(IDictionary properties) {
             properties.Remove("ImeMode");
             properties.Remove("FlatAppearance");
@@ -610,8 +610,62 @@ namespace YamuiFramework.Controls {
             //properties.Remove("ItemSize");
             properties.Remove("Font");
             properties.Remove("RightToLeft");
-
+            
             base.PreFilterProperties(properties);
+            /*
+            string[] propertiesToHide = {
+                "AccessibleDescription", 
+                "AccessibleName", 
+                "AccessibleRole", 
+                "Alignment", 
+                "AllowDrop", 
+                "Appearance", 
+                "AutoScrollOffset", 
+                "CausesValidation", 
+                "HotTrack", 
+                "MaximumSize", 
+                "MinimumSize", 
+                "Font", 
+                "Anchor", 
+                "DrawMode", 
+                "Enabled",
+                "ImeMode", 
+                "ItemSize", 
+                "Location", 
+                "Locked", 
+                "Margin", 
+                "MaximumSize", 
+                "MinimumSize", 
+                "Modifiers", 
+                "Multiline", 
+                "RightToLeft", 
+                "RightToLeftLayout", 
+                "ShowToolTips", 
+                "Size",
+                "Multiline", 
+                "RightToLeft", 
+                "RightToLeftLayout", 
+                "ShowToolTips", 
+                "Size",
+                "SizeMode", 
+                "Tag", 
+                "UseWaitCursor", 
+                "ShowNormallyHiddenTabs"
+            };
+
+            foreach (string propname in propertiesToHide) {
+                var prop = (PropertyDescriptor)properties[propname];
+                if (prop != null) {
+                    AttributeCollection runtimeAttributes = prop.Attributes;
+                    // make a copy of the original attributes but make room for one extra attribute
+                    Attribute[] attrs = new Attribute[runtimeAttributes.Count + 1];
+                    runtimeAttributes.CopyTo(attrs, 0);
+                    attrs[runtimeAttributes.Count] = new BrowsableAttribute(false);
+                    prop = TypeDescriptor.CreateProperty(this.GetType(), propname, prop.PropertyType, attrs);
+                    properties[propname] = prop;
+                }
+            }
+            */
         }
 
         #endregion

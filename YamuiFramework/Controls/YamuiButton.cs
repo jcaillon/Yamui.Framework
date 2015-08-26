@@ -26,27 +26,33 @@ namespace YamuiFramework.Controls {
         [Category("Yamui")]
         public bool Highlight { get; set; }
 
+        /// <summary>
+        /// This public prop is only defined so we can set it from the transitions (animation component)
+        /// </summary>
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public bool IsPressed {
-            get { return _isPressed; }
-            set { _isPressed = value; Invalidate(); }
+        public bool DoPressed {
+            get { return IsPressed; }
+            set { IsPressed = value; Invalidate(); }
         }
 
-        private bool _isHovered;
-        private bool _isPressed;
-        private bool _isFocused;
+        public bool IsHovered;
+        public bool IsPressed;
+        public bool IsFocused;
         #endregion
 
         #region Constructor
 
         public YamuiButton() {
-            SetStyle(ControlStyles.SupportsTransparentBackColor |
+            // why those styles? check here: https://sites.google.com/site/craigandera/craigs-stuff/windows-forms/flicker-free-control-drawing
+            SetStyle(
+                ControlStyles.SupportsTransparentBackColor |
                 ControlStyles.OptimizedDoubleBuffer |
                 ControlStyles.ResizeRedraw |
                 ControlStyles.UserPaint |
                 ControlStyles.Selectable |
-                ControlStyles.AllPaintingInWmPaint, true);
+                ControlStyles.AllPaintingInWmPaint |
+                ControlStyles.Opaque, true);
         }
 
         #endregion
@@ -72,8 +78,8 @@ namespace YamuiFramework.Controls {
 
         protected override void OnPaintBackground(PaintEventArgs e) { }
 
-        protected void CustomOnPaintBackground(PaintEventArgs e) {
-            Color backColor = ThemeManager.ButtonColors.BackGround(BackColor, UseCustomBackColor, _isFocused, _isHovered, _isPressed, Enabled);
+        protected virtual void CustomOnPaintBackground(PaintEventArgs e) {
+            Color backColor = ThemeManager.ButtonColors.BackGround(BackColor, UseCustomBackColor, IsFocused, IsHovered, IsPressed, Enabled);
             if (backColor != Color.Transparent)
                 e.Graphics.Clear(backColor);
             else
@@ -90,8 +96,8 @@ namespace YamuiFramework.Controls {
         }
 
         protected virtual void OnPaintForeground(PaintEventArgs e) {
-            Color borderColor = ThemeManager.ButtonColors.BorderColor(_isFocused, _isHovered, _isPressed, Enabled);
-            Color foreColor = ThemeManager.ButtonColors.ForeGround(ForeColor, UseCustomForeColor, _isFocused, _isHovered, _isPressed, Enabled);
+            Color borderColor = ThemeManager.ButtonColors.BorderColor(IsFocused, IsHovered, IsPressed, Enabled);
+            Color foreColor = ThemeManager.ButtonColors.ForeGround(ForeColor, UseCustomForeColor, IsFocused, IsHovered, IsPressed, Enabled);
 
             if (borderColor != Color.Transparent)
                 using (Pen p = new Pen(borderColor)) {
@@ -100,7 +106,7 @@ namespace YamuiFramework.Controls {
                 }
 
             // highlight is a border with more width
-            if (Highlight && !_isHovered && !_isPressed && Enabled) {
+            if (Highlight && !IsHovered && !IsPressed && Enabled) {
                 using (Pen p = new Pen(ThemeManager.AccentColor, 4)) {
                     Rectangle borderRect = new Rectangle(2, 2, Width - 4, Height - 4);
                     e.Graphics.DrawRectangle(p, borderRect);
@@ -117,28 +123,28 @@ namespace YamuiFramework.Controls {
         #region Focus Methods
 
         protected override void OnGotFocus(EventArgs e) {
-            _isFocused = true;
+            IsFocused = true;
             Invalidate();
 
             base.OnGotFocus(e);
         }
 
         protected override void OnLostFocus(EventArgs e) {
-            _isFocused = false;
+            IsFocused = false;
             Invalidate();
 
             base.OnLostFocus(e);
         }
 
         protected override void OnEnter(EventArgs e) {
-            _isFocused = true;
+            IsFocused = true;
             Invalidate();
 
             base.OnEnter(e);
         }
 
         protected override void OnLeave(EventArgs e) {
-            _isFocused = false;
+            IsFocused = false;
             Invalidate();
 
             base.OnLeave(e);
@@ -150,7 +156,7 @@ namespace YamuiFramework.Controls {
 
         protected override void OnKeyDown(KeyEventArgs e) {
             if (e.KeyCode == Keys.Space) {
-                _isPressed = true;
+                IsPressed = true;
                 Invalidate();
             }
 
@@ -159,7 +165,7 @@ namespace YamuiFramework.Controls {
 
         protected override void OnKeyUp(KeyEventArgs e) {
             //Remove this code cause this prevents the focus color
-            _isPressed = false;
+            IsPressed = false;
             Invalidate();
             base.OnKeyUp(e);
         }
@@ -169,27 +175,28 @@ namespace YamuiFramework.Controls {
         #region Mouse Methods
 
         protected override void OnMouseEnter(EventArgs e) {
-            _isHovered = true;
+            IsHovered = true;
             Invalidate();
             base.OnMouseEnter(e);
         }
 
         protected override void OnMouseDown(MouseEventArgs e) {
             if (e.Button == MouseButtons.Left) {
-                _isPressed = true;
+                IsPressed = true;
                 Invalidate();
             }
             base.OnMouseDown(e);
         }
 
         protected override void OnMouseUp(MouseEventArgs e) {
-            _isPressed = false;
+            IsPressed = false;
             Invalidate();
             base.OnMouseUp(e);
         }
 
         protected override void OnMouseLeave(EventArgs e) {
-            _isHovered = false;
+            IsPressed = false;
+            IsHovered = false;
             Invalidate();
             base.OnMouseLeave(e);
         }

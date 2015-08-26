@@ -49,5 +49,9 @@ namespace YamuiDemoApp {
         private void yamuiLink7_Click(object sender, EventArgs e) {
             GoBack();
         }
+
+        private void classic1_Load(object sender, EventArgs e) {
+
+        }
     }
 }
