@@ -347,7 +347,6 @@ namespace YamuiFramework.Controls {
         protected virtual void OnPaintForeground(PaintEventArgs e) {
             Color thumbColor = ThemeManager.ScrollBarsColors.ForeGround(false, _isHovered, _isPressed, Enabled);
             Color barColor = ThemeManager.ScrollBarsColors.BackGround(false, _isHovered, _isPressed, Enabled);
-
             DrawScrollBar(e.Graphics, thumbColor, barColor);
         }
 

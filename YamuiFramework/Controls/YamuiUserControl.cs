@@ -14,6 +14,10 @@ namespace YamuiFramework.Controls
         public bool UseCustomBackColor { get; set; }
         #endregion
 
+        public YamuiUserControl() {
+            Dock = DockStyle.Fill;
+        }
+
         #region Overridden Methods
         protected void PaintTransparentBackground(Graphics graphics, Rectangle clipRect) {
             graphics.Clear(Color.Transparent);

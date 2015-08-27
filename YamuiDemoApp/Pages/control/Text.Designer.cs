@@ -112,7 +112,6 @@
             this.yamuiLabel17.AutoSize = true;
             this.yamuiLabel17.Location = new System.Drawing.Point(203, 70);
             this.yamuiLabel17.Name = "yamuiLabel17";
-            this.yamuiLabel17.SelectionMode = YamuiFramework.Controls.LabelMode.Selectable;
             this.yamuiLabel17.Size = new System.Drawing.Size(60, 15);
             this.yamuiLabel17.TabIndex = 26;
             this.yamuiLabel17.Text = "Selectable";
