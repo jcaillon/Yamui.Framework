@@ -15,7 +15,6 @@ namespace YamuiFramework.Controls
         #endregion
 
         public YamuiUserControl() {
-            Dock = DockStyle.Fill;
         }
 
         #region Overridden Methods

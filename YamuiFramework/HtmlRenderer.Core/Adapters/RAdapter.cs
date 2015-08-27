@@ -19,6 +19,7 @@ using TheArtOfDev.HtmlRenderer.Core;
 using TheArtOfDev.HtmlRenderer.Core.Entities;
 using TheArtOfDev.HtmlRenderer.Core.Handlers;
 using TheArtOfDev.HtmlRenderer.Core.Utils;
+using YamuiFramework;
 
 namespace TheArtOfDev.HtmlRenderer.Adapters
 {

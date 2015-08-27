@@ -4,10 +4,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Text;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security;
 using System.Web.UI.Design.WebControls;
 using System.Windows.Forms;
+using TheArtOfDev.HtmlRenderer.WinForms;
 using YamuiFramework.Controls;
 using YamuiFramework.Native;
 
@@ -268,8 +272,8 @@ namespace YamuiFramework.Forms {
             if (UseGoBackButton) {
                 _goBackButton = new YamuiGoBackButton();
                 Controls.Add(_goBackButton);
-                _goBackButton.Location = new Point(10, Padding.Top + 8);
-                _goBackButton.Size = new Size(25, 25);
+                _goBackButton.Location = new Point(8, Padding.Top + 6);
+                _goBackButton.Size = new Size(27, 27);
             }
 
             if (DesignMode) return;
@@ -288,17 +292,52 @@ namespace YamuiFramework.Forms {
             }
 
             RemoveCloseButton();
-
             if (ControlBox) {
                 AddWindowButton(WindowButtons.Close);
-
                 if (MaximizeBox)
                     AddWindowButton(WindowButtons.Maximize);
-
                 if (MinimizeBox)
                     AddWindowButton(WindowButtons.Minimize);
-
                 UpdateWindowButtonPosition();
+            }
+
+
+            // add the fonts to renderer
+            try {
+                HtmlRender.AddFontFamily(GetFontFamily("SEGOEUI"));
+                HtmlRender.AddFontFamily(GetFontFamily("SEGOEUII"));
+                HtmlRender.AddFontFamily(GetFontFamily("SEGOEUIB"));
+            } catch (Exception) {
+                // ignored
+            }
+        }
+
+        private readonly PrivateFontCollection _fontCollection = new PrivateFontCollection();
+
+        private FontFamily GetFontFamily(string familyName) {
+            lock (_fontCollection) {
+                foreach (FontFamily fontFamily in _fontCollection.Families)
+                    if (fontFamily.Name == familyName) return fontFamily;
+
+                string resourceName = GetType().Namespace + ".Fonts." + familyName.Replace(' ', '_') + ".ttf";
+
+                Stream fontStream = null;
+                IntPtr data = IntPtr.Zero;
+                try {
+                    fontStream = GetType().Assembly.GetManifestResourceStream(resourceName);
+                    if (fontStream != null) {
+                        int bytes = (int) fontStream.Length;
+                        data = Marshal.AllocCoTaskMem(bytes);
+                        byte[] fontdata = new byte[bytes];
+                        fontStream.Read(fontdata, 0, bytes);
+                        Marshal.Copy(fontdata, 0, data, bytes);
+                        _fontCollection.AddMemoryFont(data, bytes);
+                    }
+                    return _fontCollection.Families[_fontCollection.Families.Length - 1];
+                } finally {
+                    if (fontStream != null) fontStream.Dispose();
+                    if (data != IntPtr.Zero) Marshal.FreeCoTaskMem(data);
+                }
             }
         }
 
@@ -330,33 +369,33 @@ namespace YamuiFramework.Forms {
             }
 
             switch (m.Msg) {
-                case (int) WinApi.Messages.WM_SYSCOMMAND:
+                case (int)WinApi.Messages.WM_SYSCOMMAND:
                     var sc = m.WParam.ToInt32() & 0xFFF0;
                     switch (sc) {
-                        case (int) WinApi.Messages.SC_MOVE:
+                        case (int)WinApi.Messages.SC_MOVE:
                             if (!Movable) return;
                             break;
-                        case (int) WinApi.Messages.SC_MAXIMIZE:
+                        case (int)WinApi.Messages.SC_MAXIMIZE:
                             break;
-                        case (int) WinApi.Messages.SC_RESTORE:
+                        case (int)WinApi.Messages.SC_RESTORE:
                             break;
                     }
                     break;
 
-                case (int) WinApi.Messages.WM_NCLBUTTONDBLCLK:
-                case (int) WinApi.Messages.WM_LBUTTONDBLCLK:
+                case (int)WinApi.Messages.WM_NCLBUTTONDBLCLK:
+                case (int)WinApi.Messages.WM_LBUTTONDBLCLK:
                     if (!MaximizeBox) return;
                     break;
 
-                case (int) WinApi.Messages.WM_NCHITTEST:
+                case (int)WinApi.Messages.WM_NCHITTEST:
                     var ht = HitTestNca(m.HWnd, m.WParam, m.LParam);
                     if (ht != WinApi.HitTest.HTCLIENT) {
-                        m.Result = (IntPtr) ht;
+                        m.Result = (IntPtr)ht;
                         return;
                     }
                     break;
 
-                case (int) WinApi.Messages.WM_DWMCOMPOSITIONCHANGED:
+                case (int)WinApi.Messages.WM_DWMCOMPOSITIONCHANGED:
                     break;
 
                 case WmNcpaint: // box shadow
@@ -372,10 +411,10 @@ namespace YamuiFramework.Forms {
             base.WndProc(ref m);
 
             switch (m.Msg) {
-                case (int) WinApi.Messages.WM_GETMINMAXINFO:
+                case (int)WinApi.Messages.WM_GETMINMAXINFO:
                     OnGetMinMaxInfo(m.HWnd, m.LParam);
                     break;
-                case (int) WinApi.Messages.WM_SIZE:
+                case (int)WinApi.Messages.WM_SIZE:
                     if (_windowButtonList != null) {
                         YamuiFormButton btn;
                         _windowButtonList.TryGetValue(WindowButtons.Maximize, out btn);
@@ -387,13 +426,13 @@ namespace YamuiFramework.Forms {
                     break;
             }
 
-            if (m.Msg == WmNchittest && (int) m.Result == Htclient) // drag the form
-                m.Result = (IntPtr) Htcaption;
+            if (m.Msg == WmNchittest && (int)m.Result == Htclient) // drag the form
+                m.Result = (IntPtr)Htcaption;
         }
 
         [SecuritySafeCritical]
         private unsafe void OnGetMinMaxInfo(IntPtr hwnd, IntPtr lParam) {
-            var pmmi = (WinApi.MINMAXINFO*) lParam;
+            var pmmi = (WinApi.MINMAXINFO*)lParam;
 
             var s = Screen.FromHandle(hwnd);
             pmmi->ptMaxSize.x = s.WorkingArea.Width;
@@ -403,9 +442,7 @@ namespace YamuiFramework.Forms {
         }
 
         private WinApi.HitTest HitTestNca(IntPtr hwnd, IntPtr wparam, IntPtr lparam) {
-            //Point vPoint = PointToClient(new Point((int)lparam & 0xFFFF, (int)lparam >> 16 & 0xFFFF));
-            //Point vPoint = PointToClient(new Point((Int16)lparam, (Int16)((int)lparam >> 16)));
-            var vPoint = new Point((short) lparam, (short) ((int) lparam >> 16));
+            var vPoint = new Point((short)lparam, (short)((int)lparam >> 16));
             var vPadding = Math.Max(Padding.Right, Padding.Bottom);
 
             if (Resizable) {
@@ -413,7 +450,7 @@ namespace YamuiFramework.Forms {
                     return WinApi.HitTest.HTBOTTOMRIGHT;
             }
 
-            if (RectangleToScreen(new Rectangle(BorderWidth, BorderWidth, ClientRectangle.Width - 2*BorderWidth, 50)).Contains(vPoint))
+            if (RectangleToScreen(new Rectangle(BorderWidth, BorderWidth, ClientRectangle.Width - 2 * BorderWidth, 50)).Contains(vPoint))
                 return WinApi.HitTest.HTCAPTION;
 
             return WinApi.HitTest.HTCLIENT;
@@ -431,7 +468,7 @@ namespace YamuiFramework.Forms {
         [SecuritySafeCritical]
         private void MoveControl() {
             WinApi.ReleaseCapture();
-            WinApi.SendMessage(Handle, (int) WinApi.Messages.WM_NCLBUTTONDOWN, (int) WinApi.HitTest.HTCAPTION, 0);
+            WinApi.SendMessage(Handle, (int)WinApi.Messages.WM_NCLBUTTONDOWN, (int)WinApi.HitTest.HTCAPTION, 0);
         }
 
         #endregion
@@ -456,7 +493,7 @@ namespace YamuiFramework.Forms {
 
             private void TryToGoBack() {
                 try {
-                    YamuiForm ownerForm = (YamuiForm) FindForm();
+                    YamuiForm ownerForm = (YamuiForm)FindForm();
                     if (ownerForm != null) ownerForm.GoBack();
                 } catch (Exception) {
                     // ignored
@@ -509,7 +546,7 @@ namespace YamuiFramework.Forms {
         private void WindowButton_Click(object sender, EventArgs e) {
             var btn = sender as YamuiFormButton;
             if (btn != null) {
-                var btnFlag = (WindowButtons) btn.Tag;
+                var btnFlag = (WindowButtons)btn.Tag;
                 if (btnFlag == WindowButtons.Close) {
                     Close();
                 } else if (btnFlag == WindowButtons.Minimize) {
@@ -529,7 +566,7 @@ namespace YamuiFramework.Forms {
         private void UpdateWindowButtonPosition() {
             if (!ControlBox) return;
 
-            var priorityOrder = new Dictionary<int, WindowButtons>(3) {{0, WindowButtons.Close}, {1, WindowButtons.Maximize}, {2, WindowButtons.Minimize}};
+            var priorityOrder = new Dictionary<int, WindowButtons>(3) { { 0, WindowButtons.Close }, { 1, WindowButtons.Maximize }, { 2, WindowButtons.Minimize } };
 
             var firstButtonLocation = new Point(ClientRectangle.Width - BorderWidth - 25, BorderWidth);
             var lastDrawedButtonPosition = firstButtonLocation.X - 25;
@@ -699,8 +736,8 @@ namespace YamuiFramework.Forms {
             var n = WinApi.GetMenuItemCount(hMenu);
             if (n <= 0) return;
 
-            WinApi.RemoveMenu(hMenu, (uint) (n - 1), WinApi.MfByposition | WinApi.MfRemove);
-            WinApi.RemoveMenu(hMenu, (uint) (n - 2), WinApi.MfByposition | WinApi.MfRemove);
+            WinApi.RemoveMenu(hMenu, (uint)(n - 1), WinApi.MfByposition | WinApi.MfRemove);
+            WinApi.RemoveMenu(hMenu, (uint)(n - 2), WinApi.MfByposition | WinApi.MfRemove);
             WinApi.DrawMenuBar(Handle);
         }
 

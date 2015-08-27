@@ -16,3 +16,4 @@ C:\Work\YamuiFramework\YamuiFramework\obj\Debug\YamuiFramework.dll
 C:\Work\YamuiFramework\YamuiFramework\obj\Debug\YamuiFramework.pdb
 C:\Work\YamuiFramework\YamuiFramework\obj\Debug\YamuiFramework.Forms.YamuiForm.resources
 C:\Work\YamuiFramework\YamuiFramework\obj\Debug\YamuiFramework.csprojResolveAssemblyReference.cache
+C:\Work\YamuiFramework\YamuiFramework\obj\Debug\YamuiFramework.Properties.Resources.resources

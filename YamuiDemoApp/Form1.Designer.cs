@@ -78,13 +78,13 @@
             this.yamuiTabControlMain.Controls.Add(this.yamuiTabMainSetting);
             this.yamuiTabControlMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.yamuiTabControlMain.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
-            this.yamuiTabControlMain.ItemSize = new System.Drawing.Size(183, 32);
+            this.yamuiTabControlMain.ItemSize = new System.Drawing.Size(246, 32);
             this.yamuiTabControlMain.Location = new System.Drawing.Point(40, 40);
             this.yamuiTabControlMain.Margin = new System.Windows.Forms.Padding(0);
             this.yamuiTabControlMain.Name = "yamuiTabControlMain";
             this.yamuiTabControlMain.Padding = new System.Drawing.Point(0, 0);
-            this.yamuiTabControlMain.SelectedIndex = 2;
-            this.yamuiTabControlMain.SelectIndex = 2;
+            this.yamuiTabControlMain.SelectedIndex = 0;
+            this.yamuiTabControlMain.SelectIndex = 0;
             this.yamuiTabControlMain.ShowNormallyHiddenTabs = false;
             this.yamuiTabControlMain.Size = new System.Drawing.Size(755, 418);
             this.yamuiTabControlMain.SizeMode = System.Windows.Forms.TabSizeMode.FillToRight;
@@ -114,8 +114,8 @@
             this.yamuiTabControl2.Location = new System.Drawing.Point(0, 0);
             this.yamuiTabControl2.Name = "yamuiTabControl2";
             this.yamuiTabControl2.Padding = new System.Drawing.Point(6, 0);
-            this.yamuiTabControl2.SelectedIndex = 4;
-            this.yamuiTabControl2.SelectIndex = 4;
+            this.yamuiTabControl2.SelectedIndex = 0;
+            this.yamuiTabControl2.SelectIndex = 0;
             this.yamuiTabControl2.ShowNormallyHiddenTabs = false;
             this.yamuiTabControl2.Size = new System.Drawing.Size(747, 378);
             this.yamuiTabControl2.SizeMode = System.Windows.Forms.TabSizeMode.FillToRight;
@@ -179,6 +179,7 @@
             this.text1.Name = "text1";
             this.text1.Size = new System.Drawing.Size(709, 327);
             this.text1.TabIndex = 0;
+            this.text1.Load += new System.EventHandler(this.text1_Load);
             // 
             // yamuiTabPage4
             // 

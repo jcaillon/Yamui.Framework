@@ -21,6 +21,7 @@ using TheArtOfDev.HtmlRenderer.Core;
 using TheArtOfDev.HtmlRenderer.Core.Entities;
 using TheArtOfDev.HtmlRenderer.WinForms.Adapters;
 using TheArtOfDev.HtmlRenderer.WinForms.Utilities;
+using YamuiFramework;
 
 namespace TheArtOfDev.HtmlRenderer.WinForms
 {
@@ -294,9 +295,9 @@ namespace TheArtOfDev.HtmlRenderer.WinForms
             get { return _baseRawCssData; }
             set
             {
-                _baseRawCssData = value;
-                _baseCssData = HtmlRender.ParseStyleSheet(value);
-                _htmlContainer.SetHtml(_text, _baseCssData);
+                //_baseRawCssData = value;
+                //_baseCssData = HtmlRender.ParseStyleSheet(value);
+                //_htmlContainer.SetHtml(_text, _baseCssData);
             }
         }
 
@@ -389,7 +390,7 @@ namespace TheArtOfDev.HtmlRenderer.WinForms
                 base.Text = value;
                 if (!IsDisposed)
                 {
-                    _htmlContainer.SetHtml(_text, _baseCssData);
+                    _htmlContainer.SetHtml(@"<span class='yamui-text'>" + _text + @"</span>", ThemeManager.GetBaseCssData());
                     PerformLayout();
                     Invalidate();
                 }

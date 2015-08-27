@@ -18,6 +18,7 @@ using System.Windows.Forms;
 using TheArtOfDev.HtmlRenderer.Core;
 using TheArtOfDev.HtmlRenderer.Core.Entities;
 using TheArtOfDev.HtmlRenderer.WinForms.Utilities;
+using YamuiFramework;
 
 namespace TheArtOfDev.HtmlRenderer.WinForms
 {
@@ -245,9 +246,9 @@ namespace TheArtOfDev.HtmlRenderer.WinForms
         protected virtual void OnToolTipPopup(PopupEventArgs e)
         {
             //Create fragment container
-            var cssClass = string.IsNullOrEmpty(_tooltipCssClass) ? null : string.Format(" class=\"{0}\"", _tooltipCssClass);
+            var cssClass = string.IsNullOrEmpty(_tooltipCssClass) ? null : string.Format(" class=\"{0}\"", "yamui-tooltip");
             var toolipHtml = string.Format("<div{0}>{1}</div>", cssClass, GetToolTip(e.AssociatedControl));
-            _htmlContainer.SetHtml(toolipHtml, _baseCssData);
+            _htmlContainer.SetHtml(toolipHtml, ThemeManager.GetBaseCssData());
             _htmlContainer.MaxSize = MaximumSize;
 
             //Measure size of the container

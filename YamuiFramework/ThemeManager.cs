@@ -1,4 +1,8 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
+using TheArtOfDev.HtmlRenderer.Core;
+using TheArtOfDev.HtmlRenderer.WinForms;
+using YamuiFramework.Forms;
 
 namespace YamuiFramework {
 
@@ -53,6 +57,21 @@ namespace YamuiFramework {
                     Color.FromArgb(135, 121, 78)
                 };
             }
+        }
+
+
+        public static void UpdateBaseCssData() {
+            string baseCss = Properties.Resources.theme;
+            baseCss = baseCss.Replace("%FormForeGroundColor%", ColorTranslator.ToHtml(LabelsColors.Normal.ForeColor()));
+            _baseCssData = HtmlRender.ParseStyleSheet(baseCss);
+        }
+
+        private static CssData _baseCssData;
+        public static CssData GetBaseCssData() {
+            if (_baseCssData == null) {
+                UpdateBaseCssData();
+            }
+            return _baseCssData;
         }
 
         public static Color[] GetThemeBackColors {

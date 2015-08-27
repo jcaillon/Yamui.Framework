@@ -20,6 +20,7 @@ using TheArtOfDev.HtmlRenderer.Core;
 using TheArtOfDev.HtmlRenderer.Core.Entities;
 using TheArtOfDev.HtmlRenderer.Core.Utils;
 using TheArtOfDev.HtmlRenderer.WinForms.Utilities;
+using YamuiFramework;
 
 namespace TheArtOfDev.HtmlRenderer.WinForms
 {
@@ -309,9 +310,9 @@ namespace TheArtOfDev.HtmlRenderer.WinForms
             get { return _baseRawCssData; }
             set
             {
-                _baseRawCssData = value;
-                _baseCssData = HtmlRender.ParseStyleSheet(value);
-                _htmlContainer.SetHtml(_text, _baseCssData);
+                //_baseRawCssData = value;
+                //_baseCssData = HtmlRender.ParseStyleSheet(value);
+                //_htmlContainer.SetHtml(_text, _baseCssData);
             }
         }
 
@@ -341,7 +342,7 @@ namespace TheArtOfDev.HtmlRenderer.WinForms
                 if (!IsDisposed)
                 {
                     VerticalScroll.Value = VerticalScroll.Minimum;
-                    _htmlContainer.SetHtml(_text, _baseCssData);
+                    _htmlContainer.SetHtml(_text, ThemeManager.GetBaseCssData());
                     PerformLayout();
                     Invalidate();
                     InvokeMouseMove();

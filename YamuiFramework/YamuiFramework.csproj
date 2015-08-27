@@ -266,6 +266,11 @@
     <Compile Include="Native\WinApi.cs" />
     <Compile Include="Native\WinCaret.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="ThemeManager.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -281,6 +286,10 @@
     <EmbeddedResource Include="Forms\YamuiForm.resx">
       <DependentUpon>YamuiForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="Fonts\SEGOEUI.TTF" />
@@ -290,6 +299,7 @@
   <ItemGroup>
     <Content Include="Animations\Animator\readme.txt" />
     <Content Include="Animations\Transitions\readme.txt" />
+    <Content Include="HtmlRenderer.WinForms\theme.css" />
     <EmbeddedResource Include="HtmlRenderer.Core\Core\Utils\ImageLoad.png" />
     <EmbeddedResource Include="HtmlRenderer.Core\Core\Utils\ImageError.png" />
   </ItemGroup>

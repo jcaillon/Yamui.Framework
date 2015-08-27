@@ -53,5 +53,9 @@ namespace YamuiDemoApp {
         private void classic1_Load(object sender, EventArgs e) {
 
         }
+
+        private void text1_Load(object sender, EventArgs e) {
+
+        }
     }
 }
