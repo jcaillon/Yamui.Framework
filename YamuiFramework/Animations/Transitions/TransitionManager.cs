@@ -121,7 +121,7 @@ namespace YamuiFramework.Animations.Transitions
         /// </summary>
         private TransitionManager()
         {
-            m_Timer = new Timer(15);
+            m_Timer = new Timer(33); // it was 15ms, set to 33ms for 30 frames per second
             m_Timer.Elapsed += onTimerElapsed;
             m_Timer.Enabled = true;
         }

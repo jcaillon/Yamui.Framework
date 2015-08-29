@@ -60,7 +60,6 @@ namespace YamuiDemoApp.Pages {
             this.comboTheme.Name = "comboTheme";
             this.comboTheme.Size = new System.Drawing.Size(180, 25);
             this.comboTheme.TabIndex = 13;
-            this.comboTheme.SelectedIndexChanged += new System.EventHandler(this.yamuiComboBox1_SelectedIndexChanged);
             // 
             // yamuiComboBox3
             // 
@@ -122,7 +121,6 @@ namespace YamuiDemoApp.Pages {
             this.Controls.Add(this.yamuiPanel1);
             this.Name = "SettingAppearance";
             this.Size = new System.Drawing.Size(715, 315);
-            this.Load += new System.EventHandler(this.SettingAppearance_Load);
             this.yamuiPanel1.ResumeLayout(false);
             this.yamuiPanel1.PerformLayout();
             this.ResumeLayout(false);

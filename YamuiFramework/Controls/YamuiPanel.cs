@@ -194,7 +194,7 @@ namespace YamuiFramework.Controls {
         protected override void WndProc(ref Message m) {
             base.WndProc(ref m);
 
-            if (!DesignMode) {
+            if (!DesignMode && AutoScroll) {
                 WinApi.ShowScrollBar(Handle, (int)WinApi.ScrollBar.SB_BOTH, 0);
             }
         }

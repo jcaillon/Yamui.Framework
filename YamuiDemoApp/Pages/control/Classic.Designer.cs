@@ -108,6 +108,7 @@
             this.yamuiCharButton4.TabIndex = 40;
             this.yamuiCharButton4.Text = "yamuiCharButton4";
             this.yamuiCharButton4.UseWingdings = true;
+            this.yamuiCharButton4.Click += new System.EventHandler(this.yamuiCharButton4_Click);
             // 
             // yamuiCharButton3
             // 
@@ -118,6 +119,7 @@
             this.yamuiCharButton3.TabIndex = 39;
             this.yamuiCharButton3.Text = "yamuiCharButton3";
             this.yamuiCharButton3.UseWingdings = true;
+            this.yamuiCharButton3.Click += new System.EventHandler(this.yamuiCharButton3_Click);
             // 
             // yamuiCharButton2
             // 

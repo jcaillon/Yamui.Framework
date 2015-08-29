@@ -2,56 +2,82 @@
 using System.Drawing;
 using YamuiFramework.HtmlRenderer.Core.Core;
 using YamuiFramework.HtmlRenderer.WinForms;
+using YamuiFramework.Resources;
 
 namespace YamuiFramework.Themes {
 
-    public enum Themes {
-        Default,
-        Light,
-        Dark
-    }
-
     public static class ThemeManager {
 
+        private static Color _accentColor = GetAccentColors[13];
+        private static int _currentThemeId = 2;
         private static Theme _currentTheme;
         private static List<Theme> _listOfThemes = new List<Theme>();
-        private static int _themeToUse = 0;
+        public static string ImageName;
+        public static int CurrentThemeIndex;
 
-        public static List<Theme> GetThemesList() {
-            if (_listOfThemes.Count == 0) {
-                //_listOfThemes.Add(new Theme());
-                Class2Xml<Theme>.LoadFromRaw(_listOfThemes, Properties.Resources.themesXml, true);
-                //Class2Xml<Theme>.SaveToFile(_listOfThemes, @"C:\Work\YamuiFramework\YamuiDemoApp\bin\Debug\try.xml", true);
-            }
-            return _listOfThemes;
-        } 
+        /// <summary>
+        /// Default theme id to use when the ThemeManager is first called, 
+        /// should be set before calling anyelse in the ThemeManager
+        /// </summary>
+        public static int CurrentThemeIdToUse {
+            get { return _currentThemeId; }
+            set { _currentThemeId = value; }
+        }
 
+        /// <summary>
+        /// Return the current Theme object 
+        /// </summary>
         public static Theme Current {
-            set { _currentTheme = value; }
-            get { return _currentTheme ?? (_currentTheme = GetThemesList().Find(theme => theme.UniqueId == _themeToUse)); }
+            set { 
+                _currentTheme = value;
+                UpdatedTheme();
+            }
+            get {
+                if (_currentTheme != null)
+                    return _currentTheme;
+                // instanciation of current theme
+                _currentTheme = GetThemesList().Find(theme => theme.UniqueId == CurrentThemeIdToUse) ?? GetThemesList()[0];
+                UpdatedTheme();
+                return _currentTheme;
+            }
         }
 
-        private static Color _accentColor = GetAccentColors[13];
-        private static Themes _modernTheme = Themes.Dark;
-
-        public static Themes Theme {
-            get { return _modernTheme; }
-            set { _modernTheme = value; }
+        private static void UpdatedTheme() {
+            if (!_currentTheme.UseCurrentAccentColor)
+                _accentColor = _currentTheme.AccentColor;
+            HtmlHandler.UpdateBaseCssData();
+            ImageName = _currentTheme.PageBackGroundImage;
+            CurrentThemeIndex = _listOfThemes.IndexOf(_currentTheme);
         }
 
+        /// <summary>
+        /// Set/get the accent color
+        /// </summary>
         public static Color AccentColor {
             get { return _accentColor; }
             set { _accentColor = value; }
         }
 
-        public static Image ImageTheme { get; set; }
-
-        public static bool AnimationAllowed { get; set; }
-
-        public static Color[] GetAccentColors  {
+        /// <summary>
+        /// get the Image of the page background
+        /// </summary>
+        public static Image ThemePageImage {
             get {
-                return new[] 
-                {
+                return !string.IsNullOrEmpty(ImageName) ? GetImage.GetInstance().Get(ImageName) : null;
+            }
+        }
+
+        /// <summary>
+        /// Set to false to deactivate tab animation
+        /// </summary>
+        public static bool TabAnimationAllowed { get; set; }
+
+        /// <summary>
+        /// Returns a list of accent colors to choose from
+        /// </summary>
+        public static Color[] GetAccentColors {
+            get {
+                return new[] {
                     Color.FromArgb(164, 196, 0),
                     Color.FromArgb(96, 169, 23),
                     Color.FromArgb(0, 138, 0),
@@ -76,31 +102,23 @@ namespace YamuiFramework.Themes {
             }
         }
 
-
-
-        public static void UpdateBaseCssData() {
-            string baseCss = Properties.Resources.baseCss;
-            baseCss = baseCss.Replace("%FormForeGroundColor%", ColorTranslator.ToHtml(Current.LabelsColorsNormalForeColor));
-            _baseCssData = HtmlRender.ParseStyleSheet(baseCss);
-        }
-
-        private static CssData _baseCssData;
-        public static CssData GetBaseCssData() {
-            if (_baseCssData == null) {
-                UpdateBaseCssData();
+        /// <summary>
+        /// Returns the list of all available themes
+        /// </summary>
+        /// <returns></returns>
+        public static List<Theme> GetThemesList() {
+            if (_listOfThemes.Count == 0) {
+                Class2Xml<Theme>.LoadFromRaw(_listOfThemes, Resources.Resources.themesXml, true);
+                //_listOfThemes.Add(new Theme());
+                //Class2Xml<Theme>.SaveToFile(_listOfThemes, @"C:\Work\YamuiFramework\YamuiDemoApp\bin\Debug\try.xml", true);
             }
-            return _baseCssData;
-        }
-
-        public static Color[] GetThemeBackColors {
-            get { return new[] { Color.FromArgb(230, 230, 230), Color.FromArgb(37, 37, 38)}; }
+            return _listOfThemes;
         }
 
         /// <summary>
-        /// This class is used for trackbars as well as scrollbars
+        ///     This class is used for sliders as well as scrollbars
         /// </summary>
         public static class ScrollBarsColors {
-
             public static Color BackGround(bool isFocused, bool isHovered, bool isPressed, bool enabled) {
                 Color backColor;
                 if (!enabled)
@@ -132,10 +150,9 @@ namespace YamuiFramework.Themes {
         }
 
         /// <summary>
-        ///  This class is used for labels as well as links
+        ///     This class is used for labels as well as links
         /// </summary>
         public static class LabelsColors {
-
             public static Color ForeGround(Color controlForeColor, bool useCustomForeColor, bool isFocused, bool isHovered, bool isPressed, bool enabled) {
                 Color foreColor;
 
@@ -152,15 +169,14 @@ namespace YamuiFramework.Themes {
             }
 
             public static Color BackGround(Color controlBackColor, bool useCustomBackColor) {
-                return !useCustomBackColor ? Color.Transparent : controlBackColor; ;
+                return !useCustomBackColor ? Color.Transparent : controlBackColor;
             }
         }
 
         /// <summary>
-        ///  This class is used for tab controls (back color is also used for tab pages)
+        ///     This class is used for tab controls (back color is also used for tab pages)
         /// </summary>
         public static class TabsColors {
-
             public static Color ForeGround(bool isFocused, bool isHovered, bool isSelected) {
                 Color foreColor;
 

@@ -32,10 +32,18 @@ namespace YamuiFramework.Forms {
             set { _isMovable = value; }
         }
 
+        [Category("Yamui")]
+        [DefaultValue(false)]
+        public bool UseCustomBackColor { get; set; }
+
+        [Category("Yamui")]
+        [DefaultValue(false)]
+        public bool UseCustomBorderColor { get; set; }
+
         public new Padding Padding {
             get { return base.Padding; }
             set {
-                value.Top = Math.Max(value.Top, 40);
+                //value.Top = Math.Max(value.Top, 40);
                 base.Padding = value;
             }
         }
@@ -82,8 +90,9 @@ namespace YamuiFramework.Forms {
         protected override void OnPaintBackground(PaintEventArgs e) { }
 
         protected override void OnPaint(PaintEventArgs e) {
-            var backColor = ThemeManager.Current.FormColorBackColor;
+            var backColor = UseCustomBackColor ? BackColor : ThemeManager.Current.FormColorBackColor;
             var foreColor = ThemeManager.Current.FormColorForeColor;
+            var borderColor = UseCustomBorderColor ? ForeColor : ThemeManager.AccentColor;
 
             e.Graphics.Clear(backColor);
 
@@ -108,15 +117,10 @@ namespace YamuiFramework.Forms {
             }
              * */
             /*
-            if (ThemeManager.ImageTheme != null) {
-                Rectangle imgRectangle = new Rectangle(ClientRectangle.Right - ThemeManager.ImageTheme.Width, ClientRectangle.Height - ThemeManager.ImageTheme.Height, ThemeManager.ImageTheme.Width, ThemeManager.ImageTheme.Height);
-                e.Graphics.DrawImage(ThemeManager.ImageTheme, imgRectangle, 0, 0, ThemeManager.ImageTheme.Width, ThemeManager.ImageTheme.Height, GraphicsUnit.Pixel);
+            if (ThemeManager.ThemePageImage != null) {
+                Rectangle imgRectangle = new Rectangle(ClientRectangle.Right - ThemeManager.ThemePageImage.Width, ClientRectangle.Height - ThemeManager.ThemePageImage.Height, ThemeManager.ThemePageImage.Width, ThemeManager.ThemePageImage.Height);
+                e.Graphics.DrawImage(ThemeManager.ThemePageImage, imgRectangle, 0, 0, ThemeManager.ThemePageImage.Width, ThemeManager.ThemePageImage.Height, GraphicsUnit.Pixel);
             }*/
-
-            // draw the border with Style color
-            var rect = new Rectangle(new Point(0, 0), new Size(Width - BorderWidth, Height - BorderWidth));
-            var pen = new Pen(ThemeManager.AccentColor, BorderWidth);
-            e.Graphics.DrawRectangle(pen, rect);
 
             /*
             // draw my logo
@@ -132,9 +136,14 @@ namespace YamuiFramework.Forms {
             //e.Graphics.DrawImage(Properties.Resources.bull_ant, ClientRectangle.Right - (100 + Properties.Resources.bull_ant.Width), 0 + 5);
             */
 
+            // draw the border with Style color
+            var rect = new Rectangle(new Point(0, 0), new Size(Width - BorderWidth, Height - BorderWidth));
+            var pen = new Pen(borderColor, BorderWidth);
+            e.Graphics.DrawRectangle(pen, rect);
+
             // draw the resize pixel stuff on the bottom right
             if (Resizable && (SizeGripStyle == SizeGripStyle.Auto || SizeGripStyle == SizeGripStyle.Show)) {
-                using (var b = new SolidBrush(ThemeManager.Current.FormColorForeColor)) {
+                using (var b = new SolidBrush(foreColor)) {
                     var resizeHandleSize = new Size(2, 2);
                     e.Graphics.FillRectangles(b, new[] {
                         new Rectangle(new Point(ClientRectangle.Width - 6, ClientRectangle.Height - 6), resizeHandleSize),
@@ -196,12 +205,15 @@ namespace YamuiFramework.Forms {
 
             // if we change both pages, we can't do the animation for both!
             if (pageMainInt != tabMain.SelectIndex && pageSecInt != tabSecondary.SelectIndex) {
-                ThemeManager.AnimationAllowed = false;
+                var initState = ThemeManager.TabAnimationAllowed;
+                ThemeManager.TabAnimationAllowed = false;
                 tabSecondary.SelectIndex = pageSecInt;
-                ThemeManager.AnimationAllowed = true;
-            } else
+                ThemeManager.TabAnimationAllowed = initState;
+            } else if (pageSecInt != tabSecondary.SelectIndex)
                 tabSecondary.SelectIndex = pageSecInt;
-            tabMain.SelectIndex = pageMainInt;
+
+            if (pageMainInt != tabMain.SelectIndex)
+                tabMain.SelectIndex = pageMainInt;
         }
 
         /// <summary>
@@ -225,6 +237,11 @@ namespace YamuiFramework.Forms {
             YamuiTabControl secControl = (YamuiTabControl)GetFirst(mainControl.TabPages[pageMainInt], typeof(YamuiTabControl));
             if (secControl == null) return;
             var pageSecInt = secControl.SelectedIndex;
+            // save only if different from the previous 
+            if (_formHistory.Count > 0) {
+                var lastPage = _formHistory.Last();
+                if (lastPage[0] == pageMainInt && lastPage[1] == pageSecInt) return;
+            }
             _formHistory.Add(new[] { pageMainInt, pageSecInt });
             if (_goBackButton.FakeDisabled) _goBackButton.FakeDisabled = false;
         }
@@ -253,7 +270,7 @@ namespace YamuiFramework.Forms {
             Application.DoEvents();
 
             // only then activate the animations
-            ThemeManager.AnimationAllowed = true;
+            ThemeManager.TabAnimationAllowed = true;
         }
 
         protected override void OnLoad(EventArgs e) {
@@ -292,7 +309,7 @@ namespace YamuiFramework.Forms {
             }
 
 
-            // add the fonts to renderer
+            // add the fonts to the html renderer
             try {
                 HtmlRender.AddFontFamily(GetFontFamily("SEGOEUI"));
                 HtmlRender.AddFontFamily(GetFontFamily("SEGOEUII"));
@@ -479,6 +496,7 @@ namespace YamuiFramework.Forms {
                         TryToGoBack();
                     }
                 };
+                Focus();
             }
 
             private void TryToGoBack() {
@@ -491,7 +509,6 @@ namespace YamuiFramework.Forms {
             }
         }
         #endregion
-
 
         #region Window Buttons
 
@@ -624,7 +641,8 @@ namespace YamuiFramework.Forms {
                 else if (_isHovered)
                     e.Graphics.Clear(ThemeManager.Current.ButtonColorsHoverBackColor);
                 else
-                    PaintTransparentBackground(e.Graphics, DisplayRectangle);
+                    e.Graphics.Clear(ThemeManager.Current.FormColorBackColor);
+                    //PaintTransparentBackground(e.Graphics, DisplayRectangle);
 
                 Color foreColor = ThemeManager.ButtonColors.ForeGround(ForeColor, false, false, _isHovered, _isPressed, Enabled);
                 TextRenderer.DrawText(e.Graphics, Text, new Font("Webdings", 9.25f), ClientRectangle, foreColor, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
@@ -680,14 +698,6 @@ namespace YamuiFramework.Forms {
         private bool _mAeroEnabled; // variables for box shadow
         private const int CsDropshadow = 0x00020000;
         private const int WmNcpaint = 0x0085;
-
-        public struct Margins // struct for box shadow
-        {
-            public int BottomHeight;
-            public int LeftWidth;
-            public int RightWidth;
-            public int TopHeight;
-        }
 
         private const int WmNchittest = 0x84; // variables for dragging the form
         private const int Htclient = 0x1;

@@ -36,6 +36,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
@@ -147,12 +148,22 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Fonts\FontManager.cs" />
+    <Compile Include="Forms\SmokeScreen.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\YamuiForm.cs">
       <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\YamuiFormMessageBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\YamuiFormMessageBox.Designer.cs">
+      <DependentUpon>YamuiFormMessageBox.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\YamuiTaskWindow.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Helper\WindowWrapper.cs" />
     <Compile Include="HtmlRenderer.Core\Adapters\Entities\RColor.cs" />
     <Compile Include="HtmlRenderer.Core\Adapters\Entities\RDashStyle.cs" />
     <Compile Include="HtmlRenderer.Core\Adapters\Entities\RFontStyle.cs" />
@@ -250,18 +261,19 @@
     <Compile Include="HtmlRenderer.WinForms\Utilities\ClipboardHelper.cs" />
     <Compile Include="HtmlRenderer.WinForms\Utilities\Utils.cs" />
     <Compile Include="HtmlRenderer.WinForms\Utilities\Win32Utils.cs" />
-    <Compile Include="Native\DwmApi.cs" />
-    <Compile Include="Native\SubClass.cs" />
-    <Compile Include="Native\Taskbar.cs" />
-    <Compile Include="Native\WinApi.cs" />
-    <Compile Include="Native\WinCaret.cs" />
+    <Compile Include="Helper\ControlHelper.cs" />
+    <Compile Include="Helper\DwmApi.cs" />
+    <Compile Include="Helper\Taskbar.cs" />
+    <Compile Include="Helper\WinApi.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
+    <Compile Include="Resources\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Resources\GetImage.cs" />
     <Compile Include="Themes\Class2xml.cs" />
+    <Compile Include="Themes\HtmlHandler.cs" />
     <Compile Include="Themes\Theme.cs" />
     <Compile Include="Themes\ThemeManager.cs" />
   </ItemGroup>
@@ -273,10 +285,15 @@
     <EmbeddedResource Include="Forms\YamuiForm.resx">
       <DependentUpon>YamuiForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
+    <EmbeddedResource Include="Forms\YamuiFormMessageBox.resx">
+      <DependentUpon>YamuiFormMessageBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\YamuiTaskWindow.resx">
+      <DependentUpon>YamuiTaskWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -288,6 +305,13 @@
     <Content Include="Animations\Animator\readme.txt" />
     <Content Include="Animations\Transitions\readme.txt" />
     <Content Include="Resources\baseCss.css" />
+    <Content Include="Resources\hellokitty.png" />
+    <Content Include="Resources\MessageBox\error.png" />
+    <Content Include="Resources\MessageBox\info.png" />
+    <Content Include="Resources\MessageBox\question.png" />
+    <Content Include="Resources\MessageBox\question_shield.png" />
+    <Content Include="Resources\MessageBox\services.png" />
+    <Content Include="Resources\MessageBox\warning.png" />
     <Content Include="Resources\themesXml.xml" />
     <EmbeddedResource Include="HtmlRenderer.Core\Core\Utils\ImageLoad.png" />
     <EmbeddedResource Include="HtmlRenderer.Core\Core\Utils\ImageError.png" />

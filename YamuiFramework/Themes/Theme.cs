@@ -8,8 +8,16 @@ namespace YamuiFramework.Themes {
     public class Theme {
         
         /* public members will be exported to the xml configuration file (Class2xml) */
-        /* This is the classic theme :
+        /* This is the classic theme : */
         public string ThemeName = "Classique theme";
+
+        public int UniqueId = 0;
+        public int RankNeeded = 0; /* rank needed by the user to access this theme */
+        public string PageBackGroundImage;
+
+        public bool UseCurrentAccentColor = true;
+        public Color AccentColor = ThemeManager.AccentColor; /* default accent color for this theme, read only when loading theme */
+
 		public Color FormColorBackColor                = Color.FromArgb(230, 230, 230);
 		public Color FormColorForeColor                = Color.FromArgb(30, 30, 30);
 		public Color ScrollBarsColorsNormalBackColor   = Color.FromArgb(204, 204, 204);
@@ -35,11 +43,7 @@ namespace YamuiFramework.Themes {
 		public Color ButtonColorsDisabledBackColor     = Color.FromArgb(230, 230, 230);
 		public Color ButtonColorsDisabledForeColor     = Color.FromArgb(100, 100, 100);
 		public Color ButtonColorsDisabledBorderColor   = Color.FromArgb(190, 190, 190);
-         * */
-
-        public int UniqueId = 0;
-        public string ThemeName = "Dark theme";
-        public int RankNeeded = 0; /* rank needed by the user to access this theme */
+        /*
         public Color FormColorBackColor = Color.FromArgb(37, 37, 38);
         public Color FormColorForeColor = Color.FromArgb(210, 210, 210);
         public Color ScrollBarsColorsNormalBackColor = Color.FromArgb(51, 51, 51);
@@ -65,6 +69,7 @@ namespace YamuiFramework.Themes {
         public Color ButtonColorsDisabledBackColor = Color.FromArgb(51, 51, 51);
         public Color ButtonColorsDisabledForeColor = Color.FromArgb(84, 84, 84);
         public Color ButtonColorsDisabledBorderColor = Color.FromArgb(51, 51, 51);
+         * */
     }
 
 }

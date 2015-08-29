@@ -390,7 +390,7 @@ namespace YamuiFramework.HtmlRenderer.WinForms
                 base.Text = value;
                 if (!IsDisposed)
                 {
-                    _htmlContainer.SetHtml(@"<span class='yamui-text'>" + _text + @"</span>", ThemeManager.GetBaseCssData());
+                    _htmlContainer.SetHtml(@"<span class='yamui-text'>" + _text + @"</span>", HtmlHandler.GetBaseCssData());
                     PerformLayout();
                     Invalidate();
                 }

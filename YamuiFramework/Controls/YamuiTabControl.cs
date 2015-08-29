@@ -166,7 +166,7 @@ namespace YamuiFramework.Controls {
 
             _lastSelectedTab = e.TabPageIndex;
 
-            if (!ThemeManager.AnimationAllowed) return;
+            if (!ThemeManager.TabAnimationAllowed) return;
             try {
                 Animation anim = new Animation();
                 anim.AnimateOnlyDifferences = true;
@@ -292,33 +292,12 @@ namespace YamuiFramework.Controls {
             Color foreColor = ThemeManager.TabsColors.ForeGround(_isFocused, (index == _hotTrackTab && _isHovered), index == SelectIndex);
             TextRenderer.DrawText(graphics, tabPage.Text, usedFont, thisTabRekt, foreColor, TextFormatFlags.Top | TextFormatFlags.Left);
         }
-
-        /*
-        private void DrawUpDown(Graphics graphics) {
-            Color backColor = ThemeManager.Current.FormColorBackColor;
-            Rectangle borderRect = new Rectangle();
-            WinApi.GetClientRect(_scUpDown.Handle, ref borderRect);
-            graphics.CompositingQuality = CompositingQuality.HighQuality;
-            graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            graphics.Clear(backColor);
-            using (Brush b = new SolidBrush(ThemeManager.TabsColors.Press.ForeColor())) {
-                GraphicsPath gp = new GraphicsPath(FillMode.Winding);
-                PointF[] pts = { new PointF(6, (float)borderRect.Height / 2), new PointF(16, (float)borderRect.Height / 2 - 6), new PointF(16, (float)borderRect.Height / 2 + 6) };
-                gp.AddLines(pts);
-                graphics.FillPath(b, gp);
-                gp.Reset();
-                PointF[] pts2 = { new PointF(borderRect.Width - 15, (float)borderRect.Height / 2 - 6), new PointF(borderRect.Width - 5, (float)borderRect.Height / 2), new PointF(borderRect.Width - 15, (float)borderRect.Height / 2 + 6) };
-                gp.AddLines(pts2);
-                graphics.FillPath(b, gp);
-                gp.Dispose();
-            }
-        }
-         * */
         #endregion
 
         #region Overridden Methods
         protected override void OnSelectedIndexChanged(EventArgs e) {
             base.OnSelectedIndexChanged(e);
+            Focus();
         }
 
         protected override void OnResize(EventArgs e) {
@@ -380,9 +359,21 @@ namespace YamuiFramework.Controls {
 
         protected override void OnGotFocus(EventArgs e) {
             _isFocused = true;
+            try {
+                if (Function == TabFunction.Secondary) {
+                    YamuiTabControl par = (YamuiTabControl)Parent.Parent;
+                    par.ForceUnfocus();
+                    par.Invalidate();
+                }
+            } catch (Exception) {
+                // ignored
+            }
             Invalidate();
-
             base.OnGotFocus(e);
+        }
+
+        public void ForceUnfocus() {
+            _isFocused = false;
         }
 
         protected override void OnLostFocus(EventArgs e) {
@@ -411,12 +402,43 @@ namespace YamuiFramework.Controls {
         #region Keyboard Methods
 
         protected override void OnKeyDown(KeyEventArgs e) {
+            if (!_isFocused) return;
             if (e.KeyCode == Keys.Space) {
+                if (SelectIndex == _hotTrackTab) return;
                 SaveFormCurrentPath();
                 SelectIndex = _hotTrackTab;
                 Invalidate();
             }
-
+            if (e.KeyCode == Keys.Left) {
+                if (!ShowNormallyHiddenTabs && SelectIndex > 0) SelectIndex--;
+                Invalidate();
+            }
+            if (e.KeyCode == Keys.Right) {
+                if (!ShowNormallyHiddenTabs && SelectIndex < TabPages.Count - 1) {
+                    YamuiTabPage tabPage = (YamuiTabPage) TabPages[SelectedIndex + 1];
+                    if (tabPage.HiddenState != true) SelectIndex++;
+                }
+                Invalidate();
+            }
+            if (e.KeyCode == Keys.Up) {
+                try {
+                    if (Function == TabFunction.Secondary) {
+                        Parent.Parent.Focus();
+                    }
+                } catch (Exception) {
+                    // ignored
+                }
+            }
+            if (e.KeyCode == Keys.Down) {
+                try {
+                    if (Function == TabFunction.Main) {
+                        var listCtrl = ControlHelper.GetAll(Controls[SelectIndex], typeof(YamuiTabControl));
+                        if (listCtrl != null) listCtrl.First().Focus();
+                    }
+                } catch (Exception) {
+                    // ignored
+                }
+            }
             base.OnKeyDown(e);
         }
         #endregion
@@ -431,6 +453,7 @@ namespace YamuiFramework.Controls {
 
         protected override void OnMouseDown(MouseEventArgs e) {
             if (e.Button == MouseButtons.Left) {
+                if (SelectIndex == _hotTrackTab) return;
                 SaveFormCurrentPath();
                 SelectIndex = _hotTrackTab;
                 Invalidate();

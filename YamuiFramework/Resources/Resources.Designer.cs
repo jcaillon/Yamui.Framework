@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace YamuiFramework.Properties {
+namespace YamuiFramework.Resources {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace YamuiFramework.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("YamuiFramework.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("YamuiFramework.Resources.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -85,22 +85,93 @@ namespace YamuiFramework.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap error {
+            get {
+                object obj = ResourceManager.GetObject("error", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap hellokitty {
+            get {
+                object obj = ResourceManager.GetObject("hellokitty", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap info {
+            get {
+                object obj = ResourceManager.GetObject("info", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap question {
+            get {
+                object obj = ResourceManager.GetObject("question", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap question_shield {
+            get {
+                object obj = ResourceManager.GetObject("question_shield", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap services {
+            get {
+                object obj = ResourceManager.GetObject("services", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
         ///&lt;Root&gt;
         ///  &lt;Item&gt;
-        ///    &lt;ThemeName Value=&quot;Classique theme&quot; /&gt;
+        ///    &lt;UniqueId Value=&quot;0&quot; /&gt;
+        ///    &lt;ThemeName Value=&quot;The classic&quot; /&gt;
+        ///    &lt;RankNeeded Value=&quot;0&quot; /&gt;
         ///    &lt;FormColorBackColor Value=&quot;#E6E6E6&quot; /&gt;
         ///    &lt;FormColorForeColor Value=&quot;#1E1E1E&quot; /&gt;
         ///    &lt;ScrollBarsColorsNormalBackColor Value=&quot;#CCCCCC&quot; /&gt;
         ///    &lt;ScrollBarsColorsNormalForeColor Value=&quot;#666666&quot; /&gt;
         ///    &lt;ScrollBarsColorsHoverBackColor Value=&quot;#CCCCCC&quot; /&gt;
         ///    &lt;ScrollBarsColorsHoverForeColor Value=&quot;#252526&quot; /&gt;
-        ///    &lt;ScrollBarsColorsDisabledBackColor Value=&quot;#E6E6E6&quot; /&gt;
-        ///    &lt;ScrollBarsColorsDisabledForeColor [rest of string was truncated]&quot;;.
+        ///    &lt;ScrollBarsColorsDisabledBackColor Valu [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string themesXml {
             get {
                 return ResourceManager.GetString("themesXml", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap warning {
+            get {
+                object obj = ResourceManager.GetObject("warning", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
     }

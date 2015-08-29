@@ -337,12 +337,13 @@ namespace YamuiFramework.HtmlRenderer.WinForms
             get { return _text; }
             set
             {
+                if (value == null) return;;
                 _text = value;
                 base.Text = value;
                 if (!IsDisposed)
                 {
                     VerticalScroll.Value = VerticalScroll.Minimum;
-                    _htmlContainer.SetHtml((_text.StartsWith(@"<html>") ? _text : @"<html><body>" + _text + @"</body><html>"), ThemeManager.GetBaseCssData());
+                    _htmlContainer.SetHtml((_text.StartsWith(@"<html") ? _text : @"<html><body>" + _text + @"</body><html>"), HtmlHandler.GetBaseCssData());
                     PerformLayout();
                     Invalidate();
                     InvokeMouseMove();
@@ -653,8 +654,8 @@ namespace YamuiFramework.HtmlRenderer.WinForms
         /// <summary>
         /// Propagate the image load event from root container.
         /// </summary>
-        protected virtual void OnImageLoad(HtmlImageLoadEventArgs e)
-        {
+        protected virtual void OnImageLoad(HtmlImageLoadEventArgs e) {
+            HtmlHandler.OnImageLoad(e);
             var handler = ImageLoad;
             if (handler != null)
                 handler(this, e);

@@ -50,7 +50,9 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Pages\control\Classic.cs" />
+    <Compile Include="Pages\control\Classic.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="Pages\control\Classic.Designer.cs">
       <DependentUpon>Classic.cs</DependentUpon>
     </Compile>
@@ -122,16 +124,7 @@
     <EmbeddedResource Include="Pages\PageTemplate.resx">
       <DependentUpon>PageTemplate.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx" />
     <EmbeddedResource Include="TaskWindowControl.resx">
       <DependentUpon>TaskWindowControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -144,9 +137,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="hello_kitty.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\YamuiFramework\YamuiFramework.csproj">

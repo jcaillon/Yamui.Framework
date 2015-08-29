@@ -131,7 +131,7 @@ namespace YamuiDemoApp {
             this.yamuiTabPage2.Function = YamuiFramework.Fonts.TabFunction.Secondary;
             this.yamuiTabPage2.Location = new System.Drawing.Point(4, 22);
             this.yamuiTabPage2.Name = "yamuiTabPage2";
-            this.yamuiTabPage2.Padding = new System.Windows.Forms.Padding(30, 25, 20, 20);
+            this.yamuiTabPage2.Padding = new System.Windows.Forms.Padding(30, 25, 0, 0);
             this.yamuiTabPage2.Size = new System.Drawing.Size(739, 352);
             this.yamuiTabPage2.TabIndex = 0;
             this.yamuiTabPage2.Text = "CLASSIC";
@@ -141,7 +141,7 @@ namespace YamuiDemoApp {
             this.classic1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.classic1.Location = new System.Drawing.Point(30, 25);
             this.classic1.Name = "classic1";
-            this.classic1.Size = new System.Drawing.Size(689, 307);
+            this.classic1.Size = new System.Drawing.Size(709, 327);
             this.classic1.TabIndex = 0;
             this.classic1.Load += new System.EventHandler(this.classic1_Load);
             // 
@@ -372,6 +372,7 @@ namespace YamuiDemoApp {
             this.yamuiLink6.Name = "yamuiLink6";
             this.yamuiLink6.Size = new System.Drawing.Size(57, 17);
             this.yamuiLink6.TabIndex = 12;
+            this.yamuiLink6.TabStop = false;
             this.yamuiLink6.Text = "SETTINGS";
             this.yamuiLink6.Click += new System.EventHandler(this.yamuiLink6_Click);
             // 
@@ -395,6 +396,7 @@ namespace YamuiDemoApp {
             this.yamuiLink7.Name = "yamuiLink7";
             this.yamuiLink7.Size = new System.Drawing.Size(43, 17);
             this.yamuiLink7.TabIndex = 10;
+            this.yamuiLink7.TabStop = false;
             this.yamuiLink7.Text = "ABOUT";
             this.yamuiLink7.Click += new System.EventHandler(this.yamuiLink7_Click);
             // 
@@ -406,6 +408,7 @@ namespace YamuiDemoApp {
             this.yamuiLink8.Name = "yamuiLink8";
             this.yamuiLink8.Size = new System.Drawing.Size(32, 17);
             this.yamuiLink8.TabIndex = 9;
+            this.yamuiLink8.TabStop = false;
             this.yamuiLink8.Text = "HELP";
             // 
             // yamuiLabel19

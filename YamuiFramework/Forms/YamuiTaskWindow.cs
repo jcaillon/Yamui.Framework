@@ -179,5 +179,22 @@ namespace YamuiFramework.Forms
             if (!cancelTimer)
                 timer.Reset();
         }
+
+        private void InitializeComponent() {
+            this.SuspendLayout();
+            // 
+            // YamuiTaskWindow
+            // 
+            this.ClientSize = new System.Drawing.Size(300, 300);
+            this.ControlBox = false;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.Name = "YamuiTaskWindow";
+            this.ShowIcon = false;
+            this.ShowInTaskbar = false;
+            this.TopMost = true;
+            this.ResumeLayout(false);
+
+        }
     }
 }

@@ -89,9 +89,10 @@ namespace YamuiFramework.Controls {
                 Color backColor = ThemeManager.Current.TabsColorsNormalBackColor;
                 if (backColor != Color.Transparent) {
                     e.Graphics.Clear(backColor);
-                    if (ThemeManager.ImageTheme != null) {
-                        Rectangle rect = new Rectangle(ClientRectangle.Right - ThemeManager.ImageTheme.Width, ClientRectangle.Height - ThemeManager.ImageTheme.Height, ThemeManager.ImageTheme.Width, ThemeManager.ImageTheme.Height);
-                        e.Graphics.DrawImage(ThemeManager.ImageTheme, rect, 0, 0, ThemeManager.ImageTheme.Width, ThemeManager.ImageTheme.Height, GraphicsUnit.Pixel);
+                    var img = ThemeManager.ThemePageImage;
+                    if (img != null) {
+                        Rectangle rect = new Rectangle(ClientRectangle.Right - img.Width, ClientRectangle.Height - img.Height, img.Width, img.Height);
+                        e.Graphics.DrawImage(img, rect, 0, 0, img.Width, img.Height, GraphicsUnit.Pixel);
                     }
                 } else
                     PaintTransparentBackground(e.Graphics, DisplayRectangle);

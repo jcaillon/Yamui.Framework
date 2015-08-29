@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace YamuiFramework.Animations.Transitions
@@ -79,6 +80,16 @@ namespace YamuiFramework.Animations.Transitions
         #endregion
 
         #region Public static methods
+
+        /// <summary>
+        /// Wait for all the animations to be done
+        /// WARNING THIS CAUSEES THE THREAD TO SLEEP!!!!
+        /// </summary>
+        public static void WaitAllAnimations() {
+            while (IsTransitionRunning()) {
+                Thread.Sleep(20);
+            }
+        } 
 
         /// <summary>
         /// Creates and immediately runs a transition on the property passed in.

@@ -248,7 +248,7 @@ namespace YamuiFramework.HtmlRenderer.WinForms
             //Create fragment container
             var cssClass = string.IsNullOrEmpty(_tooltipCssClass) ? null : string.Format(" class=\"{0}\"", "yamui-tooltip");
             var toolipHtml = string.Format("<div{0}>{1}</div>", cssClass, GetToolTip(e.AssociatedControl));
-            _htmlContainer.SetHtml(toolipHtml, ThemeManager.GetBaseCssData());
+            _htmlContainer.SetHtml(toolipHtml, HtmlHandler.GetBaseCssData());
             _htmlContainer.MaxSize = MaximumSize;
 
             //Measure size of the container
