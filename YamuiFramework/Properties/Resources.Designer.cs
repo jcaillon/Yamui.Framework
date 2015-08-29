@@ -67,17 +67,40 @@ namespace YamuiFramework.Properties {
         ///h3 { margin-bottom: .4em }
         ///ul { margin-top: .5em }
         ///ul li {margin: .25em}
+        ////* special for Yamui */ 
+        ///body {
+        ///    Font: 12px SEGOEUI;
+        ///    color: %FormForeGroundColor%;
+        ///}
+        ///a:hover { text-decoration: underline; }
         ///pre  { border:solid 1px gray; background-color:#eee; padding:1em }
         ///a:link { text-decoration: none; }
-        ///a:hover { text-decoration: underline; }
         ///.gray    { color:gray; }
-        ///.example { background-color:#efefef; corner-radius:5px; padding:0.5em; }
-        ///.whitehole { background-color:white; corner-radius:10px; padding:15px; }
-        ///.caption { f [rest of string was truncated]&quot;;.
+        ///.example { background-color:#efefef; corner-radius:5px; padding [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string theme {
+        internal static string baseCss {
             get {
-                return ResourceManager.GetString("theme", resourceCulture);
+                return ResourceManager.GetString("baseCss", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;Root&gt;
+        ///  &lt;Item&gt;
+        ///    &lt;ThemeName Value=&quot;Classique theme&quot; /&gt;
+        ///    &lt;FormColorBackColor Value=&quot;#E6E6E6&quot; /&gt;
+        ///    &lt;FormColorForeColor Value=&quot;#1E1E1E&quot; /&gt;
+        ///    &lt;ScrollBarsColorsNormalBackColor Value=&quot;#CCCCCC&quot; /&gt;
+        ///    &lt;ScrollBarsColorsNormalForeColor Value=&quot;#666666&quot; /&gt;
+        ///    &lt;ScrollBarsColorsHoverBackColor Value=&quot;#CCCCCC&quot; /&gt;
+        ///    &lt;ScrollBarsColorsHoverForeColor Value=&quot;#252526&quot; /&gt;
+        ///    &lt;ScrollBarsColorsDisabledBackColor Value=&quot;#E6E6E6&quot; /&gt;
+        ///    &lt;ScrollBarsColorsDisabledForeColor [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string themesXml {
+            get {
+                return ResourceManager.GetString("themesXml", resourceCulture);
             }
         }
     }

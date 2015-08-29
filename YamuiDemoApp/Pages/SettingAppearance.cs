@@ -9,9 +9,10 @@ using System.Windows.Forms;
 using YamuiFramework;
 using YamuiFramework.Animations.Animator;
 using YamuiFramework.Controls;
+using YamuiFramework.Themes;
 
 namespace YamuiDemoApp.Pages {
-    public partial class SettingAppearance : YamuiUserControl {
+    public partial class SettingAppearance : YamuiPage {
         public SettingAppearance() {
             InitializeComponent();
 
@@ -33,34 +34,22 @@ namespace YamuiDemoApp.Pages {
                     newColorPicker.Checked = true;
             }
 
-            // themes
-            x = 0;
-            foreach (var themeColor in ThemeManager.GetThemeBackColors) {
-                var newColorPicker = new YamuiColorRadioButton();
-                PanelTheme.Controls.Add(newColorPicker);
-                newColorPicker.CheckedChanged += NewColorPickerOnCheckedChanged;
-                newColorPicker.BackColor = themeColor;
-                newColorPicker.UseBorder = true;
-                newColorPicker.Bounds = new Rectangle(x, y, 50, 50);
-                x += newColorPicker.Width;
-                if (ThemeManager.FormColor.BackColor() == themeColor)
-                    newColorPicker.Checked = true;
-            }
+            comboTheme.DataSource = ThemeManager.GetThemesList().Select(theme => theme.ThemeName).ToList();
         }
 
         private void NewColorPickerOnCheckedChanged(object sender, EventArgs eventArgs) {
             YamuiColorRadioButton rb = sender as YamuiColorRadioButton;
             if (rb != null && rb.Checked) {
-                if (rb.Parent == PanelAccentColor) {
-                    ThemeManager.AccentColor = rb.BackColor;
-                } else {
-                    ThemeManager.Theme = (rb.BackColor == ThemeManager.GetThemeBackColors[0]) ? Themes.Light : Themes.Dark;
-                }
-                var form = rb.FindForm();
-                if (form != null) {
-                    // anim?
-                    form.Refresh();
-                }
+                ThemeManager.AccentColor = rb.BackColor;
+                RefreshForm();
+            }
+        }
+
+        private void RefreshForm() {
+            var form = FindForm();
+            if (form != null) {
+                // anim?
+                form.Refresh();
             }
         }
 
@@ -68,5 +57,12 @@ namespace YamuiDemoApp.Pages {
 
             //System.Drawing.ColorTranslator.FromHtml(hex);
         }
+
+        private void yamuiComboBox1_SelectedIndexChanged(object sender, EventArgs e) {
+            ThemeManager.Current = ThemeManager.GetThemesList().Find(theme => theme.ThemeName == (string)comboTheme.SelectedItem);
+            RefreshForm();
+        }
+
+        
     }
 }

@@ -12,11 +12,11 @@
 
 using System;
 using System.Collections.Generic;
-using TheArtOfDev.HtmlRenderer.Adapters;
-using TheArtOfDev.HtmlRenderer.Adapters.Entities;
-using TheArtOfDev.HtmlRenderer.Core.Utils;
+using YamuiFramework.HtmlRenderer.Core.Adapters;
+using YamuiFramework.HtmlRenderer.Core.Adapters.Entities;
+using YamuiFramework.HtmlRenderer.Core.Core.Utils;
 
-namespace TheArtOfDev.HtmlRenderer.Core.Handlers
+namespace YamuiFramework.HtmlRenderer.Core.Core.Handlers
 {
     /// <summary>
     /// Utilities for fonts and fonts families handling.

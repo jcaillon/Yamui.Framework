@@ -13,7 +13,7 @@
 using System;
 using System.IO;
 
-namespace TheArtOfDev.HtmlRenderer.Core.Utils
+namespace YamuiFramework.HtmlRenderer.Core.Core.Utils
 {
     /// <summary>
     /// Static class that contains argument-checking methods

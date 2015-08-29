@@ -11,13 +11,13 @@
 // "The Art of War"
 
 using System;
-using TheArtOfDev.HtmlRenderer.Adapters;
-using TheArtOfDev.HtmlRenderer.Adapters.Entities;
-using TheArtOfDev.HtmlRenderer.Core.Dom;
-using TheArtOfDev.HtmlRenderer.Core.Entities;
-using TheArtOfDev.HtmlRenderer.Core.Utils;
+using YamuiFramework.HtmlRenderer.Core.Adapters;
+using YamuiFramework.HtmlRenderer.Core.Adapters.Entities;
+using YamuiFramework.HtmlRenderer.Core.Core.Dom;
+using YamuiFramework.HtmlRenderer.Core.Core.Entities;
+using YamuiFramework.HtmlRenderer.Core.Core.Utils;
 
-namespace TheArtOfDev.HtmlRenderer.Core.Handlers
+namespace YamuiFramework.HtmlRenderer.Core.Core.Handlers
 {
     /// <summary>
     /// Handler for text selection in the html.
@@ -601,7 +601,7 @@ namespace TheArtOfDev.HtmlRenderer.Core.Handlers
 
         /// <summary>
         /// Calculate the character index and offset by characters for the given word and given offset.<br/>
-        /// <seealso cref="CalculateWordCharIndexAndOffset(RControl,HtmlRenderer.Core.Dom.CssRect,RPoint,bool)"/>.
+        /// <seealso cref="CalculateWordCharIndexAndOffset(RControl,CssRect,RPoint,bool)"/>.
         /// </summary>
         /// <param name="control">used to create graphics to measure string</param>
         /// <param name="word">the word to calculate its index and offset</param>

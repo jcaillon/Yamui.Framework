@@ -16,13 +16,13 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Text;
 using System.Windows.Forms;
-using TheArtOfDev.HtmlRenderer.Core;
-using TheArtOfDev.HtmlRenderer.Core.Entities;
-using TheArtOfDev.HtmlRenderer.Core.Utils;
-using TheArtOfDev.HtmlRenderer.WinForms.Utilities;
-using YamuiFramework;
+using YamuiFramework.HtmlRenderer.Core.Core;
+using YamuiFramework.HtmlRenderer.Core.Core.Entities;
+using YamuiFramework.HtmlRenderer.Core.Core.Utils;
+using YamuiFramework.HtmlRenderer.WinForms.Utilities;
+using YamuiFramework.Themes;
 
-namespace TheArtOfDev.HtmlRenderer.WinForms
+namespace YamuiFramework.HtmlRenderer.WinForms
 {
     /// <summary>
     /// Provides HTML rendering using the text property.<br/>
@@ -342,7 +342,7 @@ namespace TheArtOfDev.HtmlRenderer.WinForms
                 if (!IsDisposed)
                 {
                     VerticalScroll.Value = VerticalScroll.Minimum;
-                    _htmlContainer.SetHtml(_text, ThemeManager.GetBaseCssData());
+                    _htmlContainer.SetHtml((_text.StartsWith(@"<html>") ? _text : @"<html><body>" + _text + @"</body><html>"), ThemeManager.GetBaseCssData());
                     PerformLayout();
                     Invalidate();
                     InvokeMouseMove();

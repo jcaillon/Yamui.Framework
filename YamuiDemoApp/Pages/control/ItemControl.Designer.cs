@@ -1,4 +1,6 @@
-﻿namespace YamuiDemoApp.Pages {
+﻿using YamuiFramework.Fonts;
+
+namespace YamuiDemoApp.Pages.control {
     partial class ItemControl {
         /// <summary> 
         /// Required designer variable.
@@ -30,8 +32,8 @@
             this.yamuiDateTime2 = new YamuiFramework.Controls.YamuiDateTime();
             this.yamuiDateTime1 = new YamuiFramework.Controls.YamuiDateTime();
             this.yamuiLabel10 = new YamuiFramework.Controls.YamuiLabel();
-            this.yamuiTrackBar2 = new YamuiFramework.Controls.YamuiTrackBar();
-            this.yamuiTrackBar1 = new YamuiFramework.Controls.YamuiTrackBar();
+            this.yamuiTrackBar2 = new YamuiFramework.Controls.YamuiSlider();
+            this.yamuiTrackBar1 = new YamuiFramework.Controls.YamuiSlider();
             this.yamuiLabel7 = new YamuiFramework.Controls.YamuiLabel();
             this.yamuiPanel1.SuspendLayout();
             this.SuspendLayout();
@@ -93,7 +95,7 @@
             // yamuiLabel11
             // 
             this.yamuiLabel11.AutoSize = true;
-            this.yamuiLabel11.Function = YamuiFramework.LabelFunction.Heading;
+            this.yamuiLabel11.Function = LabelFunction.Heading;
             this.yamuiLabel11.Location = new System.Drawing.Point(0, 87);
             this.yamuiLabel11.Name = "yamuiLabel11";
             this.yamuiLabel11.Size = new System.Drawing.Size(95, 19);
@@ -118,7 +120,7 @@
             // yamuiLabel10
             // 
             this.yamuiLabel10.AutoSize = true;
-            this.yamuiLabel10.Function = YamuiFramework.LabelFunction.Heading;
+            this.yamuiLabel10.Function = LabelFunction.Heading;
             this.yamuiLabel10.Location = new System.Drawing.Point(0, 185);
             this.yamuiLabel10.Name = "yamuiLabel10";
             this.yamuiLabel10.Size = new System.Drawing.Size(80, 19);
@@ -145,7 +147,7 @@
             // yamuiLabel7
             // 
             this.yamuiLabel7.AutoSize = true;
-            this.yamuiLabel7.Function = YamuiFramework.LabelFunction.Heading;
+            this.yamuiLabel7.Function = LabelFunction.Heading;
             this.yamuiLabel7.Location = new System.Drawing.Point(0, 0);
             this.yamuiLabel7.Name = "yamuiLabel7";
             this.yamuiLabel7.Size = new System.Drawing.Size(54, 19);
@@ -173,9 +175,9 @@
         private YamuiFramework.Controls.YamuiComboBox yamuiComboBox1;
         private YamuiFramework.Controls.YamuiLabel yamuiLabel7;
         private YamuiFramework.Controls.YamuiDateTime yamuiDateTime2;
-        private YamuiFramework.Controls.YamuiTrackBar yamuiTrackBar1;
+        private YamuiFramework.Controls.YamuiSlider yamuiTrackBar1;
         private YamuiFramework.Controls.YamuiDateTime yamuiDateTime1;
-        private YamuiFramework.Controls.YamuiTrackBar yamuiTrackBar2;
+        private YamuiFramework.Controls.YamuiSlider yamuiTrackBar2;
         private YamuiFramework.Controls.YamuiLabel yamuiLabel10;
     }
 }

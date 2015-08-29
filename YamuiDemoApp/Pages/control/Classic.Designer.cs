@@ -1,4 +1,4 @@
-﻿namespace YamuiDemoApp.Pages {
+﻿namespace YamuiDemoApp.Pages.control {
     partial class Classic {
         /// <summary> 
         /// Required designer variable.
@@ -185,11 +185,12 @@
             this.yamuiButton4.Size = new System.Drawing.Size(110, 36);
             this.yamuiButton4.TabIndex = 32;
             this.yamuiButton4.Text = "Highlight button";
+            this.yamuiButton4.Click += new System.EventHandler(this.yamuiButton4_Click);
             // 
             // yamuiLabel8
             // 
             this.yamuiLabel8.AutoSize = true;
-            this.yamuiLabel8.Function = YamuiFramework.LabelFunction.Heading;
+            this.yamuiLabel8.Function = YamuiFramework.Fonts.LabelFunction.Heading;
             this.yamuiLabel8.Location = new System.Drawing.Point(0, 212);
             this.yamuiLabel8.Margin = new System.Windows.Forms.Padding(20, 5, 5, 7);
             this.yamuiLabel8.Name = "yamuiLabel8";
@@ -251,7 +252,7 @@
             // yamuiLabel3
             // 
             this.yamuiLabel3.AutoSize = true;
-            this.yamuiLabel3.Function = YamuiFramework.LabelFunction.Heading;
+            this.yamuiLabel3.Function = YamuiFramework.Fonts.LabelFunction.Heading;
             this.yamuiLabel3.Location = new System.Drawing.Point(235, 91);
             this.yamuiLabel3.Margin = new System.Windows.Forms.Padding(20, 5, 5, 7);
             this.yamuiLabel3.Name = "yamuiLabel3";
@@ -303,7 +304,7 @@
             // yamuiLabel2
             // 
             this.yamuiLabel2.AutoSize = true;
-            this.yamuiLabel2.Function = YamuiFramework.LabelFunction.Heading;
+            this.yamuiLabel2.Function = YamuiFramework.Fonts.LabelFunction.Heading;
             this.yamuiLabel2.Location = new System.Drawing.Point(0, 91);
             this.yamuiLabel2.Margin = new System.Windows.Forms.Padding(20, 5, 5, 7);
             this.yamuiLabel2.Name = "yamuiLabel2";
@@ -314,7 +315,7 @@
             // yamuiLabel1
             // 
             this.yamuiLabel1.AutoSize = true;
-            this.yamuiLabel1.Function = YamuiFramework.LabelFunction.Heading;
+            this.yamuiLabel1.Function = YamuiFramework.Fonts.LabelFunction.Heading;
             this.yamuiLabel1.Location = new System.Drawing.Point(0, 0);
             this.yamuiLabel1.Margin = new System.Windows.Forms.Padding(20, 5, 5, 7);
             this.yamuiLabel1.Name = "yamuiLabel1";

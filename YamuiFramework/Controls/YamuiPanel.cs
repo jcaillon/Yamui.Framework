@@ -5,6 +5,7 @@ using System.Drawing.Drawing2D;
 using System.Security;
 using System.Windows.Forms;
 using YamuiFramework.Native;
+using YamuiFramework.Themes;
 
 namespace YamuiFramework.Controls {
     [ToolboxBitmap(typeof(Panel))]
@@ -120,7 +121,7 @@ namespace YamuiFramework.Controls {
                 if (!UseCustomBackColor)
                     PaintTransparentBackground(e.Graphics, DisplayRectangle);
                 else
-                    e.Graphics.Clear(ThemeManager.FormColor.BackColor());
+                    e.Graphics.Clear(ThemeManager.Current.FormColorBackColor);
             } catch {
                 Invalidate();
             }

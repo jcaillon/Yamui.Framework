@@ -14,10 +14,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using TheArtOfDev.HtmlRenderer.Core.Entities;
-using TheArtOfDev.HtmlRenderer.Core.Utils;
+using YamuiFramework.HtmlRenderer.Core.Core.Entities;
+using YamuiFramework.HtmlRenderer.Core.Core.Utils;
 
-namespace TheArtOfDev.HtmlRenderer.Core.Handlers
+namespace YamuiFramework.HtmlRenderer.Core.Core.Handlers
 {
     /// <summary>
     /// Handler for loading a stylesheet data.
@@ -25,7 +25,7 @@ namespace TheArtOfDev.HtmlRenderer.Core.Handlers
     internal static class StylesheetLoadHandler
     {
         /// <summary>
-        /// Load stylesheet data from the given source.<br/>
+        /// LoadFromRaw stylesheet data from the given source.<br/>
         /// The source can be local file or web URI.<br/>
         /// First raise <see cref="HtmlStylesheetLoadEventArgs"/> event to allow the client to overwrite the stylesheet loading.<br/>
         /// If the stylesheet is downloaded from URI we will try to correct local URIs to absolute.<br/>
@@ -73,7 +73,7 @@ namespace TheArtOfDev.HtmlRenderer.Core.Handlers
         #region Private methods
 
         /// <summary>
-        /// Load stylesheet string from given source (file path or uri).
+        /// LoadFromRaw stylesheet string from given source (file path or uri).
         /// </summary>
         /// <param name="htmlContainer">the container of the html to handle load stylesheet for</param>
         /// <param name="src">the file path or uri to load the stylesheet from</param>
@@ -92,7 +92,7 @@ namespace TheArtOfDev.HtmlRenderer.Core.Handlers
         }
 
         /// <summary>
-        /// Load the stylesheet from local file by given path.
+        /// LoadFromRaw the stylesheet from local file by given path.
         /// </summary>
         /// <param name="htmlContainer">the container of the html to handle load stylesheet for</param>
         /// <param name="path">the stylesheet file to load</param>
@@ -122,7 +122,7 @@ namespace TheArtOfDev.HtmlRenderer.Core.Handlers
         }
 
         /// <summary>
-        /// Load the stylesheet from uri by downloading the string.
+        /// LoadFromRaw the stylesheet from uri by downloading the string.
         /// </summary>
         /// <param name="htmlContainer">the container of the html to handle load stylesheet for</param>
         /// <param name="uri">the uri to download from</param>

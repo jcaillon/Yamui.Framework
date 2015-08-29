@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
+using YamuiFramework.Themes;
 
 namespace YamuiFramework.Controls {
     [Designer("YamuiFramework.Controls.YamuiProgressSpinnerDesigner")]

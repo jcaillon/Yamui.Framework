@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using YamuiFramework.Animations;
 using YamuiFramework.Controls;
 using YamuiFramework.Native;
+using YamuiFramework.Themes;
 
 namespace YamuiFramework.Forms
 {
@@ -150,7 +151,7 @@ namespace YamuiFramework.Forms
         {
             base.OnPaint(e);
 
-            using (SolidBrush b = new SolidBrush(ThemeManager.FormColor.BackColor()))
+            using (SolidBrush b = new SolidBrush(ThemeManager.Current.FormColorBackColor))
             {
                 e.Graphics.FillRectangle(b, new Rectangle(Width - progressWidth, 0, progressWidth, 5));
             }

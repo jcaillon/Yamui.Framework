@@ -1,6 +1,4 @@
-﻿using YamuiFramework.Controls;
-
-namespace MetroFramework.Demo
+﻿namespace YamuiDemoApp
 {
     partial class TaskWindowControl
     {

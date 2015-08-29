@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
+using YamuiFramework.Themes;
 
 namespace YamuiFramework.Controls {
     [Designer("YamuiFramework.Controls.YamuiColorRadioButtonDesigner")]
@@ -72,7 +73,7 @@ namespace YamuiFramework.Controls {
         protected virtual void OnPaintForeground(PaintEventArgs e) {
 
             if (!Checked && _isHovered)
-                using (SolidBrush b = new SolidBrush(ThemeManager.ButtonColors.Hover.BackColor()))
+                using (SolidBrush b = new SolidBrush(ThemeManager.Current.ButtonColorsHoverBackColor))
                     e.Graphics.FillRectangle(b, new Rectangle(0, 0, Width, Height));
 
             Rectangle boxRect = (!Checked) ? new Rectangle(5, 5, Width - 10, Height - 10) : new Rectangle(0, 0, Width, Height);

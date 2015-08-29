@@ -12,13 +12,13 @@
 
 using System;
 using System.Collections.Generic;
-using TheArtOfDev.HtmlRenderer.Adapters;
-using TheArtOfDev.HtmlRenderer.Adapters.Entities;
-using TheArtOfDev.HtmlRenderer.Core.Entities;
-using TheArtOfDev.HtmlRenderer.Core.Parse;
-using TheArtOfDev.HtmlRenderer.Core.Utils;
+using YamuiFramework.HtmlRenderer.Core.Adapters;
+using YamuiFramework.HtmlRenderer.Core.Adapters.Entities;
+using YamuiFramework.HtmlRenderer.Core.Core.Entities;
+using YamuiFramework.HtmlRenderer.Core.Core.Parse;
+using YamuiFramework.HtmlRenderer.Core.Core.Utils;
 
-namespace TheArtOfDev.HtmlRenderer.Core.Dom
+namespace YamuiFramework.HtmlRenderer.Core.Core.Dom
 {
     /// <summary>
     /// Layout engine for tables executing the complex layout of tables with rows/columns/headers/etc.

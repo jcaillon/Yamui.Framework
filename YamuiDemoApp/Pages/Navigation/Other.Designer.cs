@@ -1,4 +1,4 @@
-﻿namespace YamuiDemoApp.Pages {
+﻿namespace YamuiDemoApp.Pages.Navigation {
     partial class Other {
         /// <summary> 
         /// Required designer variable.

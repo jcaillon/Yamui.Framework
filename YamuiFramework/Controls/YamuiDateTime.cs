@@ -3,6 +3,8 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using YamuiFramework.Fonts;
+using YamuiFramework.Themes;
 
 namespace YamuiFramework.Controls {
     [ToolboxBitmap(typeof(DateTimePicker))]
@@ -106,7 +108,7 @@ namespace YamuiFramework.Controls {
                         e.Graphics.FillRectangle(b, boxRect);
                     }
                 } else {
-                    foreColor = ThemeManager.ButtonColors.Disabled.ForeColor();
+                    foreColor = ThemeManager.Current.ButtonColorsDisabledForeColor;
                 }
             }
 

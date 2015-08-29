@@ -32,9 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MetroFramework">
-      <HintPath>..\..\4GL-npp-plugin\packages\MetroModernUI.1.3.0.0\lib\net\MetroFramework.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -45,9 +42,6 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="YamuiFramework">
-      <HintPath>..\YamuiFramework\bin\Debug\YamuiFramework.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Form1.cs">
@@ -56,9 +50,7 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Pages\control\Classic.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="Pages\control\Classic.cs" />
     <Compile Include="Pages\control\Classic.Designer.cs">
       <DependentUpon>Classic.cs</DependentUpon>
     </Compile>
@@ -73,12 +65,6 @@
     </Compile>
     <Compile Include="Pages\control\Text.Designer.cs">
       <DependentUpon>Text.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\Navigation.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Pages\Navigation.Designer.cs">
-      <DependentUpon>Navigation.cs</DependentUpon>
     </Compile>
     <Compile Include="Pages\control\ItemControl.cs">
       <SubType>UserControl</SubType>
@@ -124,9 +110,6 @@
     <EmbeddedResource Include="Pages\control\Text.resx">
       <DependentUpon>Text.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Pages\Navigation.resx">
-      <DependentUpon>Navigation.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Pages\control\ItemControl.resx">
       <DependentUpon>ItemControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -164,6 +147,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="hello_kitty.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\YamuiFramework\YamuiFramework.csproj">
+      <Project>{0a4be330-b2bb-43a5-b392-15dce4736e55}</Project>
+      <Name>YamuiFramework</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

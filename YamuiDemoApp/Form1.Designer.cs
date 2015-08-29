@@ -1,4 +1,7 @@
-﻿namespace YamuiDemoApp {
+﻿using YamuiDemoApp.Pages.control;
+using YamuiFramework.Fonts;
+
+namespace YamuiDemoApp {
     partial class Form1 {
         /// <summary>
         /// Required designer variable.
@@ -27,20 +30,20 @@
             this.pageClassic = new YamuiFramework.Controls.YamuiTabPage();
             this.yamuiTabControl2 = new YamuiFramework.Controls.YamuiTabControl();
             this.yamuiTabPage2 = new YamuiFramework.Controls.YamuiTabPage();
-            this.classic1 = new YamuiDemoApp.Pages.Classic();
+            this.classic1 = new YamuiDemoApp.Pages.control.Classic();
             this.yamuiTabPage6 = new YamuiFramework.Controls.YamuiTabPage();
-            this.itemControl1 = new YamuiDemoApp.Pages.ItemControl();
+            this.itemControl1 = new YamuiDemoApp.Pages.control.ItemControl();
             this.yamuiTabPage7 = new YamuiFramework.Controls.YamuiTabPage();
-            this.text1 = new YamuiDemoApp.Pages.Text();
+            this.text1 = new YamuiDemoApp.Pages.control.Text();
             this.yamuiTabPage4 = new YamuiFramework.Controls.YamuiTabPage();
-            this.progress1 = new YamuiDemoApp.Pages.Progress();
+            this.progress1 = new YamuiDemoApp.Pages.control.Progress();
             this.yamuiTabPage3 = new YamuiFramework.Controls.YamuiTabPage();
             this.pageFormAndNav = new YamuiFramework.Controls.YamuiTabPage();
             this.yamuiTabControl4 = new YamuiFramework.Controls.YamuiTabControl();
             this.yamuiTabPage12 = new YamuiFramework.Controls.YamuiTabPage();
             this.navigation1 = new YamuiDemoApp.Pages.PageTemplate();
             this.yamuiTabPage11 = new YamuiFramework.Controls.YamuiTabPage();
-            this.other1 = new YamuiDemoApp.Pages.Other();
+            this.other1 = new YamuiDemoApp.Pages.Navigation.Other();
             this.yamuiTabPage10 = new YamuiFramework.Controls.YamuiTabPage();
             this.yamuiTabMainSetting = new YamuiFramework.Controls.YamuiTabPage();
             this.yamuiTabControlSecSetting = new YamuiFramework.Controls.YamuiTabControl();
@@ -109,7 +112,7 @@
             this.yamuiTabControl2.Controls.Add(this.yamuiTabPage4);
             this.yamuiTabControl2.Controls.Add(this.yamuiTabPage3);
             this.yamuiTabControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.yamuiTabControl2.Function = YamuiFramework.TabFunction.Secondary;
+            this.yamuiTabControl2.Function = YamuiFramework.Fonts.TabFunction.Secondary;
             this.yamuiTabControl2.ItemSize = new System.Drawing.Size(144, 18);
             this.yamuiTabControl2.Location = new System.Drawing.Point(0, 0);
             this.yamuiTabControl2.Name = "yamuiTabControl2";
@@ -125,7 +128,7 @@
             // 
             this.yamuiTabPage2.BackColor = System.Drawing.Color.Transparent;
             this.yamuiTabPage2.Controls.Add(this.classic1);
-            this.yamuiTabPage2.Function = YamuiFramework.TabFunction.Secondary;
+            this.yamuiTabPage2.Function = YamuiFramework.Fonts.TabFunction.Secondary;
             this.yamuiTabPage2.Location = new System.Drawing.Point(4, 22);
             this.yamuiTabPage2.Name = "yamuiTabPage2";
             this.yamuiTabPage2.Padding = new System.Windows.Forms.Padding(30, 25, 20, 20);
@@ -145,7 +148,7 @@
             // yamuiTabPage6
             // 
             this.yamuiTabPage6.Controls.Add(this.itemControl1);
-            this.yamuiTabPage6.Function = YamuiFramework.TabFunction.Secondary;
+            this.yamuiTabPage6.Function = YamuiFramework.Fonts.TabFunction.Secondary;
             this.yamuiTabPage6.Location = new System.Drawing.Point(4, 22);
             this.yamuiTabPage6.Name = "yamuiTabPage6";
             this.yamuiTabPage6.Padding = new System.Windows.Forms.Padding(30, 25, 0, 0);
@@ -164,7 +167,7 @@
             // yamuiTabPage7
             // 
             this.yamuiTabPage7.Controls.Add(this.text1);
-            this.yamuiTabPage7.Function = YamuiFramework.TabFunction.Secondary;
+            this.yamuiTabPage7.Function = YamuiFramework.Fonts.TabFunction.Secondary;
             this.yamuiTabPage7.Location = new System.Drawing.Point(4, 22);
             this.yamuiTabPage7.Name = "yamuiTabPage7";
             this.yamuiTabPage7.Padding = new System.Windows.Forms.Padding(30, 25, 0, 0);
@@ -184,7 +187,7 @@
             // yamuiTabPage4
             // 
             this.yamuiTabPage4.Controls.Add(this.progress1);
-            this.yamuiTabPage4.Function = YamuiFramework.TabFunction.Secondary;
+            this.yamuiTabPage4.Function = YamuiFramework.Fonts.TabFunction.Secondary;
             this.yamuiTabPage4.Location = new System.Drawing.Point(4, 22);
             this.yamuiTabPage4.Name = "yamuiTabPage4";
             this.yamuiTabPage4.Padding = new System.Windows.Forms.Padding(30, 25, 0, 0);
@@ -202,7 +205,7 @@
             // 
             // yamuiTabPage3
             // 
-            this.yamuiTabPage3.Function = YamuiFramework.TabFunction.Secondary;
+            this.yamuiTabPage3.Function = YamuiFramework.Fonts.TabFunction.Secondary;
             this.yamuiTabPage3.Location = new System.Drawing.Point(4, 22);
             this.yamuiTabPage3.Name = "yamuiTabPage3";
             this.yamuiTabPage3.Padding = new System.Windows.Forms.Padding(30, 25, 0, 0);
@@ -225,7 +228,7 @@
             this.yamuiTabControl4.Controls.Add(this.yamuiTabPage11);
             this.yamuiTabControl4.Controls.Add(this.yamuiTabPage10);
             this.yamuiTabControl4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.yamuiTabControl4.Function = YamuiFramework.TabFunction.Secondary;
+            this.yamuiTabControl4.Function = YamuiFramework.Fonts.TabFunction.Secondary;
             this.yamuiTabControl4.ItemSize = new System.Drawing.Size(244, 18);
             this.yamuiTabControl4.Location = new System.Drawing.Point(0, 0);
             this.yamuiTabControl4.Margin = new System.Windows.Forms.Padding(0);
@@ -241,7 +244,7 @@
             // yamuiTabPage12
             // 
             this.yamuiTabPage12.Controls.Add(this.navigation1);
-            this.yamuiTabPage12.Function = YamuiFramework.TabFunction.Secondary;
+            this.yamuiTabPage12.Function = YamuiFramework.Fonts.TabFunction.Secondary;
             this.yamuiTabPage12.Location = new System.Drawing.Point(4, 22);
             this.yamuiTabPage12.Name = "yamuiTabPage12";
             this.yamuiTabPage12.Padding = new System.Windows.Forms.Padding(30, 25, 0, 0);
@@ -260,7 +263,7 @@
             // yamuiTabPage11
             // 
             this.yamuiTabPage11.Controls.Add(this.other1);
-            this.yamuiTabPage11.Function = YamuiFramework.TabFunction.Secondary;
+            this.yamuiTabPage11.Function = YamuiFramework.Fonts.TabFunction.Secondary;
             this.yamuiTabPage11.Location = new System.Drawing.Point(4, 22);
             this.yamuiTabPage11.Name = "yamuiTabPage11";
             this.yamuiTabPage11.Padding = new System.Windows.Forms.Padding(30, 25, 0, 0);
@@ -278,7 +281,7 @@
             // 
             // yamuiTabPage10
             // 
-            this.yamuiTabPage10.Function = YamuiFramework.TabFunction.Secondary;
+            this.yamuiTabPage10.Function = YamuiFramework.Fonts.TabFunction.Secondary;
             this.yamuiTabPage10.Location = new System.Drawing.Point(4, 22);
             this.yamuiTabPage10.Name = "yamuiTabPage10";
             this.yamuiTabPage10.Padding = new System.Windows.Forms.Padding(30, 25, 0, 0);
@@ -300,7 +303,7 @@
             // 
             this.yamuiTabControlSecSetting.Controls.Add(this.yamuiTabSecAppearance);
             this.yamuiTabControlSecSetting.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.yamuiTabControlSecSetting.Function = YamuiFramework.TabFunction.Secondary;
+            this.yamuiTabControlSecSetting.Function = YamuiFramework.Fonts.TabFunction.Secondary;
             this.yamuiTabControlSecSetting.ItemSize = new System.Drawing.Size(742, 18);
             this.yamuiTabControlSecSetting.Location = new System.Drawing.Point(0, 0);
             this.yamuiTabControlSecSetting.Name = "yamuiTabControlSecSetting";
@@ -314,7 +317,7 @@
             // yamuiTabSecAppearance
             // 
             this.yamuiTabSecAppearance.Controls.Add(this.settingAppearance1);
-            this.yamuiTabSecAppearance.Function = YamuiFramework.TabFunction.Secondary;
+            this.yamuiTabSecAppearance.Function = YamuiFramework.Fonts.TabFunction.Secondary;
             this.yamuiTabSecAppearance.Location = new System.Drawing.Point(4, 22);
             this.yamuiTabSecAppearance.Name = "yamuiTabSecAppearance";
             this.yamuiTabSecAppearance.Padding = new System.Windows.Forms.Padding(30, 25, 0, 0);
@@ -353,7 +356,7 @@
             // 
             this.yamuiLabel24.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.yamuiLabel24.AutoSize = true;
-            this.yamuiLabel24.Function = YamuiFramework.LabelFunction.Small;
+            this.yamuiLabel24.Function = YamuiFramework.Fonts.LabelFunction.Small;
             this.yamuiLabel24.Location = new System.Drawing.Point(56, 12);
             this.yamuiLabel24.Margin = new System.Windows.Forms.Padding(5);
             this.yamuiLabel24.Name = "yamuiLabel24";
@@ -364,7 +367,7 @@
             // yamuiLink6
             // 
             this.yamuiLink6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.yamuiLink6.Function = YamuiFramework.LabelFunction.TopLink;
+            this.yamuiLink6.Function = YamuiFramework.Fonts.LabelFunction.TopLink;
             this.yamuiLink6.Location = new System.Drawing.Point(1, 10);
             this.yamuiLink6.Name = "yamuiLink6";
             this.yamuiLink6.Size = new System.Drawing.Size(57, 17);
@@ -376,7 +379,7 @@
             // 
             this.yamuiLabel25.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.yamuiLabel25.AutoSize = true;
-            this.yamuiLabel25.Function = YamuiFramework.LabelFunction.Small;
+            this.yamuiLabel25.Function = YamuiFramework.Fonts.LabelFunction.Small;
             this.yamuiLabel25.Location = new System.Drawing.Point(103, 12);
             this.yamuiLabel25.Margin = new System.Windows.Forms.Padding(5);
             this.yamuiLabel25.Name = "yamuiLabel25";
@@ -387,7 +390,7 @@
             // yamuiLink7
             // 
             this.yamuiLink7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.yamuiLink7.Function = YamuiFramework.LabelFunction.TopLink;
+            this.yamuiLink7.Function = YamuiFramework.Fonts.LabelFunction.TopLink;
             this.yamuiLink7.Location = new System.Drawing.Point(61, 10);
             this.yamuiLink7.Name = "yamuiLink7";
             this.yamuiLink7.Size = new System.Drawing.Size(43, 17);
@@ -398,7 +401,7 @@
             // yamuiLink8
             // 
             this.yamuiLink8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.yamuiLink8.Function = YamuiFramework.LabelFunction.TopLink;
+            this.yamuiLink8.Function = YamuiFramework.Fonts.LabelFunction.TopLink;
             this.yamuiLink8.Location = new System.Drawing.Point(109, 10);
             this.yamuiLink8.Name = "yamuiLink8";
             this.yamuiLink8.Size = new System.Drawing.Size(32, 17);
@@ -408,7 +411,8 @@
             // yamuiLabel19
             // 
             this.yamuiLabel19.AutoSize = true;
-            this.yamuiLabel19.Function = YamuiFramework.LabelFunction.FormTitle;
+            this.yamuiLabel19.Enabled = false;
+            this.yamuiLabel19.Function = YamuiFramework.Fonts.LabelFunction.FormTitle;
             this.yamuiLabel19.Location = new System.Drawing.Point(8, 10);
             this.yamuiLabel19.Margin = new System.Windows.Forms.Padding(5);
             this.yamuiLabel19.Name = "yamuiLabel19";
@@ -485,11 +489,11 @@
         private YamuiFramework.Controls.YamuiTabPage yamuiTabPage12;
         private Pages.PageTemplate navigation1;
         private Pages.SettingAppearance settingAppearance1;
-        private Pages.Classic classic1;
-        private Pages.ItemControl itemControl1;
-        private Pages.Text text1;
-        private Pages.Progress progress1;
-        private Pages.Other other1;
+        private Classic classic1;
+        private ItemControl itemControl1;
+        private Text text1;
+        private Progress progress1;
+        private Pages.Navigation.Other other1;
 
 
     }

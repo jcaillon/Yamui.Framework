@@ -10,7 +10,7 @@ using YamuiFramework.Controls;
 using YamuiFramework.Forms;
 
 namespace YamuiDemoApp.Pages {
-    public partial class PageTemplate : YamuiUserControl {
+    public partial class PageTemplate : YamuiPage {
 
         #region fields
         private Form _ownerForm;

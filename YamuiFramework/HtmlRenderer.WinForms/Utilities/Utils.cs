@@ -12,9 +12,9 @@
 
 using System;
 using System.Drawing;
-using TheArtOfDev.HtmlRenderer.Adapters.Entities;
+using YamuiFramework.HtmlRenderer.Core.Adapters.Entities;
 
-namespace TheArtOfDev.HtmlRenderer.WinForms.Utilities
+namespace YamuiFramework.HtmlRenderer.WinForms.Utilities
 {
     /// <summary>
     /// Utilities for converting WinForms entities to HtmlRenderer core entities.

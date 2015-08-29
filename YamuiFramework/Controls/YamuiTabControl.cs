@@ -15,8 +15,10 @@ using System.Windows.Forms.Design;
 using YamuiFramework.Animations.Animator;
 using YamuiFramework.Animations.Transitions;
 using YamuiFramework.Controls;
+using YamuiFramework.Fonts;
 using YamuiFramework.Forms;
 using YamuiFramework.Native;
+using YamuiFramework.Themes;
 
 namespace YamuiFramework.Controls {
 
@@ -234,7 +236,7 @@ namespace YamuiFramework.Controls {
 
         protected void CustomOnPaintBackground(PaintEventArgs e) {
             try {
-                Color backColor = ThemeManager.TabsColors.Normal.BackColor();
+                Color backColor = ThemeManager.Current.TabsColorsNormalBackColor;
                 if (backColor != Color.Transparent)
                     e.Graphics.Clear(backColor);
                 else
@@ -280,7 +282,7 @@ namespace YamuiFramework.Controls {
             }
 
             // redraw the back just in case
-            Color backColor = ThemeManager.TabsColors.Normal.BackColor();
+            Color backColor = ThemeManager.Current.TabsColorsNormalBackColor;
             if (backColor != Color.Transparent) {
                 using (SolidBrush b = new SolidBrush(backColor))
                     graphics.FillRectangle(b, thisTabRekt);
@@ -293,7 +295,7 @@ namespace YamuiFramework.Controls {
 
         /*
         private void DrawUpDown(Graphics graphics) {
-            Color backColor = ThemeManager.FormColor.BackColor();
+            Color backColor = ThemeManager.Current.FormColorBackColor;
             Rectangle borderRect = new Rectangle();
             WinApi.GetClientRect(_scUpDown.Handle, ref borderRect);
             graphics.CompositingQuality = CompositingQuality.HighQuality;

@@ -13,7 +13,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace TheArtOfDev.HtmlRenderer.Core.Parse
+namespace YamuiFramework.HtmlRenderer.Core.Core.Parse
 {
     /// <summary>
     /// Collection of regular expressions used when parsing

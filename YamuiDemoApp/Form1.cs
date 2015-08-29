@@ -6,7 +6,6 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using MetroFramework.Demo;
 using YamuiFramework;
 using YamuiFramework.Animations.Transitions;
 using YamuiFramework.Controls;

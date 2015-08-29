@@ -15,12 +15,12 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Text;
 using System.Windows.Forms;
-using TheArtOfDev.HtmlRenderer.Core;
-using TheArtOfDev.HtmlRenderer.Core.Entities;
-using TheArtOfDev.HtmlRenderer.WinForms.Utilities;
-using YamuiFramework;
+using YamuiFramework.HtmlRenderer.Core.Core;
+using YamuiFramework.HtmlRenderer.Core.Core.Entities;
+using YamuiFramework.HtmlRenderer.WinForms.Utilities;
+using YamuiFramework.Themes;
 
-namespace TheArtOfDev.HtmlRenderer.WinForms
+namespace YamuiFramework.HtmlRenderer.WinForms
 {
     /// <summary>
     /// Provides HTML rendering on the tooltips.

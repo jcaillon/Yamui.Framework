@@ -12,7 +12,7 @@
 
 using System;
 
-namespace TheArtOfDev.HtmlRenderer.Core.Utils
+namespace YamuiFramework.HtmlRenderer.Core.Core.Utils
 {
     /// <summary>
     /// Represents sub-string of a full string starting at specific location with a specific length.

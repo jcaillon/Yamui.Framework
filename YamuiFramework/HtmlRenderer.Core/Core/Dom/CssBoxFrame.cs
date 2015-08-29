@@ -14,13 +14,13 @@ using System;
 using System.Net;
 using System.Text;
 using System.Threading;
-using TheArtOfDev.HtmlRenderer.Adapters;
-using TheArtOfDev.HtmlRenderer.Adapters.Entities;
-using TheArtOfDev.HtmlRenderer.Core.Entities;
-using TheArtOfDev.HtmlRenderer.Core.Handlers;
-using TheArtOfDev.HtmlRenderer.Core.Utils;
+using YamuiFramework.HtmlRenderer.Core.Adapters;
+using YamuiFramework.HtmlRenderer.Core.Adapters.Entities;
+using YamuiFramework.HtmlRenderer.Core.Core.Entities;
+using YamuiFramework.HtmlRenderer.Core.Core.Handlers;
+using YamuiFramework.HtmlRenderer.Core.Core.Utils;
 
-namespace TheArtOfDev.HtmlRenderer.Core.Dom
+namespace YamuiFramework.HtmlRenderer.Core.Core.Dom
 {
     /// <summary>
     /// CSS box for iframe element.<br/>
@@ -138,7 +138,7 @@ namespace TheArtOfDev.HtmlRenderer.Core.Dom
         #region Private methods
 
         /// <summary>
-        /// Load YouTube video data (title, image, link) by calling YouTube API.
+        /// LoadFromRaw YouTube video data (title, image, link) by calling YouTube API.
         /// </summary>
         private void LoadYoutubeDataAsync(Uri uri)
         {
@@ -274,7 +274,7 @@ namespace TheArtOfDev.HtmlRenderer.Core.Dom
         }
 
         /// <summary>
-        /// Load Vimeo video data (title, image, link) by calling Vimeo API.
+        /// LoadFromRaw Vimeo video data (title, image, link) by calling Vimeo API.
         /// </summary>
         private void LoadVimeoDataAsync(Uri uri)
         {

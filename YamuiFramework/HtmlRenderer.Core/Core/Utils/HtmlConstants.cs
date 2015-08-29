@@ -1,4 +1,4 @@
-namespace TheArtOfDev.HtmlRenderer.Core.Utils
+namespace YamuiFramework.HtmlRenderer.Core.Core.Utils
 {
     /// <summary>
     /// Defines HTML strings

@@ -13,12 +13,12 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using TheArtOfDev.HtmlRenderer.Adapters.Entities;
-using TheArtOfDev.HtmlRenderer.Core.Dom;
-using TheArtOfDev.HtmlRenderer.Core.Entities;
-using TheArtOfDev.HtmlRenderer.Core.Parse;
+using YamuiFramework.HtmlRenderer.Core.Adapters.Entities;
+using YamuiFramework.HtmlRenderer.Core.Core.Dom;
+using YamuiFramework.HtmlRenderer.Core.Core.Entities;
+using YamuiFramework.HtmlRenderer.Core.Core.Parse;
 
-namespace TheArtOfDev.HtmlRenderer.Core.Utils
+namespace YamuiFramework.HtmlRenderer.Core.Core.Utils
 {
     /// <summary>
     /// Utility class for traversing DOM structure and execution stuff on it.

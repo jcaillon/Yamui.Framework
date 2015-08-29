@@ -7,6 +7,7 @@ using System.Security;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 using YamuiFramework.Native;
+using YamuiFramework.Themes;
 
 namespace YamuiFramework.Controls {
     #region Enums

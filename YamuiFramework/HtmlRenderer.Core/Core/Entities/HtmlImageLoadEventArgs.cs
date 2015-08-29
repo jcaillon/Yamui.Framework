@@ -12,10 +12,10 @@
 
 using System;
 using System.Collections.Generic;
-using TheArtOfDev.HtmlRenderer.Adapters.Entities;
-using TheArtOfDev.HtmlRenderer.Core.Utils;
+using YamuiFramework.HtmlRenderer.Core.Adapters.Entities;
+using YamuiFramework.HtmlRenderer.Core.Core.Utils;
 
-namespace TheArtOfDev.HtmlRenderer.Core.Entities
+namespace YamuiFramework.HtmlRenderer.Core.Core.Entities
 {
     /// <summary>
     /// Callback used in <see cref="HtmlImageLoadEventArgs"/> to allow setting image externally and async.<br/>

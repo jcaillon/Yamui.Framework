@@ -1,4 +1,6 @@
-﻿namespace YamuiDemoApp.Pages {
+﻿using YamuiFramework.Fonts;
+
+namespace YamuiDemoApp.Pages.control {
     partial class Progress {
         /// <summary> 
         /// Required designer variable.
@@ -91,7 +93,7 @@
             // yamuiLabel9
             // 
             this.yamuiLabel9.AutoSize = true;
-            this.yamuiLabel9.Function = YamuiFramework.LabelFunction.Heading;
+            this.yamuiLabel9.Function = LabelFunction.Heading;
             this.yamuiLabel9.Location = new System.Drawing.Point(0, 185);
             this.yamuiLabel9.Name = "yamuiLabel9";
             this.yamuiLabel9.Size = new System.Drawing.Size(131, 19);
@@ -114,7 +116,7 @@
             // yamuiLabel5
             // 
             this.yamuiLabel5.AutoSize = true;
-            this.yamuiLabel5.Function = YamuiFramework.LabelFunction.Heading;
+            this.yamuiLabel5.Function = LabelFunction.Heading;
             this.yamuiLabel5.Location = new System.Drawing.Point(0, 123);
             this.yamuiLabel5.Name = "yamuiLabel5";
             this.yamuiLabel5.Size = new System.Drawing.Size(92, 19);
@@ -142,7 +144,7 @@
             // yamuiLabel4
             // 
             this.yamuiLabel4.AutoSize = true;
-            this.yamuiLabel4.Function = YamuiFramework.LabelFunction.Heading;
+            this.yamuiLabel4.Function = LabelFunction.Heading;
             this.yamuiLabel4.Location = new System.Drawing.Point(0, 0);
             this.yamuiLabel4.Name = "yamuiLabel4";
             this.yamuiLabel4.Size = new System.Drawing.Size(112, 19);

@@ -5,6 +5,8 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
+using YamuiFramework.Fonts;
+using YamuiFramework.Themes;
 
 namespace YamuiFramework.Controls {
     #region Enums
@@ -36,8 +38,17 @@ namespace YamuiFramework.Controls {
             get { return _function; }
             set {
                 _function = value;
-                Margin = _function == LabelFunction.Heading ? new Padding(20, 5, 5, 7) : new Padding(5, 5, 5, 5);
+                Margin = _function == LabelFunction.Heading ? new Padding(5, 18, 5, 7) : new Padding(3, 3, 3, 3);
             }
+        }
+
+        private bool _fakeDisabled;
+
+        [DefaultValue(false)]
+        [Category("Yamui")]
+        public bool FakeDisabled {
+            get { return _fakeDisabled; }
+            set { _fakeDisabled = value; Invalidate(); }
         }
 
         private bool _wrapToLine;
@@ -106,7 +117,7 @@ namespace YamuiFramework.Controls {
 
         protected virtual void OnPaintForeground(PaintEventArgs e) {
 
-            Color foreColor = ThemeManager.LabelsColors.ForeGround(ForeColor, UseCustomForeColor, false, false, false, Enabled);
+            Color foreColor = ThemeManager.LabelsColors.ForeGround(ForeColor, UseCustomForeColor, false, false, false, !FakeDisabled);
 
             TextRenderer.DrawText(e.Graphics, Text, FontManager.GetLabelFont(Function), ClientRectangle, foreColor, FontManager.GetTextFormatFlags(TextAlign, _wrapToLine));
         }

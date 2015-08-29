@@ -1,9 +1,9 @@
 using System;
 using System.Globalization;
-using TheArtOfDev.HtmlRenderer.Core.Parse;
-using TheArtOfDev.HtmlRenderer.Core.Utils;
+using YamuiFramework.HtmlRenderer.Core.Core.Parse;
+using YamuiFramework.HtmlRenderer.Core.Core.Utils;
 
-namespace TheArtOfDev.HtmlRenderer.Core.Dom
+namespace YamuiFramework.HtmlRenderer.Core.Core.Dom
 {
     /// <summary>
     /// Represents and gets info about a CSS Length

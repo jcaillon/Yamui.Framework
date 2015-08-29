@@ -5,7 +5,7 @@
 using System;
 using System.Text;
 
-namespace TheArtOfDev.HtmlRenderer.Adapters.Entities
+namespace YamuiFramework.HtmlRenderer.Core.Adapters.Entities
 {
     /// <summary>
     /// Represents an ARGB (alpha, red, green, blue) color.

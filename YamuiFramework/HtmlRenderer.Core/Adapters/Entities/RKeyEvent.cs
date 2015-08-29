@@ -10,9 +10,9 @@
 // - Sun Tsu,
 // "The Art of War"
 
-using TheArtOfDev.HtmlRenderer.Core;
+using YamuiFramework.HtmlRenderer.Core.Core;
 
-namespace TheArtOfDev.HtmlRenderer.Adapters.Entities
+namespace YamuiFramework.HtmlRenderer.Core.Adapters.Entities
 {
     /// <summary>
     /// Even class for handling keyboard events in <see cref="HtmlContainerInt"/>.

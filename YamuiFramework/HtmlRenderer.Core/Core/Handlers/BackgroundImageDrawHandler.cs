@@ -11,11 +11,11 @@
 // "The Art of War"
 
 using System;
-using TheArtOfDev.HtmlRenderer.Adapters;
-using TheArtOfDev.HtmlRenderer.Adapters.Entities;
-using TheArtOfDev.HtmlRenderer.Core.Dom;
+using YamuiFramework.HtmlRenderer.Core.Adapters;
+using YamuiFramework.HtmlRenderer.Core.Adapters.Entities;
+using YamuiFramework.HtmlRenderer.Core.Core.Dom;
 
-namespace TheArtOfDev.HtmlRenderer.Core.Handlers
+namespace YamuiFramework.HtmlRenderer.Core.Core.Handlers
 {
     /// <summary>
     /// Contains all the paint code to paint different background images.

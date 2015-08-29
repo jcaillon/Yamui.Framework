@@ -1,17 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
-using MetroFramework.Demo;
 using YamuiFramework.Controls;
 using YamuiFramework.Forms;
 
-namespace YamuiDemoApp.Pages {
-    public partial class Other : YamuiUserControl {
+namespace YamuiDemoApp.Pages.Navigation {
+    public partial class Other : YamuiPage {
         public Other() {
             InitializeComponent();
         }

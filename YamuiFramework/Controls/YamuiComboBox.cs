@@ -6,6 +6,8 @@ using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
+using YamuiFramework.Fonts;
+using YamuiFramework.Themes;
 
 namespace YamuiFramework.Controls {
 
@@ -142,13 +144,13 @@ namespace YamuiFramework.Controls {
         protected override void OnDrawItem(DrawItemEventArgs e) {
             if (e.Index >= 0) {
                 Color foreColor;
-                Color backColor = ThemeManager.ButtonColors.Normal.BackColor();
+                Color backColor = ThemeManager.Current.ButtonColorsNormalBackColor;
 
                 if ((e.State & DrawItemState.Selected) == DrawItemState.Selected) {
                     backColor = ThemeManager.AccentColor;
-                    foreColor = ThemeManager.ButtonColors.Press.ForeColor();
+                    foreColor = ThemeManager.Current.ButtonColorsPressForeColor;
                 } else {
-                    foreColor = ThemeManager.ButtonColors.Normal.ForeColor();
+                    foreColor = ThemeManager.Current.ButtonColorsNormalForeColor;
                 }
 
                 using (SolidBrush b = new SolidBrush(backColor)) {

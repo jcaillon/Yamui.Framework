@@ -11,9 +11,9 @@
 // "The Art of War"
 
 using System.Collections.Generic;
-using TheArtOfDev.HtmlRenderer.Core.Utils;
+using YamuiFramework.HtmlRenderer.Core.Core.Utils;
 
-namespace TheArtOfDev.HtmlRenderer.Core.Entities
+namespace YamuiFramework.HtmlRenderer.Core.Core.Entities
 {
     /// <summary>
     /// Represents a block of CSS property values.<br/>

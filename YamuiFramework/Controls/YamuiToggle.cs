@@ -5,7 +5,9 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
+using YamuiFramework.Fonts;
 using YamuiFramework.Native;
+using YamuiFramework.Themes;
 
 namespace YamuiFramework.Controls {
     [Designer("YamuiFramework.Controls.YamuiToggleDesigner")]
@@ -81,7 +83,7 @@ namespace YamuiFramework.Controls {
                 e.Graphics.DrawRectangle(p, boxRect);
             }
 
-            Color fillColor = Checked ? ThemeManager.AccentColor : ThemeManager.ButtonColors.Normal.BackColor();
+            Color fillColor = Checked ? ThemeManager.AccentColor : ThemeManager.Current.ButtonColorsNormalBackColor;
 
             using (SolidBrush b = new SolidBrush(fillColor)) {
                 Rectangle boxRect = new Rectangle(2, 2, backRect.Width - 4, backRect.Height - 4);
@@ -96,7 +98,7 @@ namespace YamuiFramework.Controls {
                 Rectangle boxRect = new Rectangle(left, 0, 11, backRect.Height);
                 e.Graphics.FillRectangle(b, boxRect);
             }
-            using (SolidBrush b = new SolidBrush(ThemeManager.ButtonColors.Hover.BackColor())) {
+            using (SolidBrush b = new SolidBrush(ThemeManager.Current.ButtonColorsHoverBackColor)) {
                 int left = Checked ? backRect.Width - 10 : 0;
 
                 Rectangle boxRect = new Rectangle(left, 0, 10, backRect.Height);

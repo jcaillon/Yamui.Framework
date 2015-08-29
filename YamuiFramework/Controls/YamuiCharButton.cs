@@ -6,6 +6,7 @@ using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 using YamuiFramework.Forms;
+using YamuiFramework.Themes;
 
 namespace YamuiFramework.Controls {
 
@@ -13,6 +14,7 @@ namespace YamuiFramework.Controls {
     [ToolboxBitmap(typeof(Button))]
     [DefaultEvent("Click")]
     public class YamuiCharButton : YamuiButton {
+        
 
         #region Fields
         [DefaultValue(false)]
@@ -22,14 +24,24 @@ namespace YamuiFramework.Controls {
         [DefaultValue("ç")]
         [Category("Yamui")]
         public string ButtonChar { get; set; }
+
+        private bool _fakeDisabled;
+
+        [DefaultValue(false)]
+        [Category("Yamui")]
+        public bool FakeDisabled {
+            get { return _fakeDisabled; }
+            set { _fakeDisabled = value; Invalidate(); }
+        }
+
         #endregion
 
         #region Paint Methods
         protected override void OnPaint(PaintEventArgs e) {
             try {
-                Color backColor = ThemeManager.ButtonColors.BackGround(BackColor, UseCustomBackColor, IsFocused, IsHovered, IsPressed, Enabled);
-                Color borderColor = ThemeManager.ButtonColors.BorderColor(IsFocused, IsHovered, IsPressed, Enabled);
-                Color foreColor = ThemeManager.ButtonColors.ForeGround(ForeColor, UseCustomForeColor, IsFocused, IsHovered, IsPressed, Enabled);
+                Color backColor = ThemeManager.ButtonColors.BackGround(BackColor, UseCustomBackColor, IsFocused, IsHovered, IsPressed, Enabled && !FakeDisabled);
+                Color borderColor = ThemeManager.ButtonColors.BorderColor(IsFocused, IsHovered, IsPressed, Enabled && !FakeDisabled);
+                Color foreColor = ThemeManager.ButtonColors.ForeGround(ForeColor, UseCustomForeColor, IsFocused, IsHovered, IsPressed, Enabled && !FakeDisabled);
 
                 var designRect = ClientRectangle;
                 designRect.Width -= 2;

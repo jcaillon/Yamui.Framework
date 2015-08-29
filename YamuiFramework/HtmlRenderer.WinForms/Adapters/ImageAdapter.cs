@@ -11,9 +11,9 @@
 // "The Art of War"
 
 using System.Drawing;
-using TheArtOfDev.HtmlRenderer.Adapters;
+using YamuiFramework.HtmlRenderer.Core.Adapters;
 
-namespace TheArtOfDev.HtmlRenderer.WinForms.Adapters
+namespace YamuiFramework.HtmlRenderer.WinForms.Adapters
 {
     /// <summary>
     /// Adapter for WinForms Image object for core.

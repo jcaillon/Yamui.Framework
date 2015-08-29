@@ -5,6 +5,8 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
+using YamuiFramework.Fonts;
+using YamuiFramework.Themes;
 
 namespace YamuiFramework.Controls {
     [Designer("YamuiFramework.Controls.YamuiTextBoxDesigner")]
@@ -470,7 +472,7 @@ namespace YamuiFramework.Controls {
                         break;
                 }
 
-                TextRenderer.DrawText(g, _waterMark, FontManager.GetStandardWaterMarkFont(), clientRectangle, ThemeManager.ButtonColors.Disabled.ForeColor(), flags);
+                TextRenderer.DrawText(g, _waterMark, FontManager.GetStandardWaterMarkFont(), clientRectangle, ThemeManager.Current.ButtonColorsDisabledForeColor, flags);
             }
 
             protected override void OnTextAlignChanged(EventArgs e) {

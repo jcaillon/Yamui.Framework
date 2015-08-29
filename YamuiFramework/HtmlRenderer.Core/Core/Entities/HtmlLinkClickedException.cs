@@ -12,7 +12,7 @@
 
 using System;
 
-namespace TheArtOfDev.HtmlRenderer.Core.Entities
+namespace YamuiFramework.HtmlRenderer.Core.Core.Entities
 {
     /// <summary>
     /// Exception thrown when client code subscribed to LinkClicked event thrown exception.

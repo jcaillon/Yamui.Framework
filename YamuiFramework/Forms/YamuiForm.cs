@@ -11,22 +11,12 @@ using System.Runtime.InteropServices;
 using System.Security;
 using System.Web.UI.Design.WebControls;
 using System.Windows.Forms;
-using TheArtOfDev.HtmlRenderer.WinForms;
 using YamuiFramework.Controls;
+using YamuiFramework.HtmlRenderer.WinForms;
 using YamuiFramework.Native;
+using YamuiFramework.Themes;
 
 namespace YamuiFramework.Forms {
-
-    #region Enums
-
-    public enum BackLocation {
-        TopLeft,
-        TopRight,
-        BottomLeft,
-        BottomRight
-    }
-
-    #endregion
 
     public class YamuiForm : Form {
 
@@ -92,8 +82,8 @@ namespace YamuiFramework.Forms {
         protected override void OnPaintBackground(PaintEventArgs e) { }
 
         protected override void OnPaint(PaintEventArgs e) {
-            var backColor = ThemeManager.FormColor.BackColor();
-            var foreColor = ThemeManager.FormColor.ForeColor();
+            var backColor = ThemeManager.Current.FormColorBackColor;
+            var foreColor = ThemeManager.Current.FormColorForeColor;
 
             e.Graphics.Clear(backColor);
 
@@ -144,7 +134,7 @@ namespace YamuiFramework.Forms {
 
             // draw the resize pixel stuff on the bottom right
             if (Resizable && (SizeGripStyle == SizeGripStyle.Auto || SizeGripStyle == SizeGripStyle.Show)) {
-                using (var b = new SolidBrush(ThemeManager.FormColor.ForeColor())) {
+                using (var b = new SolidBrush(ThemeManager.Current.FormColorForeColor)) {
                     var resizeHandleSize = new Size(2, 2);
                     e.Graphics.FillRectangles(b, new[] {
                         new Rectangle(new Point(ClientRectangle.Width - 6, ClientRectangle.Height - 6), resizeHandleSize),
@@ -222,7 +212,7 @@ namespace YamuiFramework.Forms {
             var lastPage = _formHistory.Last();
             GoToPage(lastPage[0], lastPage[1]);
             _formHistory.Remove(_formHistory.Last());
-            if (_formHistory.Count == 0 && _goBackButton != null) _goBackButton.Enabled = false;
+            if (_formHistory.Count == 0 && _goBackButton != null) _goBackButton.FakeDisabled = true;
         }
 
         /// <summary>
@@ -236,7 +226,7 @@ namespace YamuiFramework.Forms {
             if (secControl == null) return;
             var pageSecInt = secControl.SelectedIndex;
             _formHistory.Add(new[] { pageMainInt, pageSecInt });
-            if (_goBackButton.Enabled == false) _goBackButton.Enabled = true;
+            if (_goBackButton.FakeDisabled) _goBackButton.FakeDisabled = false;
         }
 
         private IEnumerable<Control> GetAll(Control control, Type type) {
@@ -478,14 +468,14 @@ namespace YamuiFramework.Forms {
             public YamuiGoBackButton() {
                 UseWingdings = true;
                 ButtonChar = "ç";
-                Enabled = false;
+                FakeDisabled = true;
                 KeyUp += (sender, args) => {
-                    if (args.KeyCode == Keys.Space) {
+                    if (args.KeyCode == Keys.Space && !FakeDisabled) {
                         TryToGoBack();
                     }
                 };
                 MouseDown += (sender, args) => {
-                    if (args.Button == MouseButtons.Left) {
+                    if (args.Button == MouseButtons.Left && !FakeDisabled) {
                         TryToGoBack();
                     }
                 };
@@ -632,7 +622,7 @@ namespace YamuiFramework.Forms {
                 if (_isPressed)
                     e.Graphics.Clear(ThemeManager.AccentColor);
                 else if (_isHovered)
-                    e.Graphics.Clear(ThemeManager.ButtonColors.Hover.BackColor());
+                    e.Graphics.Clear(ThemeManager.Current.ButtonColorsHoverBackColor);
                 else
                     PaintTransparentBackground(e.Graphics, DisplayRectangle);
 

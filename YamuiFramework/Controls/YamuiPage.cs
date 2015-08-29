@@ -3,10 +3,11 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using YamuiFramework.Themes;
 
 namespace YamuiFramework.Controls
 {
-    public class YamuiUserControl : UserControl
+    public class YamuiPage : UserControl
     {
         #region Fields
         [DefaultValue(false)]
@@ -14,10 +15,10 @@ namespace YamuiFramework.Controls
         public bool UseCustomBackColor { get; set; }
         #endregion
 
-        public YamuiUserControl() {
+        public YamuiPage() {
         }
 
-        #region Overridden Methods
+        #region Paint
         protected void PaintTransparentBackground(Graphics graphics, Rectangle clipRect) {
             graphics.Clear(Color.Transparent);
             if ((Parent != null)) {
@@ -40,7 +41,11 @@ namespace YamuiFramework.Controls
 
         protected void CustomOnPaintBackground(PaintEventArgs e) {
             try {
-                if (UseCustomBackColor)
+                if (DesignMode) {
+                    e.Graphics.Clear(ThemeManager.Current.FormColorBackColor);
+                    return;
+                }
+                if (UseCustomBackColor) 
                     e.Graphics.Clear(BackColor);
                 else
                     PaintTransparentBackground(e.Graphics, DisplayRectangle);
@@ -65,7 +70,6 @@ namespace YamuiFramework.Controls
             base.OnEnabledChanged(e);
             Invalidate();
         }
-
         #endregion
     }
 }

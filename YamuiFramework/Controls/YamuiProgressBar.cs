@@ -5,6 +5,8 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
+using YamuiFramework.Fonts;
+using YamuiFramework.Themes;
 
 namespace YamuiFramework.Controls {
     [Designer("YamuiFramework.Controls.YamuiProgressBarDesigner")]
@@ -143,7 +145,7 @@ namespace YamuiFramework.Controls {
 
             DrawProgressText(e.Graphics);
 
-            using (Pen p = new Pen(ThemeManager.ButtonColors.Normal.BorderColor())) {
+            using (Pen p = new Pen(ThemeManager.Current.ButtonColorsNormalBorderColor)) {
                 Rectangle borderRect = new Rectangle(0, 0, Width - 1, Height - 1);
                 e.Graphics.DrawRectangle(p, borderRect);
             }

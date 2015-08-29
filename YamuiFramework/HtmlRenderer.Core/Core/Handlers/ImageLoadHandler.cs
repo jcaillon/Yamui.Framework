@@ -17,12 +17,12 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading;
-using TheArtOfDev.HtmlRenderer.Adapters;
-using TheArtOfDev.HtmlRenderer.Adapters.Entities;
-using TheArtOfDev.HtmlRenderer.Core.Entities;
-using TheArtOfDev.HtmlRenderer.Core.Utils;
+using YamuiFramework.HtmlRenderer.Core.Adapters;
+using YamuiFramework.HtmlRenderer.Core.Adapters.Entities;
+using YamuiFramework.HtmlRenderer.Core.Core.Entities;
+using YamuiFramework.HtmlRenderer.Core.Core.Utils;
 
-namespace TheArtOfDev.HtmlRenderer.Core.Handlers
+namespace YamuiFramework.HtmlRenderer.Core.Core.Handlers
 {
     /// <summary>
     /// Handler for all loading image logic.<br/>
@@ -126,7 +126,7 @@ namespace TheArtOfDev.HtmlRenderer.Core.Handlers
 
         /// <summary>
         /// Set image of this image box by analyzing the src attribute.<br/>
-        /// Load the image from inline base64 encoded string.<br/>
+        /// LoadFromRaw the image from inline base64 encoded string.<br/>
         /// Or from calling property/method on the bridge object that returns image or URL to image.<br/>
         /// Or from file path<br/>
         /// Or from URI.
@@ -213,7 +213,7 @@ namespace TheArtOfDev.HtmlRenderer.Core.Handlers
         }
 
         /// <summary>
-        /// Load the image from inline base64 encoded string data.
+        /// LoadFromRaw the image from inline base64 encoded string data.
         /// </summary>
         /// <param name="src">the source that has the base64 encoded image</param>
         private void SetFromInlineData(string src)
@@ -255,7 +255,7 @@ namespace TheArtOfDev.HtmlRenderer.Core.Handlers
         }
 
         /// <summary>
-        /// Load image from path of image file or URL.
+        /// LoadFromRaw image from path of image file or URL.
         /// </summary>
         /// <param name="path">the file path or uri to load image from</param>
         private void SetImageFromPath(string path)
@@ -281,7 +281,7 @@ namespace TheArtOfDev.HtmlRenderer.Core.Handlers
         }
 
         /// <summary>
-        /// Load the image file on thread-pool thread and calling <see cref="ImageLoadComplete"/> after.
+        /// LoadFromRaw the image file on thread-pool thread and calling <see cref="ImageLoadComplete"/> after.
         /// </summary>
         /// <param name="source">the file path to get the image from</param>
         private void SetImageFromFile(FileInfo source)
@@ -300,7 +300,7 @@ namespace TheArtOfDev.HtmlRenderer.Core.Handlers
         }
 
         /// <summary>
-        /// Load the image file on thread-pool thread and calling <see cref="ImageLoadComplete"/> after.<br/>
+        /// LoadFromRaw the image file on thread-pool thread and calling <see cref="ImageLoadComplete"/> after.<br/>
         /// Calling <see cref="ImageLoadComplete"/> on the main thread and not thread-pool.
         /// </summary>
         /// <param name="source">the file path to get the image from</param>
@@ -324,7 +324,7 @@ namespace TheArtOfDev.HtmlRenderer.Core.Handlers
         }
 
         /// <summary>
-        /// Load image from the given URI by downloading it.<br/>
+        /// LoadFromRaw image from the given URI by downloading it.<br/>
         /// Create local file name in temp folder from the URI, if the file already exists use it as it has already been downloaded.
         /// If not download the file using <see cref="DownloadImageFromUrlAsync"/>.
         /// </summary>

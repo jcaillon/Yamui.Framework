@@ -13,7 +13,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace TheArtOfDev.HtmlRenderer.Core.Entities
+namespace YamuiFramework.HtmlRenderer.Core.Core.Entities
 {
     /// <summary>
     /// Invoked when a stylesheet is about to be loaded by file path or URL in 'link' element.<br/>

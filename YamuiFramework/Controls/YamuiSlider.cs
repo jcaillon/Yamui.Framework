@@ -3,11 +3,12 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using YamuiFramework.Themes;
 
 namespace YamuiFramework.Controls {
     [ToolboxBitmap(typeof(TrackBar))]
     [DefaultEvent("Scroll")]
-    public class YamuiTrackBar : Control {
+    public class YamuiSlider : Control {
         #region Fields
         private int _trackerValue = 50;
         [DefaultValue(50)]
@@ -94,7 +95,7 @@ namespace YamuiFramework.Controls {
 
         #region Constructor
 
-        public YamuiTrackBar(int min, int max, int value) {
+        public YamuiSlider(int min, int max, int value) {
             SetStyle(ControlStyles.AllPaintingInWmPaint |
                      ControlStyles.OptimizedDoubleBuffer |
                      ControlStyles.ResizeRedraw |
@@ -108,7 +109,7 @@ namespace YamuiFramework.Controls {
             Value = value;
         }
 
-        public YamuiTrackBar() : this(0, 100, 50) { }
+        public YamuiSlider() : this(0, 100, 50) { }
 
         #endregion
 

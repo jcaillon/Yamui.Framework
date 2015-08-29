@@ -5,7 +5,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace YamuiFramework {
+namespace YamuiFramework.Fonts {
     public enum LabelFunction {
         Small,
         Normal,

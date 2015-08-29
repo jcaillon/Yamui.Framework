@@ -15,13 +15,13 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
-using TheArtOfDev.HtmlRenderer.Core;
-using TheArtOfDev.HtmlRenderer.Core.Entities;
-using TheArtOfDev.HtmlRenderer.Core.Utils;
-using TheArtOfDev.HtmlRenderer.WinForms.Adapters;
-using TheArtOfDev.HtmlRenderer.WinForms.Utilities;
+using YamuiFramework.HtmlRenderer.Core.Core;
+using YamuiFramework.HtmlRenderer.Core.Core.Entities;
+using YamuiFramework.HtmlRenderer.Core.Core.Utils;
+using YamuiFramework.HtmlRenderer.WinForms.Adapters;
+using YamuiFramework.HtmlRenderer.WinForms.Utilities;
 
-namespace TheArtOfDev.HtmlRenderer.WinForms
+namespace YamuiFramework.HtmlRenderer.WinForms
 {
     /// <summary>
     /// Standalone static class for simple and direct HTML rendering.<br/>

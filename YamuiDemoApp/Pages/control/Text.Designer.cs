@@ -1,4 +1,7 @@
-﻿namespace YamuiDemoApp.Pages {
+﻿using YamuiFramework.Fonts;
+using YamuiFramework.HtmlRenderer.WinForms;
+
+namespace YamuiDemoApp.Pages.control {
     partial class Text {
         /// <summary> 
         /// Required designer variable.
@@ -24,8 +27,8 @@
         /// </summary>
         private void InitializeComponent() {
             this.yamuiPanel1 = new YamuiFramework.Controls.YamuiPanel();
-            this.htmlPanel1 = new TheArtOfDev.HtmlRenderer.WinForms.HtmlPanel();
-            this.htmlLabel1 = new TheArtOfDev.HtmlRenderer.WinForms.HtmlLabel();
+            this.htmlPanel1 = new YamuiFramework.HtmlRenderer.WinForms.HtmlPanel();
+            this.htmlLabel1 = new YamuiFramework.HtmlRenderer.WinForms.HtmlLabel();
             this.yamuiLabel15 = new YamuiFramework.Controls.YamuiLabel();
             this.yamuiLink1 = new YamuiFramework.Controls.YamuiLink();
             this.yamuiLink2 = new YamuiFramework.Controls.YamuiLink();
@@ -40,7 +43,7 @@
             this.yamuiTextBox4 = new YamuiFramework.Controls.YamuiTextBox();
             this.yamuiLabel13 = new YamuiFramework.Controls.YamuiLabel();
             this.yamuiTextBox5 = new YamuiFramework.Controls.YamuiTextBox();
-            this.htmlToolTip1 = new TheArtOfDev.HtmlRenderer.WinForms.HtmlToolTip();
+            this.htmlToolTip1 = new YamuiFramework.HtmlRenderer.WinForms.HtmlToolTip();
             this.yamuiPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -75,14 +78,14 @@
             // htmlPanel1
             // 
             this.htmlPanel1.AutoScroll = true;
-            this.htmlPanel1.AutoScrollMinSize = new System.Drawing.Size(338, 20);
+            this.htmlPanel1.AutoScrollMinSize = new System.Drawing.Size(338, 46);
             this.htmlPanel1.BackColor = System.Drawing.Color.Transparent;
             this.htmlPanel1.BaseStylesheet = null;
             this.htmlPanel1.Location = new System.Drawing.Point(347, 80);
             this.htmlPanel1.Name = "htmlPanel1";
             this.htmlPanel1.Size = new System.Drawing.Size(338, 224);
             this.htmlPanel1.TabIndex = 32;
-            this.htmlPanel1.Text = "htmlPanel1";
+            this.htmlPanel1.Text = "htmlPanel1<br>I\'mTesting <b>bold</b> and <i>Italic?</i>";
             // 
             // htmlLabel1
             // 
@@ -107,7 +110,7 @@
             // 
             // yamuiLink1
             // 
-            this.yamuiLink1.Function = YamuiFramework.LabelFunction.Link;
+            this.yamuiLink1.Function = YamuiFramework.Fonts.LabelFunction.Link;
             this.yamuiLink1.Location = new System.Drawing.Point(203, 122);
             this.yamuiLink1.Name = "yamuiLink1";
             this.yamuiLink1.Size = new System.Drawing.Size(118, 23);
@@ -118,7 +121,7 @@
             // yamuiLink2
             // 
             this.yamuiLink2.Enabled = false;
-            this.yamuiLink2.Function = YamuiFramework.LabelFunction.Link;
+            this.yamuiLink2.Function = YamuiFramework.Fonts.LabelFunction.Link;
             this.yamuiLink2.Location = new System.Drawing.Point(203, 143);
             this.yamuiLink2.Name = "yamuiLink2";
             this.yamuiLink2.Size = new System.Drawing.Size(118, 23);
@@ -129,7 +132,7 @@
             // yamuiLabel12
             // 
             this.yamuiLabel12.AutoSize = true;
-            this.yamuiLabel12.Function = YamuiFramework.LabelFunction.Heading;
+            this.yamuiLabel12.Function = YamuiFramework.Fonts.LabelFunction.Heading;
             this.yamuiLabel12.Location = new System.Drawing.Point(0, 0);
             this.yamuiLabel12.Margin = new System.Windows.Forms.Padding(20, 5, 5, 7);
             this.yamuiLabel12.Name = "yamuiLabel12";
@@ -140,7 +143,7 @@
             // yamuiLabel18
             // 
             this.yamuiLabel18.AutoSize = true;
-            this.yamuiLabel18.Function = YamuiFramework.LabelFunction.Heading;
+            this.yamuiLabel18.Function = YamuiFramework.Fonts.LabelFunction.Heading;
             this.yamuiLabel18.Location = new System.Drawing.Point(203, 100);
             this.yamuiLabel18.Margin = new System.Windows.Forms.Padding(20, 5, 5, 7);
             this.yamuiLabel18.Name = "yamuiLabel18";
@@ -190,6 +193,7 @@
             // 
             this.yamuiLabel16.AutoSize = true;
             this.yamuiLabel16.Enabled = false;
+            this.yamuiLabel16.FakeDisabled = true;
             this.yamuiLabel16.Location = new System.Drawing.Point(203, 55);
             this.yamuiLabel16.Name = "yamuiLabel16";
             this.yamuiLabel16.Size = new System.Drawing.Size(79, 15);
@@ -214,7 +218,7 @@
             // yamuiLabel14
             // 
             this.yamuiLabel14.AutoSize = true;
-            this.yamuiLabel14.Function = YamuiFramework.LabelFunction.Title;
+            this.yamuiLabel14.Function = YamuiFramework.Fonts.LabelFunction.Title;
             this.yamuiLabel14.Location = new System.Drawing.Point(203, 19);
             this.yamuiLabel14.Margin = new System.Windows.Forms.Padding(5);
             this.yamuiLabel14.Name = "yamuiLabel14";
@@ -240,7 +244,7 @@
             // yamuiLabel13
             // 
             this.yamuiLabel13.AutoSize = true;
-            this.yamuiLabel13.Function = YamuiFramework.LabelFunction.Heading;
+            this.yamuiLabel13.Function = YamuiFramework.Fonts.LabelFunction.Heading;
             this.yamuiLabel13.Location = new System.Drawing.Point(203, 0);
             this.yamuiLabel13.Margin = new System.Windows.Forms.Padding(20, 5, 5, 7);
             this.yamuiLabel13.Name = "yamuiLabel13";
@@ -302,8 +306,8 @@
         private YamuiFramework.Controls.YamuiTextBox yamuiTextBox4;
         private YamuiFramework.Controls.YamuiLabel yamuiLabel13;
         private YamuiFramework.Controls.YamuiTextBox yamuiTextBox5;
-        private TheArtOfDev.HtmlRenderer.WinForms.HtmlLabel htmlLabel1;
-        private TheArtOfDev.HtmlRenderer.WinForms.HtmlPanel htmlPanel1;
-        private TheArtOfDev.HtmlRenderer.WinForms.HtmlToolTip htmlToolTip1;
+        private HtmlLabel htmlLabel1;
+        private HtmlPanel htmlPanel1;
+        private HtmlToolTip htmlToolTip1;
     }
 }

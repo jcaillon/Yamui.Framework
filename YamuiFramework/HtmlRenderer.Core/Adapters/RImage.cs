@@ -12,7 +12,7 @@
 
 using System;
 
-namespace TheArtOfDev.HtmlRenderer.Adapters
+namespace YamuiFramework.HtmlRenderer.Core.Adapters
 {
     /// <summary>
     /// Adapter for platform specific image object - used to render images.
