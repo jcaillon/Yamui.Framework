@@ -328,18 +328,15 @@ namespace YamuiFramework.HtmlRenderer.Core.Core.Dom
             {
                 return new CssBoxImage(parent, tag);
             }
-            else if (tag.Name == HtmlConstants.Iframe)
+            if (tag.Name == HtmlConstants.Iframe)
             {
                 return new CssBoxFrame(parent, tag);
             }
-            else if (tag.Name == HtmlConstants.Hr)
+            if (tag.Name == HtmlConstants.Hr)
             {
                 return new CssBoxHr(parent, tag);
             }
-            else
-            {
-                return new CssBox(parent, tag);
-            }
+            return new CssBox(parent, tag);
         }
 
         /// <summary>
@@ -790,20 +787,17 @@ namespace YamuiFramework.HtmlRenderer.Core.Core.Dom
                 }
                 return null;
             }
-            else
+            foreach (CssBox bb in b.Boxes)
             {
-                foreach (CssBox bb in b.Boxes)
+                CssRect w = FirstWordOccourence(bb, line);
+
+                if (w != null)
                 {
-                    CssRect w = FirstWordOccourence(bb, line);
-
-                    if (w != null)
-                    {
-                        return w;
-                    }
+                    return w;
                 }
-
-                return null;
             }
+
+            return null;
         }
 
         /// <summary>
@@ -1060,8 +1054,7 @@ namespace YamuiFramework.HtmlRenderer.Core.Core.Dom
         /// Calculate the actual right of the box by the actual right of the child boxes if this box actual right is not set.
         /// </summary>
         /// <returns>the calculated actual right value</returns>
-        private double CalculateActualRight()
-        {
+        private double CalculateActualRight() {
             if (ActualRight > 90999)
             {
                 var maxRight = 0d;
@@ -1071,10 +1064,7 @@ namespace YamuiFramework.HtmlRenderer.Core.Core.Dom
                 }
                 return maxRight + ActualPaddingRight + ActualMarginRight + ActualBorderRightWidth;
             }
-            else
-            {
-                return ActualRight;
-            }
+            return ActualRight;
         }
 
         /// <summary>
@@ -1384,17 +1374,12 @@ namespace YamuiFramework.HtmlRenderer.Core.Core.Dom
         protected RBrush GetSelectionBackBrush(RGraphics g, bool forceAlpha)
         {
             var backColor = HtmlContainer.SelectionBackColor;
-            if (backColor != RColor.Empty)
-            {
+            if (backColor != RColor.Empty) {
                 if (forceAlpha && backColor.A > 180)
                     return g.GetSolidBrush(RColor.FromArgb(180, backColor.R, backColor.G, backColor.B));
-                else
-                    return g.GetSolidBrush(backColor);
+                return g.GetSolidBrush(backColor);
             }
-            else
-            {
-                return g.GetSolidBrush(CssUtils.DefaultSelectionBackcolor);
-            }
+            return g.GetSolidBrush(CssUtils.DefaultSelectionBackcolor);
         }
 
         protected override RFont GetCachedFont(string fontFamily, double fsize, RFontStyle st)
@@ -1419,14 +1404,11 @@ namespace YamuiFramework.HtmlRenderer.Core.Core.Dom
             {
                 return string.Format("{0}{1} Block {2}, Children:{3}", ParentBox == null ? "Root: " : string.Empty, tag, FontSize, Boxes.Count);
             }
-            else if (Display == CssConstants.None)
+            if (Display == CssConstants.None)
             {
                 return string.Format("{0}{1} None", ParentBox == null ? "Root: " : string.Empty, tag);
             }
-            else
-            {
-                return string.Format("{0}{1} {2}: {3}", ParentBox == null ? "Root: " : string.Empty, tag, Display, Text);
-            }
+            return string.Format("{0}{1} {2}: {3}", ParentBox == null ? "Root: " : string.Empty, tag, Display, Text);
         }
 
         #endregion

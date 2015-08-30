@@ -61,22 +61,40 @@ namespace YamuiFramework.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to h1, h2, h3 { color: navy; font-weight:normal; }
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ant {
+            get {
+                object obj = ResourceManager.GetObject("ant", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to html {
+        ///    padding: 0;
+        ///    margin: 0;
+        ///}
+        ///
+        ///h1, h2, h3 { color: navy; font-weight:normal; }
         ///h1 { margin-bottom: .47em }
         ///h2 { margin-bottom: .3em }
         ///h3 { margin-bottom: .4em }
         ///ul { margin-top: .5em }
         ///ul li {margin: .25em}
-        ////* special for Yamui */ 
+        ///
         ///body {
         ///    Font: 12px SEGOEUI;
         ///    color: %FormForeGroundColor%;
+        ///    padding: 0;
+        ///    margin: 0;
         ///}
+        ///
         ///a:hover { text-decoration: underline; }
         ///pre  { border:solid 1px gray; background-color:#eee; padding:1em }
         ///a:link { text-decoration: none; }
         ///.gray    { color:gray; }
-        ///.example { background-color:#efefef; corner-radius:5px; padding [rest of string was truncated]&quot;;.
+        ///.examp [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string baseCss {
             get {
@@ -107,9 +125,49 @@ namespace YamuiFramework.Resources {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap high_importance {
+            get {
+                object obj = ResourceManager.GetObject("high_importance", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap info {
             get {
                 object obj = ResourceManager.GetObject("info", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ok {
+            get {
+                object obj = ResourceManager.GetObject("ok", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap pin {
+            get {
+                object obj = ResourceManager.GetObject("pin", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap poison {
+            get {
+                object obj = ResourceManager.GetObject("poison", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -137,9 +195,29 @@ namespace YamuiFramework.Resources {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap radio_active {
+            get {
+                object obj = ResourceManager.GetObject("radio_active", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap services {
             get {
                 object obj = ResourceManager.GetObject("services", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap skull {
+            get {
+                object obj = ResourceManager.GetObject("skull", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -171,6 +249,16 @@ namespace YamuiFramework.Resources {
         internal static System.Drawing.Bitmap warning {
             get {
                 object obj = ResourceManager.GetObject("warning", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap warning_shield {
+            get {
+                object obj = ResourceManager.GetObject("warning_shield", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

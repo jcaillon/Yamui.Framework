@@ -24,6 +24,6 @@ namespace YamuiFramework.HtmlRenderer.Core.Adapters.Entities
         Bold = 1,
         Italic = 2,
         Underline = 4,
-        Strikeout = 8,
+        Strikeout = 8
     }
 }

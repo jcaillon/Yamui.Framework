@@ -2,11 +2,9 @@
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using YamuiFramework.Animations;
-using YamuiFramework.Animations.Transitions;
 using YamuiFramework.Controls;
-using YamuiFramework.Forms;
-using YamuiFramework.Helper;
+using YamuiFramework.HtmlRenderer.WinForms;
+using YamuiFramework.Native;
 using YamuiFramework.Themes;
 
 namespace YamuiDemoApp.Pages {
@@ -78,6 +76,20 @@ namespace YamuiDemoApp.Pages {
         }
 
         private void PlsRefresh() {
+            try {
+                var x = ControlHelper.GetAll(FindForm(), typeof (HtmlLabel));
+                if (x != null)
+                    foreach (var y in x) {
+                        y.Text = y.Text;
+                    }
+                x = ControlHelper.GetAll(FindForm(), typeof(HtmlPanel));
+                if (x != null)
+                    foreach (var y in x) {
+                        y.Text = y.Text;
+                    }
+            } catch (Exception) {
+                throw;
+            }
             Application.DoEvents();
             Program.MainForm.Invalidate();
             Application.DoEvents();

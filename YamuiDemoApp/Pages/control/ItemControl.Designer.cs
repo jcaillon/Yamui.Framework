@@ -1,11 +1,13 @@
-﻿using YamuiFramework.Fonts;
+﻿using System.ComponentModel;
+using YamuiFramework.Controls;
+using YamuiFramework.Fonts;
 
 namespace YamuiDemoApp.Pages.control {
     partial class ItemControl {
         /// <summary> 
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary> 
         /// Clean up any resources being used.
@@ -169,15 +171,15 @@ namespace YamuiDemoApp.Pages.control {
 
         #endregion
 
-        private YamuiFramework.Controls.YamuiPanel yamuiPanel1;
-        private YamuiFramework.Controls.YamuiComboBox yamuiComboBox2;
-        private YamuiFramework.Controls.YamuiLabel yamuiLabel11;
-        private YamuiFramework.Controls.YamuiComboBox yamuiComboBox1;
-        private YamuiFramework.Controls.YamuiLabel yamuiLabel7;
-        private YamuiFramework.Controls.YamuiDateTime yamuiDateTime2;
-        private YamuiFramework.Controls.YamuiSlider yamuiTrackBar1;
-        private YamuiFramework.Controls.YamuiDateTime yamuiDateTime1;
-        private YamuiFramework.Controls.YamuiSlider yamuiTrackBar2;
-        private YamuiFramework.Controls.YamuiLabel yamuiLabel10;
+        private YamuiPanel yamuiPanel1;
+        private YamuiComboBox yamuiComboBox2;
+        private YamuiLabel yamuiLabel11;
+        private YamuiComboBox yamuiComboBox1;
+        private YamuiLabel yamuiLabel7;
+        private YamuiDateTime yamuiDateTime2;
+        private YamuiSlider yamuiTrackBar1;
+        private YamuiDateTime yamuiDateTime1;
+        private YamuiSlider yamuiTrackBar2;
+        private YamuiLabel yamuiLabel10;
     }
 }

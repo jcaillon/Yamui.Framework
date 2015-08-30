@@ -71,20 +71,16 @@ namespace YamuiFramework.HtmlRenderer.Core.Core.Utils
         /// <param name="root"></param>
         /// <param name="tagName"></param>
         /// <param name="box"></param>
-        public static CssBox FindParent(CssBox root, string tagName, CssBox box)
-        {
+        public static CssBox FindParent(CssBox root, string tagName, CssBox box) {
             if (box == null)
             {
                 return root;
             }
-            else if (box.HtmlTag != null && box.HtmlTag.Name.Equals(tagName, StringComparison.CurrentCultureIgnoreCase))
+            if (box.HtmlTag != null && box.HtmlTag.Name.Equals(tagName, StringComparison.CurrentCultureIgnoreCase))
             {
                 return box.ParentBox ?? root;
             }
-            else
-            {
-                return FindParent(root, tagName, box.ParentBox);
-            }
+            return FindParent(root, tagName, box.ParentBox);
         }
 
         /// <summary>
@@ -893,25 +889,21 @@ namespace YamuiFramework.HtmlRenderer.Core.Core.Utils
         /// </summary>
         /// <param name="rect">the word to append</param>
         /// <param name="selectedText">is to get selected text or all the text in the word</param>
-        private static string GetSelectedWord(CssRect rect, bool selectedText)
-        {
+        private static string GetSelectedWord(CssRect rect, bool selectedText) {
             if (selectedText && rect.SelectedStartIndex > -1 && rect.SelectedEndIndexOffset > -1)
             {
                 return rect.Text.Substring(rect.SelectedStartIndex, rect.SelectedEndIndexOffset - rect.SelectedStartIndex);
             }
-            else if (selectedText && rect.SelectedStartIndex > -1)
+            if (selectedText && rect.SelectedStartIndex > -1)
             {
                 return rect.Text.Substring(rect.SelectedStartIndex) + (rect.HasSpaceAfter ? " " : "");
             }
-            else if (selectedText && rect.SelectedEndIndexOffset > -1)
+            if (selectedText && rect.SelectedEndIndexOffset > -1)
             {
                 return rect.Text.Substring(0, rect.SelectedEndIndexOffset);
             }
-            else
-            {
-                var whitespaceBefore = rect.OwnerBox.Words[0] == rect ? IsBoxHasWhitespace(rect.OwnerBox) : rect.HasSpaceBefore;
-                return (whitespaceBefore ? " " : "") + rect.Text + (rect.HasSpaceAfter ? " " : "");
-            }
+            var whitespaceBefore = rect.OwnerBox.Words[0] == rect ? IsBoxHasWhitespace(rect.OwnerBox) : rect.HasSpaceBefore;
+            return (whitespaceBefore ? " " : "") + rect.Text + (rect.HasSpaceAfter ? " " : "");
         }
 
         /// <summary>

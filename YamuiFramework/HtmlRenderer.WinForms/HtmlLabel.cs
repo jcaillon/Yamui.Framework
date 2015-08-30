@@ -390,7 +390,10 @@ namespace YamuiFramework.HtmlRenderer.WinForms
                 base.Text = value;
                 if (!IsDisposed)
                 {
-                    _htmlContainer.SetHtml(@"<span class='yamui-text'>" + _text + @"</span>", HtmlHandler.GetBaseCssData());
+                    if (_text.StartsWith(@"<div class='yamui-text'>"))
+                        _htmlContainer.SetHtml(_text, HtmlHandler.GetBaseCssData());
+                    else
+                        _htmlContainer.SetHtml(@"<div class='yamui-text'>" + _text + @"</div>", HtmlHandler.GetBaseCssData());
                     PerformLayout();
                     Invalidate();
                 }
@@ -539,7 +542,7 @@ namespace YamuiFramework.HtmlRenderer.WinForms
         /// </summary>
         protected override void OnMouseUp(MouseEventArgs e)
         {
-            base.OnMouseClick(e);
+            OnMouseClick(e);
             if (_htmlContainer != null)
                 _htmlContainer.HandleMouseUp(this, e);
         }
@@ -601,6 +604,7 @@ namespace YamuiFramework.HtmlRenderer.WinForms
         /// </summary>
         protected virtual void OnImageLoad(HtmlImageLoadEventArgs e)
         {
+            HtmlHandler.OnImageLoad(e);
             var handler = ImageLoad;
             if (handler != null)
                 handler(this, e);

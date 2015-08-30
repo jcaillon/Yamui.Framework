@@ -100,12 +100,10 @@ namespace YamuiFramework.HtmlRenderer.Core.Adapters.Entities
         /// <filterpriority>1</filterpriority>
         public bool IsEmpty
         {
-            get
-            {
+            get {
                 if (Math.Abs(_width) < 0.0001)
                     return Math.Abs(_height) < 0.0001;
-                else
-                    return false;
+                return false;
             }
         }
 
@@ -202,12 +200,10 @@ namespace YamuiFramework.HtmlRenderer.Core.Adapters.Entities
         ///     The <see cref="RSize" /> structure on the right of the equality operator.
         /// </param>
         /// <filterpriority>3</filterpriority>
-        public static bool operator ==(RSize sz1, RSize sz2)
-        {
+        public static bool operator ==(RSize sz1, RSize sz2) {
             if (Math.Abs(sz1.Width - sz2.Width) < 0.001)
                 return Math.Abs(sz1.Height - sz2.Height) < 0.001;
-            else
-                return false;
+            return false;
         }
 
         /// <summary>
@@ -294,8 +290,7 @@ namespace YamuiFramework.HtmlRenderer.Core.Adapters.Entities
             var sizeF = (RSize)obj;
             if (Math.Abs(sizeF.Width - Width) < 0.001 && Math.Abs(sizeF.Height - Height) < 0.001)
                 return sizeF.GetType() == GetType();
-            else
-                return false;
+            return false;
         }
 
         /// <summary>

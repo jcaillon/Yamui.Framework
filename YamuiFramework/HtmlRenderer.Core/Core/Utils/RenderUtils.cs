@@ -55,13 +55,10 @@ namespace YamuiFramework.HtmlRenderer.Core.Core.Utils
                     g.PushClip(rect);
                     return true;
                 }
-                else
-                {
-                    var cBlock = containingBlock.ContainingBlock;
-                    if (cBlock == containingBlock)
-                        return false;
-                    containingBlock = cBlock;
-                }
+                var cBlock = containingBlock.ContainingBlock;
+                if (cBlock == containingBlock)
+                    return false;
+                containingBlock = cBlock;
             }
         }
 

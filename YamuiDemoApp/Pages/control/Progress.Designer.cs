@@ -1,11 +1,13 @@
-﻿using YamuiFramework.Fonts;
+﻿using System.ComponentModel;
+using YamuiFramework.Controls;
+using YamuiFramework.Fonts;
 
 namespace YamuiDemoApp.Pages.control {
     partial class Progress {
         /// <summary> 
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary> 
         /// Clean up any resources being used.
@@ -172,16 +174,16 @@ namespace YamuiDemoApp.Pages.control {
 
         #endregion
 
-        private YamuiFramework.Controls.YamuiPanel yamuiPanel1;
-        private YamuiFramework.Controls.YamuiProgressSpinner yamuiProgressSpinner3;
-        private YamuiFramework.Controls.YamuiProgressSpinner yamuiProgressSpinner1;
-        private YamuiFramework.Controls.YamuiProgressSpinner yamuiProgressSpinner2;
-        private YamuiFramework.Controls.YamuiLabel yamuiLabel4;
-        private YamuiFramework.Controls.YamuiLabel yamuiLabel9;
-        private YamuiFramework.Controls.YamuiProgressBar yamuiProgressBar1;
-        private YamuiFramework.Controls.YamuiScrollBar yamuiScrollBar1;
-        private YamuiFramework.Controls.YamuiProgressBar yamuiProgressBar2;
-        private YamuiFramework.Controls.YamuiLabel yamuiLabel5;
-        private YamuiFramework.Controls.YamuiProgressBar yamuiProgressBar3;
+        private YamuiPanel yamuiPanel1;
+        private YamuiProgressSpinner yamuiProgressSpinner3;
+        private YamuiProgressSpinner yamuiProgressSpinner1;
+        private YamuiProgressSpinner yamuiProgressSpinner2;
+        private YamuiLabel yamuiLabel4;
+        private YamuiLabel yamuiLabel9;
+        private YamuiProgressBar yamuiProgressBar1;
+        private YamuiScrollBar yamuiScrollBar1;
+        private YamuiProgressBar yamuiProgressBar2;
+        private YamuiLabel yamuiLabel5;
+        private YamuiProgressBar yamuiProgressBar3;
     }
 }

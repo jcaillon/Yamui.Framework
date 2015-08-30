@@ -2,7 +2,6 @@
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using YamuiFramework.Controls;
 
 namespace YamuiFramework.Forms {
     public class YamuiSmokeScreen : Form {
@@ -33,6 +32,14 @@ namespace YamuiFramework.Forms {
                 int value = 1;
                 DwmSetWindowAttribute(tocover.Handle, DWMWA_TRANSITIONS_FORCEDISABLED, ref value, 4);
             }
+        }
+        #endregion
+
+        #region dispose
+        protected override void Dispose(bool disposing) {
+            LocationChanged -= Cover_LocationChanged;
+            ClientSizeChanged -= Cover_ClientSizeChanged;
+            base.Dispose(disposing);
         }
         #endregion
 

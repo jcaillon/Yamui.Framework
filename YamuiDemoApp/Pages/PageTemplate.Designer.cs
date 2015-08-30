@@ -1,9 +1,12 @@
-﻿namespace YamuiDemoApp.Pages {
+﻿using System.ComponentModel;
+using YamuiFramework.Controls;
+
+namespace YamuiDemoApp.Pages {
     partial class PageTemplate {
         /// <summary> 
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary> 
         /// Clean up any resources being used.
@@ -51,6 +54,6 @@
 
         #endregion
 
-        private YamuiFramework.Controls.YamuiPanel yamuiPanel1;
+        private YamuiPanel yamuiPanel1;
     }
 }

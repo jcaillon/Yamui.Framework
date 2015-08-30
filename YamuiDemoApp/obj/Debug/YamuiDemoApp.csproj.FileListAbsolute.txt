@@ -11,7 +11,6 @@ C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.Pages.control.ItemCon
 C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.Pages.Navigation.Other.resources
 C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.Pages.SettingAppearance.resources
 C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.Pages.PageTemplate.resources
-C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.TaskWindowControl.resources
 C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.csproj.GenerateResource.Cache
 C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.exe
 C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.pdb

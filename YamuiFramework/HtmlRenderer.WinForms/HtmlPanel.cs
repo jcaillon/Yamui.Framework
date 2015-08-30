@@ -343,7 +343,7 @@ namespace YamuiFramework.HtmlRenderer.WinForms
                 if (!IsDisposed)
                 {
                     VerticalScroll.Value = VerticalScroll.Minimum;
-                    _htmlContainer.SetHtml((_text.StartsWith(@"<html") ? _text : @"<html><body>" + _text + @"</body><html>"), HtmlHandler.GetBaseCssData());
+                    _htmlContainer.SetHtml((_text.StartsWith(@"<html") ? _text : @"<html><body><div class='yamui-text'>" + _text + @"</div></body><html>"), HtmlHandler.GetBaseCssData());
                     PerformLayout();
                     Invalidate();
                     InvokeMouseMove();
@@ -543,7 +543,7 @@ namespace YamuiFramework.HtmlRenderer.WinForms
         /// </summary>
         protected override void OnMouseUp(MouseEventArgs e)
         {
-            base.OnMouseClick(e);
+            OnMouseClick(e);
             if (_htmlContainer != null)
                 _htmlContainer.HandleMouseUp(this, e);
         }

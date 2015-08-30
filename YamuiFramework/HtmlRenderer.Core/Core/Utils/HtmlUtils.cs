@@ -34,12 +34,11 @@ namespace YamuiFramework.HtmlRenderer.Core.Core.Utils
         /// <summary>
         /// the html encode\decode pairs
         /// </summary>
-        private static readonly KeyValuePair<string, string>[] _encodeDecode = new[]
-        {
+        private static readonly KeyValuePair<string, string>[] _encodeDecode = {
             new KeyValuePair<string, string>("&lt;", "<"),
             new KeyValuePair<string, string>("&gt;", ">"),
             new KeyValuePair<string, string>("&quot;", "\""),
-            new KeyValuePair<string, string>("&amp;", "&"),
+            new KeyValuePair<string, string>("&amp;", "&")
         };
 
         /// <summary>

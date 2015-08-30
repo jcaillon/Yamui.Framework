@@ -25,6 +25,6 @@ namespace YamuiFramework.HtmlRenderer.Core.Core.Entities
         Layout = 5,
         KeyboardMouse = 6,
         Iframe = 7,
-        ContextMenu = 8,
+        ContextMenu = 8
     }
 }

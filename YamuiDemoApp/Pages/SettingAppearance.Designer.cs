@@ -1,11 +1,12 @@
-﻿using YamuiFramework.Fonts;
+﻿using System.ComponentModel;
+using YamuiFramework.Controls;
 
 namespace YamuiDemoApp.Pages {
     partial class SettingAppearance {
         /// <summary> 
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary> 
         /// Clean up any resources being used.
@@ -129,13 +130,13 @@ namespace YamuiDemoApp.Pages {
 
         #endregion
 
-        private YamuiFramework.Controls.YamuiPanel yamuiPanel1;
-        private YamuiFramework.Controls.YamuiComboBox yamuiComboBox3;
-        private YamuiFramework.Controls.YamuiLabel yamuiLabel22;
-        private YamuiFramework.Controls.YamuiPanel PanelAccentColor;
-        private YamuiFramework.Controls.YamuiLabel yamuiLabel21;
-        private YamuiFramework.Controls.YamuiLabel yamuiLabel20;
-        private YamuiFramework.Controls.YamuiComboBox comboTheme;
+        private YamuiPanel yamuiPanel1;
+        private YamuiComboBox yamuiComboBox3;
+        private YamuiLabel yamuiLabel22;
+        private YamuiPanel PanelAccentColor;
+        private YamuiLabel yamuiLabel21;
+        private YamuiLabel yamuiLabel20;
+        private YamuiComboBox comboTheme;
 
     }
 }

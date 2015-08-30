@@ -236,7 +236,7 @@ namespace YamuiFramework.HtmlRenderer.Core.Core.Handlers
             if (s.Length == 2)
             {
                 int imagePartsCount = 0, base64PartsCount = 0;
-                foreach (var part in s[0].Split(new[] { ';' }))
+                foreach (var part in s[0].Split(';'))
                 {
                     var pPart = part.Trim();
                     if (pPart.StartsWith("image/", StringComparison.InvariantCultureIgnoreCase))

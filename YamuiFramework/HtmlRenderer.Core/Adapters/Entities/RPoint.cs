@@ -54,12 +54,10 @@ namespace YamuiFramework.HtmlRenderer.Core.Adapters.Entities
         /// <filterpriority>1</filterpriority>
         public bool IsEmpty
         {
-            get
-            {
+            get {
                 if (Math.Abs(_x - 0.0) < 0.001)
                     return Math.Abs(_y - 0.0) < 0.001;
-                else
-                    return false;
+                return false;
             }
         }
 
@@ -160,12 +158,10 @@ namespace YamuiFramework.HtmlRenderer.Core.Adapters.Entities
         ///     A <see cref="RPoint" /> to compare.
         /// </param>
         /// <filterpriority>3</filterpriority>
-        public static bool operator ==(RPoint left, RPoint right)
-        {
+        public static bool operator ==(RPoint left, RPoint right) {
             if (left.X == right.X)
                 return left.Y == right.Y;
-            else
-                return false;
+            return false;
         }
 
         /// <summary>
@@ -258,8 +254,7 @@ namespace YamuiFramework.HtmlRenderer.Core.Adapters.Entities
             var pointF = (RPoint)obj;
             if (pointF.X == X && pointF.Y == Y)
                 return pointF.GetType().Equals(GetType());
-            else
-                return false;
+            return false;
         }
 
         /// <summary>

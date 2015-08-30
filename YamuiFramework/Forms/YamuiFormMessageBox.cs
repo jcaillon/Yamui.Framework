@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Drawing;
-using System.Threading;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using YamuiFramework.Animations.Transitions;
 using YamuiFramework.Controls;
@@ -30,58 +29,48 @@ namespace YamuiFramework.Forms {
 
         private static int _dialogResult = -1;
         private const int ButtonWidth = 110;
-        public static YamuiSmokeScreen OwnerSmokeScreen = null;
+        public static YamuiSmokeScreen OwnerSmokeScreen;
         #endregion
 
-        public YamuiFormMessageBox(string htmlContent, List<string> buttonsList) {
+        public YamuiFormMessageBox(MsgType type, string htmlContent, List<string> buttonsList) {
             InitializeComponent();
 
-            // Set background 
-            panelMain.BackColor = ThemeManager.Current.FormColorBackColor;
-            panelMain.UseCustomBackColor = true;
-
+            // Set buttons
             int i = 0;
             foreach (var buttonText in buttonsList) {
                 var yamuiButton1 = new YamuiButton {
                     Anchor = AnchorStyles.Bottom | AnchorStyles.Right,
-                    Size = new Size(ButtonWidth, 30),
+                    Size = new Size(ButtonWidth, 25),
                     Name = "yamuiButton" + i,
                     TabIndex = buttonsList.Count - i,
                     Tag = i,
                     Text = buttonText
                 };
-                yamuiButton1.Location = new Point(panelMain.Width - ButtonWidth - 5 - (ButtonWidth + 5) * i, panelMain.Height - yamuiButton1.Height - 5);
-                yamuiButton1.MouseClick += (sender, args) => {
-                    var x = (YamuiButton) sender;
-                    _dialogResult = (int)x.Tag;
+                yamuiButton1.Location = new Point(Width - 12 - ButtonWidth - (ButtonWidth + 5) * i, Height - 12 - yamuiButton1.Height);
+                yamuiButton1.ButtonPressed += (sender, args) => {
+                    _dialogResult = (int) args._buttonTag;
                     Close();
                 };
-                yamuiButton1.KeyDown += (sender, args) => {
-                    if (args.KeyCode == Keys.Enter || args.KeyCode == Keys.Space || args.KeyCode == Keys.Return) {
-                        var x = (YamuiButton) sender;
-                        _dialogResult = (int) x.Tag;
-                        Close();
-                    }
-                };
-                panelMain.Controls.Add(yamuiButton1);
+                Controls.Add(yamuiButton1);
                 i++;
             }
 
-            var buttonsWidth = 10 + (ButtonWidth + 5)*buttonsList.Count + 50;
-            var predictedSize = MeasureHtmlContent(htmlContent, buttonsWidth);
-            int fWidth = (int)predictedSize.Width;
-            int fHeight = (int)predictedSize.Height;
-            if (fHeight > 2 * fWidth) {
-                predictedSize = MeasureHtmlContent(htmlContent, buttonsWidth * (fHeight / fWidth));
-            }
-
-            fWidth = Math.Min(22 + fWidth, Screen.PrimaryScreen.WorkingArea.Width);
-            fHeight = Math.Min(41 + 40 + fHeight, Screen.PrimaryScreen.WorkingArea.Height);
+            pictureBox.Image = GetImg(type, pictureBox.Size);
+            var minButtonsWidth = (ButtonWidth + 5) * buttonsList.Count + 12 + 10;
             
             // resize form and panel
-            Size = new Size(fWidth, fHeight);
-            MinimumSize = Size;
-            panelContent.Height = (int)predictedSize.Height;
+            int j = 0;
+            int compHeight;
+            do {
+                Width = minButtonsWidth;
+                contentLabel.Text = htmlContent;
+                compHeight = contentPanel.Location.Y + contentLabel.Location.Y + contentLabel.Height + 45;
+                compHeight = Math.Min(compHeight, Screen.PrimaryScreen.WorkingArea.Height);
+                Size = new Size(minButtonsWidth, compHeight);
+                MinimumSize = Size;
+                minButtonsWidth = minButtonsWidth*(compHeight/minButtonsWidth);
+                j++;
+            } while (j < 2 && Height > Width);
 
             // add outro animation
             Tag = false;
@@ -99,45 +88,7 @@ namespace YamuiFramework.Forms {
             };
         }
 
-        private SizeF MeasureHtmlContent(string htmlContent, int prefWidth = 0) {
-            using (var g = panelContent.CreateGraphics()) {
-                return HtmlRender.Measure(g, htmlContent, prefWidth, HtmlHandler.GetBaseCssData(), null, (sender, args) => HtmlHandler.OnImageLoad(args));
-            }
-        }
-
         public static int ShwDlg(IntPtr ownerHandle, MsgType type, string heading, string text, List<string> buttonsList, bool waitResponse) {
-            string imgSrc;
-            switch (type) {
-                case MsgType.Warning:
-                    imgSrc = "warning";
-                    break;
-                case MsgType.Error:
-                    imgSrc = "error";
-                    break;
-                case MsgType.Information:
-                    imgSrc = "info";
-                    break;
-                case MsgType.Question:
-                    imgSrc = "question";
-                    break;
-                case MsgType.ShieldedQuestion:
-                    imgSrc = "question_shield";
-                    break;
-                default:
-                    imgSrc = "services";
-                    break;
-            }
-            if (!text.StartsWith(@"<html"))
-            text = @"
-<h1>
-    <img src=""" + imgSrc + @""" />
-    " + heading + @"
-</h1>
-<div>
-	<p>
-	    " + text + @"
-	</p>
-</div>";
             YamuiForm ownerForm = null;
             try {
                 ownerForm = FromHandle(ownerHandle) as YamuiForm;
@@ -146,7 +97,7 @@ namespace YamuiFramework.Forms {
             }
 
             // new message box
-            var msgbox = new YamuiFormMessageBox(text, buttonsList);
+            var msgbox = new YamuiFormMessageBox(type, text, buttonsList);
             msgbox.ShowInTaskbar = !waitResponse;
             if (ownerForm != null && ownerForm.Width > msgbox.Width && ownerForm.Height > msgbox.Height) {
                 // center parent
@@ -155,7 +106,6 @@ namespace YamuiFramework.Forms {
                 // center screen
                 msgbox.Location = new Point((Screen.PrimaryScreen.WorkingArea.Width - msgbox.Width) / 2 + Screen.PrimaryScreen.WorkingArea.Location.X, (Screen.PrimaryScreen.WorkingArea.Height - msgbox.Height) / 2 + Screen.PrimaryScreen.WorkingArea.Location.Y);
             }
-            msgbox.panelContent.Text = text;
 
             FadeIn(msgbox, ownerForm);
             if (waitResponse) {
@@ -197,18 +147,55 @@ namespace YamuiFramework.Forms {
             t.run();
         }
 
-        public static void ClseSmokeScreen() {
-            OwnerSmokeScreen.Close();
-            OwnerSmokeScreen = null;
+        private Image GetImg(MsgType type, Size size) {
+            var resname = Enum.GetName(typeof (MsgType), type);
+            if (resname == null) resname = "ant";
+            var imgToResize = Resources.ImageGetter.GetInstance().Get(resname.ToLower());
+
+            int sourceWidth = imgToResize.Width;
+            int sourceHeight = imgToResize.Height;
+
+            float nPercent = 0;
+            float nPercentW = 0;
+            float nPercentH = 0;
+
+            nPercentW = ((float)size.Width / (float)sourceWidth);
+            nPercentH = ((float)size.Height / (float)sourceHeight);
+
+            if (nPercentH < nPercentW)
+                nPercent = nPercentH;
+            else
+                nPercent = nPercentW;
+
+            int destWidth = (int)(sourceWidth * nPercent);
+            int destHeight = (int)(sourceHeight * nPercent);
+
+            Bitmap b = new Bitmap(destWidth, destHeight);
+            Graphics g = Graphics.FromImage((Image)b);
+            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+
+            g.DrawImage(imgToResize, 0, 0, destWidth, destHeight);
+            g.Dispose();
+
+            return (Image)b;
         }
+
     }
 
     public enum MsgType {
-        Information,
-        Question,
-        Warning,
+        Ant,
         Error,
-        ShieldedQuestion,
-        Default
+        HighImportance,
+        Info,
+        Ok,
+        Pin,
+        Poison,
+        Question,
+        QuestionShield,
+        RadioActive,
+        Services,
+        Skull,
+        Warning,
+        WarningShield
     }
 }

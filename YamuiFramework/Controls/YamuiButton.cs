@@ -6,13 +6,14 @@ using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 using YamuiFramework.Fonts;
+using YamuiFramework.HtmlRenderer.Core.Core.Entities;
 using YamuiFramework.Themes;
 
 namespace YamuiFramework.Controls {
 
     [Designer("YamuiFramework.Controls.YamuiButtonDesigner")]
     [ToolboxBitmap(typeof(Button))]
-    [DefaultEvent("Click")]
+    [DefaultEvent("ButtonPressed")]
     public class YamuiButton : Button {
 
         #region Fields
@@ -27,6 +28,20 @@ namespace YamuiFramework.Controls {
         [DefaultValue(false)]
         [Category("Yamui")]
         public bool Highlight { get; set; }
+
+        private event EventHandler<ButtonPressedEventArgs> _onButtonPressed;
+        /// <summary>
+        /// You should register to this event to know when the button has been pressed (clicked or enter or space)
+        /// </summary>
+        [Category("Yamui")]
+        public event EventHandler<ButtonPressedEventArgs> ButtonPressed {
+           add {
+               _onButtonPressed += value;
+           }
+           remove {
+               _onButtonPressed -= value;
+           }
+        }
 
         /// <summary>
         /// This public prop is only defined so we can set it from the transitions (animation component)
@@ -118,6 +133,12 @@ namespace YamuiFramework.Controls {
             TextRenderer.DrawText(e.Graphics, Text, FontManager.GetStandardFont(), ClientRectangle, foreColor, FontManager.GetTextFormatFlags(TextAlign));
         }
 
+        private void HandlePressedButton() {
+            if (_onButtonPressed != null) {
+                var args = new ButtonPressedEventArgs(this.Tag);
+                _onButtonPressed(this, args);
+            }
+        }
         #endregion
 
         #region Managing isHovered, isPressed, isFocused
@@ -155,9 +176,16 @@ namespace YamuiFramework.Controls {
         #endregion
 
         #region Keyboard Methods
+        // This is mandatory to be able to handle the ENTER key in key events!!
+        protected override void OnPreviewKeyDown(PreviewKeyDownEventArgs e) {
+            if (e.KeyCode == Keys.Enter) e.IsInputKey = true;
+            base.OnPreviewKeyDown(e);
+        }
 
         protected override void OnKeyDown(KeyEventArgs e) {
-            if (e.KeyCode == Keys.Space) {
+            e.Handled = true;
+            if (e.KeyCode == Keys.Space || e.KeyCode == Keys.Enter) {
+                HandlePressedButton();
                 IsPressed = true;
                 Invalidate();
             }
@@ -183,6 +211,7 @@ namespace YamuiFramework.Controls {
 
         protected override void OnMouseDown(MouseEventArgs e) {
             if (e.Button == MouseButtons.Left) {
+                HandlePressedButton();
                 IsPressed = true;
                 Invalidate();
             }
@@ -212,6 +241,15 @@ namespace YamuiFramework.Controls {
             Invalidate();
         }
         #endregion
+    }
+
+    public sealed class ButtonPressedEventArgs : EventArgs
+    {
+        public readonly object _buttonTag;
+
+        public ButtonPressedEventArgs(object buttonTag) {
+            _buttonTag = buttonTag;
+        }
     }
 
     internal class YamuiButtonDesigner : ControlDesigner {

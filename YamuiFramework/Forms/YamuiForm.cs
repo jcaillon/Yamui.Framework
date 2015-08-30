@@ -348,12 +348,6 @@ namespace YamuiFramework.Forms {
             }
         }
 
-        protected override void OnClosing(CancelEventArgs e) {
-            if (!(this is YamuiTaskWindow))
-                YamuiTaskWindow.ForceClose();
-            base.OnClosing(e);
-        }
-
         [SecuritySafeCritical]
         public bool FocusMe() {
             return WinApi.SetForegroundWindow(Handle);
@@ -425,10 +419,10 @@ namespace YamuiFramework.Forms {
                     if (_windowButtonList != null) {
                         YamuiFormButton btn;
                         _windowButtonList.TryGetValue(WindowButtons.Maximize, out btn);
-                        if (WindowState == FormWindowState.Normal) {
+                        if (WindowState == FormWindowState.Normal && btn != null) {
                             btn.Text = "1";
                         }
-                        if (WindowState == FormWindowState.Maximized) btn.Text = "2";
+                        if (WindowState == FormWindowState.Maximized && btn != null) btn.Text = "2";
                     }
                     break;
             }
@@ -486,15 +480,9 @@ namespace YamuiFramework.Forms {
                 UseWingdings = true;
                 ButtonChar = "ç";
                 FakeDisabled = true;
-                KeyUp += (sender, args) => {
-                    if (args.KeyCode == Keys.Space && !FakeDisabled) {
+                ButtonPressed += (sender, args) => {
+                    if (!FakeDisabled)
                         TryToGoBack();
-                    }
-                };
-                MouseDown += (sender, args) => {
-                    if (args.Button == MouseButtons.Left && !FakeDisabled) {
-                        TryToGoBack();
-                    }
                 };
                 Focus();
             }

@@ -121,7 +121,7 @@ namespace YamuiFramework.Controls {
                 if (!UseCustomBackColor)
                     PaintTransparentBackground(e.Graphics, DisplayRectangle);
                 else
-                    e.Graphics.Clear(ThemeManager.Current.FormColorBackColor);
+                    e.Graphics.Clear(BackColor);
             } catch {
                 Invalidate();
             }

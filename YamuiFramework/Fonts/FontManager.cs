@@ -31,7 +31,7 @@ namespace YamuiFramework.Fonts {
         public static Font GetLabelFont(LabelFunction lbFunction) {
             switch (lbFunction) {
                 case LabelFunction.Title:
-                    return GetFont(FontStyle.Regular, 16f);
+                    return GetFont(FontStyle.Bold, 18f);
                 case LabelFunction.Heading:
                     return GetFont(FontStyle.Bold, 14f);
                 case LabelFunction.FormTitle:

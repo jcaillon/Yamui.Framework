@@ -1,9 +1,12 @@
-﻿namespace YamuiDemoApp.Pages.control {
+﻿using System.ComponentModel;
+using YamuiFramework.Controls;
+
+namespace YamuiDemoApp.Pages.control {
     partial class Classic {
         /// <summary> 
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary> 
         /// Clean up any resources being used.
@@ -361,31 +364,31 @@
 
         #endregion
 
-        private YamuiFramework.Controls.YamuiPanel yamuiPanel1;
-        private YamuiFramework.Controls.YamuiButton yamuiButton5;
-        private YamuiFramework.Controls.YamuiButton yamuiButton4;
-        private YamuiFramework.Controls.YamuiLabel yamuiLabel8;
-        private YamuiFramework.Controls.YamuiRadioButton yamuiRadioButton2;
-        private YamuiFramework.Controls.YamuiPanel yamuiPanel2;
-        private YamuiFramework.Controls.YamuiRadioButton yamuiRadioButton1;
-        private YamuiFramework.Controls.YamuiRadioButton yamuiRadioButton3;
-        private YamuiFramework.Controls.YamuiRadioButton yamuiRadioButton4;
-        private YamuiFramework.Controls.YamuiLabel yamuiLabel3;
-        private YamuiFramework.Controls.YamuiCheckBox yamuiCheckBox4;
-        private YamuiFramework.Controls.YamuiCheckBox yamuiCheckBox3;
-        private YamuiFramework.Controls.YamuiCheckBox yamuiCheckBox2;
-        private YamuiFramework.Controls.YamuiCheckBox yamuiCheckBox1;
-        private YamuiFramework.Controls.YamuiLabel yamuiLabel2;
-        private YamuiFramework.Controls.YamuiLabel yamuiLabel1;
-        private YamuiFramework.Controls.YamuiButton yamuiButton2;
-        private YamuiFramework.Controls.YamuiButton yamuiButton1;
-        private YamuiFramework.Controls.YamuiToggle yamuiToggle3;
-        private YamuiFramework.Controls.YamuiToggle yamuiToggle2;
-        private YamuiFramework.Controls.YamuiToggle yamuiToggle1;
-        private YamuiFramework.Controls.YamuiCharButton yamuiCharButton4;
-        private YamuiFramework.Controls.YamuiCharButton yamuiCharButton3;
-        private YamuiFramework.Controls.YamuiCharButton yamuiCharButton2;
-        private YamuiFramework.Controls.YamuiCharButton yamuiCharButton1;
-        private YamuiFramework.Controls.YamuiCharButton yamuiCharButton5;
+        private YamuiPanel yamuiPanel1;
+        private YamuiButton yamuiButton5;
+        private YamuiButton yamuiButton4;
+        private YamuiLabel yamuiLabel8;
+        private YamuiRadioButton yamuiRadioButton2;
+        private YamuiPanel yamuiPanel2;
+        private YamuiRadioButton yamuiRadioButton1;
+        private YamuiRadioButton yamuiRadioButton3;
+        private YamuiRadioButton yamuiRadioButton4;
+        private YamuiLabel yamuiLabel3;
+        private YamuiCheckBox yamuiCheckBox4;
+        private YamuiCheckBox yamuiCheckBox3;
+        private YamuiCheckBox yamuiCheckBox2;
+        private YamuiCheckBox yamuiCheckBox1;
+        private YamuiLabel yamuiLabel2;
+        private YamuiLabel yamuiLabel1;
+        private YamuiButton yamuiButton2;
+        private YamuiButton yamuiButton1;
+        private YamuiToggle yamuiToggle3;
+        private YamuiToggle yamuiToggle2;
+        private YamuiToggle yamuiToggle1;
+        private YamuiCharButton yamuiCharButton4;
+        private YamuiCharButton yamuiCharButton3;
+        private YamuiCharButton yamuiCharButton2;
+        private YamuiCharButton yamuiCharButton1;
+        private YamuiCharButton yamuiCharButton5;
     }
 }

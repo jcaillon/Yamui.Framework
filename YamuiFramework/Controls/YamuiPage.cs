@@ -15,9 +15,6 @@ namespace YamuiFramework.Controls
         public bool UseCustomBackColor { get; set; }
         #endregion
 
-        public YamuiPage() {
-        }
-
         #region Paint
         protected void PaintTransparentBackground(Graphics graphics, Rectangle clipRect) {
             graphics.Clear(Color.Transparent);

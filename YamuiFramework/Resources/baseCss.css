@@ -1,14 +1,22 @@
-﻿h1, h2, h3 { color: navy; font-weight:normal; }
+﻿html {
+    padding: 0;
+    margin: 0;
+}
+
+h1, h2, h3 { color: navy; font-weight:normal; }
 h1 { margin-bottom: .47em }
 h2 { margin-bottom: .3em }
 h3 { margin-bottom: .4em }
 ul { margin-top: .5em }
 ul li {margin: .25em}
-/* special for Yamui */ 
+
 body {
     Font: 12px SEGOEUI;
     color: %FormForeGroundColor%;
+    padding: 0;
+    margin: 0;
 }
+
 a:hover { text-decoration: underline; }
 pre  { border:solid 1px gray; background-color:#eee; padding:1em }
 a:link { text-decoration: none; }
@@ -24,6 +32,8 @@ a:link { text-decoration: none; }
 .yamui-text { 
     Font: 12px SEGOEUI;
     color: %FormForeGroundColor%;
+    margin: 0;
+    padding: 0;
 }
 
 

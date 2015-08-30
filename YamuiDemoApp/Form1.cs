@@ -1,21 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using YamuiFramework;
 using YamuiFramework.Animations.Transitions;
 using YamuiFramework.Controls;
 using YamuiFramework.Forms;
+using YamuiFramework.Themes;
 
 namespace YamuiDemoApp {
     public partial class Form1 : YamuiForm {
         public Form1() {
             InitializeComponent();
-            //yamuiTabControlMain.ApplyHideThisSettings(); //TODO: replace this by a onLoad event in yamuiLoad, foreach yamuitabControl do apply
         }
 
         private void yamuiTabControl1_SelectedIndexChanged(object sender, EventArgs e) {
@@ -30,23 +24,13 @@ namespace YamuiDemoApp {
             //ApplyHideSettingGlobally(this);
         }
 
-        private void ApplyHideSettingGlobally(Control parent) {
-            foreach (Control c in parent.Controls) {
-                if (c.GetType() == typeof(YamuiTabControl)) {
-                    YamuiTabControl fuu = (YamuiTabControl)c;
-                    //fuu.ApplyHideThisSettings();
-                    MessageBox.Show(fuu.Name);
-                }
-                ApplyHideSettingGlobally(c); // recurvise
-            }
-        }
-
         private void yamuiLink6_Click(object sender, EventArgs e) {
             GoToPage("yamuiTabSecAppearance");
         }
 
         private void yamuiLink7_Click(object sender, EventArgs e) {
-            GoBack();
+            var toastNotification = new YamuiNotifications("<img src='high_importance' />This is a notification test", 5);
+            toastNotification.Show();
         }
 
         private void classic1_Load(object sender, EventArgs e) {
@@ -55,6 +39,23 @@ namespace YamuiDemoApp {
 
         private void text1_Load(object sender, EventArgs e) {
 
+        }
+
+        private static bool lab = true;
+        private void yamuiLink8_Click(object sender, EventArgs e) {
+            statusLabel.UseCustomForeColor = true;
+            statusLabel.ForeColor = ThemeManager.Current.LabelsColorsNormalForeColor;
+            var t = new Transition(new TransitionType_Linear(500));
+            if (lab) 
+                t.add(statusLabel, "Text", "Hello world!");
+            else
+                t.add(statusLabel, "Text", "<b>WARNING :</b> this user is awesome");
+            t.add(statusLabel, "ForeColor", ThemeManager.AccentColor);
+            t.TransitionCompletedEvent += (o, args) => {
+                Transition.run(statusLabel, "ForeColor", ThemeManager.Current.LabelsColorsNormalForeColor, new TransitionType_CriticalDamping(400));
+            };
+            t.run();
+            lab = !lab;
         }
     }
 }

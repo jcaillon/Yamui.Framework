@@ -1,4 +1,5 @@
-﻿using YamuiFramework.Fonts;
+﻿using System.ComponentModel;
+using YamuiFramework.Controls;
 using YamuiFramework.HtmlRenderer.WinForms;
 
 namespace YamuiDemoApp.Pages.control {
@@ -6,7 +7,7 @@ namespace YamuiDemoApp.Pages.control {
         /// <summary> 
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary> 
         /// Clean up any resources being used.
@@ -291,21 +292,21 @@ namespace YamuiDemoApp.Pages.control {
 
         #endregion
 
-        private YamuiFramework.Controls.YamuiPanel yamuiPanel1;
-        private YamuiFramework.Controls.YamuiLabel yamuiLabel15;
-        private YamuiFramework.Controls.YamuiLink yamuiLink1;
-        private YamuiFramework.Controls.YamuiLink yamuiLink2;
-        private YamuiFramework.Controls.YamuiLabel yamuiLabel12;
-        private YamuiFramework.Controls.YamuiLabel yamuiLabel18;
-        private YamuiFramework.Controls.YamuiTextBox yamuiTextBox1;
-        private YamuiFramework.Controls.YamuiLabel yamuiLabel17;
-        private YamuiFramework.Controls.YamuiTextBox yamuiTextBox2;
-        private YamuiFramework.Controls.YamuiLabel yamuiLabel16;
-        private YamuiFramework.Controls.YamuiTextBox yamuiTextBox3;
-        private YamuiFramework.Controls.YamuiLabel yamuiLabel14;
-        private YamuiFramework.Controls.YamuiTextBox yamuiTextBox4;
-        private YamuiFramework.Controls.YamuiLabel yamuiLabel13;
-        private YamuiFramework.Controls.YamuiTextBox yamuiTextBox5;
+        private YamuiPanel yamuiPanel1;
+        private YamuiLabel yamuiLabel15;
+        private YamuiLink yamuiLink1;
+        private YamuiLink yamuiLink2;
+        private YamuiLabel yamuiLabel12;
+        private YamuiLabel yamuiLabel18;
+        private YamuiTextBox yamuiTextBox1;
+        private YamuiLabel yamuiLabel17;
+        private YamuiTextBox yamuiTextBox2;
+        private YamuiLabel yamuiLabel16;
+        private YamuiTextBox yamuiTextBox3;
+        private YamuiLabel yamuiLabel14;
+        private YamuiTextBox yamuiTextBox4;
+        private YamuiLabel yamuiLabel13;
+        private YamuiTextBox yamuiTextBox5;
         private HtmlLabel htmlLabel1;
         private HtmlPanel htmlPanel1;
         private HtmlToolTip htmlToolTip1;

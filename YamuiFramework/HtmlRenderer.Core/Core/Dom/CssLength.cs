@@ -197,52 +197,48 @@ namespace YamuiFramework.HtmlRenderer.Core.Core.Dom
         /// Returns the length formatted ready for CSS interpreting.
         /// </summary>
         /// <returns></returns>
-        public override string ToString()
-        {
+        public override string ToString() {
             if (HasError)
             {
                 return string.Empty;
             }
-            else if (IsPercentage)
+            if (IsPercentage)
             {
                 return string.Format(NumberFormatInfo.InvariantInfo, "{0}%", Number);
             }
-            else
+            string u = string.Empty;
+
+            switch (Unit)
             {
-                string u = string.Empty;
-
-                switch (Unit)
-                {
-                    case CssUnit.None:
-                        break;
-                    case CssUnit.Ems:
-                        u = "em";
-                        break;
-                    case CssUnit.Pixels:
-                        u = "px";
-                        break;
-                    case CssUnit.Ex:
-                        u = "ex";
-                        break;
-                    case CssUnit.Inches:
-                        u = "in";
-                        break;
-                    case CssUnit.Centimeters:
-                        u = "cm";
-                        break;
-                    case CssUnit.Milimeters:
-                        u = "mm";
-                        break;
-                    case CssUnit.Points:
-                        u = "pt";
-                        break;
-                    case CssUnit.Picas:
-                        u = "pc";
-                        break;
-                }
-
-                return string.Format(NumberFormatInfo.InvariantInfo, "{0}{1}", Number, u);
+                case CssUnit.None:
+                    break;
+                case CssUnit.Ems:
+                    u = "em";
+                    break;
+                case CssUnit.Pixels:
+                    u = "px";
+                    break;
+                case CssUnit.Ex:
+                    u = "ex";
+                    break;
+                case CssUnit.Inches:
+                    u = "in";
+                    break;
+                case CssUnit.Centimeters:
+                    u = "cm";
+                    break;
+                case CssUnit.Milimeters:
+                    u = "mm";
+                    break;
+                case CssUnit.Points:
+                    u = "pt";
+                    break;
+                case CssUnit.Picas:
+                    u = "pc";
+                    break;
             }
+
+            return string.Format(NumberFormatInfo.InvariantInfo, "{0}{1}", Number, u);
         }
 
         #endregion

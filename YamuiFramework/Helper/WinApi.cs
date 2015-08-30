@@ -438,6 +438,37 @@ namespace YamuiFramework.Native
         #endregion
 
         #region API Calls
+        /// <summary>
+        /// Gets the handle of the window that currently has focus.
+        /// </summary>
+        /// <returns>
+        /// The handle of the window that currently has focus.
+        /// </returns>
+        [DllImport("user32")]
+        internal static extern IntPtr GetForegroundWindow();
+
+        /// <summary>
+        /// Activates the specified window.
+        /// </summary>
+        /// <param name="hWnd">
+        /// The handle of the window to be focused.
+        /// </param>
+        /// <returns>
+        /// True if the window was focused; False otherwise.
+        /// </returns>
+        [DllImport("user32")]
+        internal static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        [DllImport("Gdi32.dll", EntryPoint = "CreateRoundRectRgn")]
+        internal static extern IntPtr CreateRoundRectRgn
+        (
+            int nLeftRect, // x-coordinate of upper-left corner
+            int nTopRect, // y-coordinate of upper-left corner
+            int nRightRect, // x-coordinate of lower-right corner
+            int nBottomRect, // y-coordinate of lower-right corner
+            int nWidthEllipse, // width of ellipse
+            int nHeightEllipse // height of ellipse
+        );
 
         [DllImport("user32.dll", ExactSpelling = true, SetLastError = true)]
         public static extern Bool UpdateLayeredWindow(IntPtr hwnd, IntPtr hdcDst, ref POINT pptDst, ref SIZE psize, IntPtr hdcSrc, ref POINT pprSrc, Int32 crKey, ref BLENDFUNCTION pblend, Int32 dwFlags);
@@ -492,10 +523,6 @@ namespace YamuiFramework.Native
 
         [DllImport("user32.dll", SetLastError = true)]
         public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
-
-        [DllImport("user32.dll")]
-        public static extern bool SetForegroundWindow(IntPtr hWnd);
-
         [DllImport("user32.dll")]
         public static extern IntPtr GetDCEx(IntPtr hwnd, IntPtr hrgnclip, uint fdwOptions);
 

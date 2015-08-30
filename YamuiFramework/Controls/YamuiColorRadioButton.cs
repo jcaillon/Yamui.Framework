@@ -17,8 +17,8 @@ namespace YamuiFramework.Controls {
         public bool UseBorder { get; set; }
 
         private bool _isHovered;
-        private bool _isPressed;
-        private bool _isFocused;
+        //private bool _isPressed;
+        //private bool _isFocused;
         #endregion
 
         #region Constructor
@@ -92,78 +92,12 @@ namespace YamuiFramework.Controls {
 
         #region Managing isHovered, isPressed, isFocused
 
-        #region Focus Methods
-
-        protected override void OnGotFocus(EventArgs e) {
-            _isFocused = true;
-            Invalidate();
-
-            base.OnGotFocus(e);
-        }
-
-        protected override void OnLostFocus(EventArgs e) {
-            _isFocused = false;
-            Invalidate();
-
-            base.OnLostFocus(e);
-        }
-
-        protected override void OnEnter(EventArgs e) {
-            _isFocused = true;
-            Invalidate();
-
-            base.OnEnter(e);
-        }
-
-        protected override void OnLeave(EventArgs e) {
-            _isFocused = false;
-            Invalidate();
-
-            base.OnLeave(e);
-        }
-
-        #endregion
-
-        #region Keyboard Methods
-
-        protected override void OnKeyDown(KeyEventArgs e) {
-            if (e.KeyCode == Keys.Space) {
-                _isPressed = true;
-                Invalidate();
-            }
-
-            base.OnKeyDown(e);
-        }
-
-        protected override void OnKeyUp(KeyEventArgs e) {
-            //Remove this code cause this prevents the focus color
-            _isPressed = false;
-            Invalidate();
-            base.OnKeyUp(e);
-        }
-
-        #endregion
-
         #region Mouse Methods
 
         protected override void OnMouseEnter(EventArgs e) {
             _isHovered = true;
             Invalidate();
             base.OnMouseEnter(e);
-        }
-
-        protected override void OnMouseDown(MouseEventArgs e) {
-            if (e.Button == MouseButtons.Left) {
-                _isPressed = true;
-                Invalidate();
-            }
-            base.OnMouseDown(e);
-        }
-
-        protected override void OnMouseUp(MouseEventArgs e) {
-            _isPressed = false;
-            Invalidate();
-            base.OnMouseUp(e);
         }
 
         protected override void OnMouseLeave(EventArgs e) {

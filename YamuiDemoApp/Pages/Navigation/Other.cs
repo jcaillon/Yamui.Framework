@@ -9,7 +9,6 @@ namespace YamuiDemoApp.Pages.Navigation {
         }
 
         private void yamuiButton6_Click(object sender, EventArgs e) {
-            YamuiTaskWindow.ShowTaskWindow(this, "SubControl in TaskWindow", new TaskWindowControl(), 5);
         }
     }
 }

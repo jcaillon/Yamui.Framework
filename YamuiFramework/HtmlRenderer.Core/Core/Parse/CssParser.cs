@@ -31,7 +31,7 @@ namespace YamuiFramework.HtmlRenderer.Core.Core.Parse
         /// <summary>
         /// split CSS rule
         /// </summary>
-        private static readonly char[] _cssBlockSplitters = new[] { '}', ';' };
+        private static readonly char[] _cssBlockSplitters = { '}', ';' };
 
         /// <summary>
         /// 
@@ -46,7 +46,7 @@ namespace YamuiFramework.HtmlRenderer.Core.Core.Parse
         /// <summary>
         /// The chars to trim the css class name by
         /// </summary>
-        private static readonly char[] _cssClassTrimChars = new[] { '\r', '\n', '\t', ' ', '-', '!', '<', '>' };
+        private static readonly char[] _cssClassTrimChars = { '\r', '\n', '\t', ' ', '-', '!', '<', '>' };
 
         #endregion
 
@@ -571,11 +571,6 @@ namespace YamuiFramework.HtmlRenderer.Core.Core.Parse
                     properties["font-size"] = fontSize;
                 if (!string.IsNullOrEmpty(lineHeight))
                     properties["line-height"] = lineHeight;
-            }
-            else
-            {
-                // Check for: caption | icon | menu | message-box | small-caption | status-bar
-                //TODO: Interpret font values of: caption | icon | menu | message-box | small-caption | status-bar
             }
         }
 

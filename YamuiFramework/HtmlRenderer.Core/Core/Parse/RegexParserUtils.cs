@@ -170,10 +170,7 @@ namespace YamuiFramework.HtmlRenderer.Core.Core.Parse
                 position = matches[0].Index;
                 return matches[0].Value;
             }
-            else
-            {
-                position = -1;
-            }
+            position = -1;
 
             return null;
         }

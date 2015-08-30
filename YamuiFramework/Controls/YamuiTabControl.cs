@@ -5,15 +5,11 @@ using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Drawing;
 using System.Drawing.Design;
-using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Security;
-using System.Security.Permissions;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 using YamuiFramework.Animations.Transitions;
-using YamuiFramework.Controls;
 using YamuiFramework.Fonts;
 using YamuiFramework.Forms;
 using YamuiFramework.Native;
@@ -80,7 +76,7 @@ namespace YamuiFramework.Controls {
         private Dictionary<int, Rectangle> _getRekt = new Dictionary<int, Rectangle>();
 
         // this is the actual tab index that should be display!
-        private int _selectedIndex = 0;
+        private int _selectedIndex;
         [Browsable(false)]
         public int SelectIndex {
             get { return _selectedIndex; }
@@ -94,7 +90,7 @@ namespace YamuiFramework.Controls {
         }
 
         private bool _fromSelectIndex;
-        private int _lastSelectedTab = 0;
+        private int _lastSelectedTab;
 
         // the index of the current tab hovered by the cursor
         private int _hotTrackTab = -1;
@@ -358,42 +354,46 @@ namespace YamuiFramework.Controls {
         #region Keyboard Methods
 
         protected override void OnKeyDown(KeyEventArgs e) {
-            if (!_isFocused) return;
-            if (e.KeyCode == Keys.Space) {
-                if (SelectIndex == _hotTrackTab) return;
-                SaveFormCurrentPath();
-                SelectIndex = _hotTrackTab;
-                Invalidate();
-            }
-            if (e.KeyCode == Keys.Left) {
-                if (!ShowNormallyHiddenTabs && SelectIndex > 0) SelectIndex--;
-                Invalidate();
-            }
-            if (e.KeyCode == Keys.Right) {
-                if (!ShowNormallyHiddenTabs && SelectIndex < TabPages.Count - 1) {
-                    YamuiTabPage tabPage = (YamuiTabPage) TabPages[SelectedIndex + 1];
-                    if (tabPage.HiddenState != true) SelectIndex++;
+            try {
+                if (!_isFocused) return;
+                if (e.KeyCode == Keys.Space) {
+                    if (SelectIndex == _hotTrackTab) return;
+                    SaveFormCurrentPath();
+                    SelectIndex = _hotTrackTab;
+                    Invalidate();
                 }
-                Invalidate();
-            }
-            if (e.KeyCode == Keys.Up) {
-                try {
-                    if (Function == TabFunction.Secondary) {
-                        Parent.Parent.Focus();
+                if (e.KeyCode == Keys.Left) {
+                    if (!ShowNormallyHiddenTabs && SelectIndex > 0) SelectIndex--;
+                    Invalidate();
+                }
+                if (e.KeyCode == Keys.Right) {
+                    if (!ShowNormallyHiddenTabs && SelectIndex < TabPages.Count - 1) {
+                        YamuiTabPage tabPage = (YamuiTabPage) TabPages[SelectedIndex + 1];
+                        if (tabPage.HiddenState != true) SelectIndex++;
                     }
-                } catch (Exception) {
-                    // ignored
+                    Invalidate();
                 }
-            }
-            if (e.KeyCode == Keys.Down) {
-                try {
-                    if (Function == TabFunction.Main) {
-                        var listCtrl = ControlHelper.GetAll(Controls[SelectIndex], typeof(YamuiTabControl));
-                        if (listCtrl != null) listCtrl.First().Focus();
+                if (e.KeyCode == Keys.Up) {
+                    try {
+                        if (Function == TabFunction.Secondary) {
+                            Parent.Parent.Focus();
+                        }
+                    } catch (Exception) {
+                        // ignored
                     }
-                } catch (Exception) {
-                    // ignored
                 }
+                if (e.KeyCode == Keys.Down) {
+                    try {
+                        if (Function == TabFunction.Main) {
+                            var listCtrl = ControlHelper.GetAll(Controls[SelectIndex], typeof(YamuiTabControl));
+                            if (listCtrl != null) listCtrl.First().Focus();
+                        }
+                    } catch (Exception) {
+                        // ignored
+                    }
+                }
+            } catch (Exception) {
+                Invalidate();
             }
             base.OnKeyDown(e);
         }

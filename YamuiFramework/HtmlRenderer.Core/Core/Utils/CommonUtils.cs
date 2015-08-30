@@ -36,8 +36,7 @@ namespace YamuiFramework.HtmlRenderer.Core.Core.Utils
         /// <summary>
         /// Table to convert numbers into roman digits
         /// </summary>
-        private static readonly string[,] _romanDigitsTable = new[,]
-        {
+        private static readonly string[,] _romanDigitsTable = {
             { "", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX" },
             { "", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC" },
             { "", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM" },
@@ -47,34 +46,29 @@ namespace YamuiFramework.HtmlRenderer.Core.Core.Utils
             }
         };
 
-        private static readonly string[,] _hebrewDigitsTable = new[,]
-        {
+        private static readonly string[,] _hebrewDigitsTable = {
             { "א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט" },
             { "י", "כ", "ל", "מ", "נ", "ס", "ע", "פ", "צ" },
-            { "ק", "ר", "ש", "ת", "תק", "תר", "תש", "תת", "תתק", }
+            { "ק", "ר", "ש", "ת", "תק", "תר", "תש", "תת", "תתק" }
         };
 
-        private static readonly string[,] _georgianDigitsTable = new[,]
-        {
+        private static readonly string[,] _georgianDigitsTable = {
             { "ა", "ბ", "გ", "დ", "ე", "ვ", "ზ", "ჱ", "თ" },
             { "ი", "პ", "ლ", "მ", "ნ", "ჲ", "ო", "პ", "ჟ" },
             { "რ", "ს", "ტ", "ჳ", "ფ", "ქ", "ღ", "ყ", "შ" }
         };
 
-        private static readonly string[,] _armenianDigitsTable = new[,]
-        {
+        private static readonly string[,] _armenianDigitsTable = {
             { "Ա", "Բ", "Գ", "Դ", "Ե", "Զ", "Է", "Ը", "Թ" },
             { "Ժ", "Ի", "Լ", "Խ", "Ծ", "Կ", "Հ", "Ձ", "Ղ" },
             { "Ճ", "Մ", "Յ", "Ն", "Շ", "Ո", "Չ", "Պ", "Ջ" }
         };
 
-        private static readonly string[] _hiraganaDigitsTable = new[]
-        {
+        private static readonly string[] _hiraganaDigitsTable = {
             "あ", "ぃ", "ぅ", "ぇ", "ぉ", "か", "き", "く", "け", "こ", "さ", "し", "す", "せ", "そ", "た", "ち", "つ", "て", "と", "な", "に", "ぬ", "ね", "の", "は", "ひ", "ふ", "へ", "ほ", "ま", "み", "む", "め", "も", "ゃ", "ゅ", "ょ", "ら", "り", "る", "れ", "ろ", "ゎ", "ゐ", "ゑ", "を", "ん"
         };
 
-        private static readonly string[] _satakanaDigitsTable = new[]
-        {
+        private static readonly string[] _satakanaDigitsTable = {
             "ア", "イ", "ウ", "エ", "オ", "カ", "キ", "ク", "ケ", "コ", "サ", "シ", "ス", "セ", "ソ", "タ", "チ", "ツ", "テ", "ト", "ナ", "ニ", "ヌ", "ネ", "ノ", "ハ", "ヒ", "フ", "ヘ", "ホ", "マ", "ミ", "ム", "メ", "モ", "ヤ", "ユ", "ヨ", "ラ", "リ", "ル", "レ", "ロ", "ワ", "ヰ", "ヱ", "ヲ", "ン"
         };
 
@@ -112,11 +106,10 @@ namespace YamuiFramework.HtmlRenderer.Core.Core.Utils
         {
             if (ch >= '0' && ch <= '9')
                 return ch - '0';
-            else if (hex)
-            {
+            if (hex) {
                 if (ch >= 'a' && ch <= 'f')
                     return ch - 'a' + 10;
-                else if (ch >= 'A' && ch <= 'F')
+                if (ch >= 'A' && ch <= 'F')
                     return ch - 'A' + 10;
             }
 
@@ -337,39 +330,36 @@ namespace YamuiFramework.HtmlRenderer.Core.Core.Utils
             {
                 return ConvertToGreekNumber(number);
             }
-            else if (style.Equals(CssConstants.LowerRoman, StringComparison.InvariantCultureIgnoreCase))
+            if (style.Equals(CssConstants.LowerRoman, StringComparison.InvariantCultureIgnoreCase))
             {
                 return ConvertToRomanNumbers(number, true);
             }
-            else if (style.Equals(CssConstants.UpperRoman, StringComparison.InvariantCultureIgnoreCase))
+            if (style.Equals(CssConstants.UpperRoman, StringComparison.InvariantCultureIgnoreCase))
             {
                 return ConvertToRomanNumbers(number, false);
             }
-            else if (style.Equals(CssConstants.Armenian, StringComparison.InvariantCultureIgnoreCase))
+            if (style.Equals(CssConstants.Armenian, StringComparison.InvariantCultureIgnoreCase))
             {
                 return ConvertToSpecificNumbers(number, _armenianDigitsTable);
             }
-            else if (style.Equals(CssConstants.Georgian, StringComparison.InvariantCultureIgnoreCase))
+            if (style.Equals(CssConstants.Georgian, StringComparison.InvariantCultureIgnoreCase))
             {
                 return ConvertToSpecificNumbers(number, _georgianDigitsTable);
             }
-            else if (style.Equals(CssConstants.Hebrew, StringComparison.InvariantCultureIgnoreCase))
+            if (style.Equals(CssConstants.Hebrew, StringComparison.InvariantCultureIgnoreCase))
             {
                 return ConvertToSpecificNumbers(number, _hebrewDigitsTable);
             }
-            else if (style.Equals(CssConstants.Hiragana, StringComparison.InvariantCultureIgnoreCase) || style.Equals(CssConstants.HiraganaIroha, StringComparison.InvariantCultureIgnoreCase))
+            if (style.Equals(CssConstants.Hiragana, StringComparison.InvariantCultureIgnoreCase) || style.Equals(CssConstants.HiraganaIroha, StringComparison.InvariantCultureIgnoreCase))
             {
                 return ConvertToSpecificNumbers2(number, _hiraganaDigitsTable);
             }
-            else if (style.Equals(CssConstants.Katakana, StringComparison.InvariantCultureIgnoreCase) || style.Equals(CssConstants.KatakanaIroha, StringComparison.InvariantCultureIgnoreCase))
+            if (style.Equals(CssConstants.Katakana, StringComparison.InvariantCultureIgnoreCase) || style.Equals(CssConstants.KatakanaIroha, StringComparison.InvariantCultureIgnoreCase))
             {
                 return ConvertToSpecificNumbers2(number, _satakanaDigitsTable);
             }
-            else
-            {
-                var lowercase = style.Equals(CssConstants.LowerAlpha, StringComparison.InvariantCultureIgnoreCase) || style.Equals(CssConstants.LowerLatin, StringComparison.InvariantCultureIgnoreCase);
-                return ConvertToEnglishNumber(number, lowercase);
-            }
+            var lowercase = style.Equals(CssConstants.LowerAlpha, StringComparison.InvariantCultureIgnoreCase) || style.Equals(CssConstants.LowerLatin, StringComparison.InvariantCultureIgnoreCase);
+            return ConvertToEnglishNumber(number, lowercase);
         }
 
         /// <summary>

@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 using YamuiFramework.Fonts;

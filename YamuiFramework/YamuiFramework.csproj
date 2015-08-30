@@ -44,7 +44,6 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Animations\DelayedCall.cs" />
     <Compile Include="Animations\Transitions\IManagedType.cs" />
     <Compile Include="Animations\Transitions\ITransitionType.cs" />
     <Compile Include="Animations\Transitions\ManagedType_Bool.cs" />
@@ -125,6 +124,12 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Fonts\FontManager.cs" />
+    <Compile Include="Forms\YamuiNotifications.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\YamuiNotifications.Designer.cs">
+      <DependentUpon>YamuiNotifications.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\YamuiTabAnimation.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -139,9 +144,6 @@
     </Compile>
     <Compile Include="Forms\YamuiFormMessageBox.Designer.cs">
       <DependentUpon>YamuiFormMessageBox.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\YamuiTaskWindow.cs">
-      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Helper\WindowWrapper.cs" />
     <Compile Include="HtmlRenderer.Core\Adapters\Entities\RColor.cs" />
@@ -251,7 +253,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Resources\GetImage.cs" />
+    <Compile Include="Resources\ImageGetter.cs" />
     <Compile Include="Themes\Class2xml.cs" />
     <Compile Include="Themes\HtmlHandler.cs" />
     <Compile Include="Themes\Theme.cs" />
@@ -265,8 +267,8 @@
     <EmbeddedResource Include="Forms\YamuiFormMessageBox.resx">
       <DependentUpon>YamuiFormMessageBox.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\YamuiTaskWindow.resx">
-      <DependentUpon>YamuiTaskWindow.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\YamuiNotifications.resx">
+      <DependentUpon>YamuiNotifications.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -282,12 +284,20 @@
     <Content Include="Animations\Transitions\readme.txt" />
     <Content Include="Resources\baseCss.css" />
     <Content Include="Resources\hellokitty.png" />
+    <Content Include="Resources\MessageBox\ant.png" />
     <Content Include="Resources\MessageBox\error.png" />
+    <Content Include="Resources\MessageBox\high_importance.png" />
     <Content Include="Resources\MessageBox\info.png" />
+    <Content Include="Resources\MessageBox\ok.png" />
+    <Content Include="Resources\MessageBox\pin.png" />
+    <Content Include="Resources\MessageBox\poison.png" />
     <Content Include="Resources\MessageBox\question.png" />
     <Content Include="Resources\MessageBox\question_shield.png" />
+    <Content Include="Resources\MessageBox\radio_active.png" />
     <Content Include="Resources\MessageBox\services.png" />
+    <Content Include="Resources\MessageBox\skull.png" />
     <Content Include="Resources\MessageBox\warning.png" />
+    <Content Include="Resources\MessageBox\warning_shield.png" />
     <Content Include="Resources\themesXml.xml" />
     <EmbeddedResource Include="HtmlRenderer.Core\Core\Utils\ImageLoad.png" />
     <EmbeddedResource Include="HtmlRenderer.Core\Core\Utils\ImageError.png" />

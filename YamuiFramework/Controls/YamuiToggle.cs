@@ -6,7 +6,6 @@ using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 using YamuiFramework.Fonts;
-using YamuiFramework.Native;
 using YamuiFramework.Themes;
 
 namespace YamuiFramework.Controls {
@@ -71,41 +70,40 @@ namespace YamuiFramework.Controls {
         }
 
         protected virtual void OnPaintForeground(PaintEventArgs e) {
-            Color foreColor = ThemeManager.ButtonColors.ForeGround(ForeColor, false, _isFocused, _isHovered, _isPressed, Enabled);
+            Color textColor = ThemeManager.ButtonColors.ForeGround(ForeColor, false, _isFocused, _isHovered, _isPressed, Enabled);
+            Color foreColor = ThemeManager.ButtonColors.ForeGround(ForeColor, false, _isFocused, _isHovered, Checked, Enabled);
+            Color borderColor = ThemeManager.ButtonColors.BorderColor(_isFocused, _isHovered, _isPressed, Enabled);
+            Color unfilledColor = ThemeManager.Current.ButtonColorsNormalBackColor;
+            if (unfilledColor == ThemeManager.Current.FormColorBackColor) unfilledColor = borderColor;
+            Color fillColor = Checked ? ThemeManager.AccentColor : unfilledColor;
 
             Rectangle textRect = new Rectangle(42, 0, Width - 42, Height);
             Rectangle backRect = new Rectangle(0, 0, 39, Height);
 
-            Color borderColor = ThemeManager.ButtonColors.BorderColor(_isFocused, _isHovered, _isPressed, Enabled);
-
-            using (Pen p = new Pen(borderColor)) {
-                Rectangle boxRect = new Rectangle(0, 0, backRect.Width - 1, backRect.Height - 1);
-                e.Graphics.DrawRectangle(p, boxRect);
-            }
-
-            Color fillColor = Checked ? ThemeManager.AccentColor : ThemeManager.Current.ButtonColorsNormalBackColor;
-
+            // draw the back
+            e.Graphics.SmoothingMode = SmoothingMode.HighQuality;           
             using (SolidBrush b = new SolidBrush(fillColor)) {
-                Rectangle boxRect = new Rectangle(2, 2, backRect.Width - 4, backRect.Height - 4);
-                e.Graphics.FillRectangle(b, boxRect);
+                e.Graphics.FillRectangle(b, new Rectangle(Height / 2, 0, backRect.Width - Height, Height));
+                e.Graphics.FillEllipse(b, new Rectangle(0, 0, Height, Height));
+                e.Graphics.FillEllipse(b, new Rectangle(backRect.Width - Height, 0, Height, Height));
             }
-
-            Color backColor = BackColor;
-
-            using (SolidBrush b = new SolidBrush(backColor)) {
-                int left = Checked ? backRect.Width - 11 : 0;
-
-                Rectangle boxRect = new Rectangle(left, 0, 11, backRect.Height);
-                e.Graphics.FillRectangle(b, boxRect);
+            // draw foreground ellipse
+            using (SolidBrush b = new SolidBrush(foreColor)) {
+                if (!Checked)
+                    e.Graphics.FillEllipse(b, new Rectangle(2, 2, Height - 4, Height - 4));
+                else
+                    e.Graphics.FillEllipse(b, new Rectangle(backRect.Width - Height + 2, 2, Height - 4, Height - 4));
             }
-            using (SolidBrush b = new SolidBrush(ThemeManager.Current.ButtonColorsHoverBackColor)) {
-                int left = Checked ? backRect.Width - 10 : 0;
-
-                Rectangle boxRect = new Rectangle(left, 0, 10, backRect.Height);
-                e.Graphics.FillRectangle(b, boxRect);
+            // draw checked.. or not
+            if (Checked) {
+                var fuRect = ClientRectangle;
+                fuRect.Width = 15;
+                fuRect.Offset(10, -3);
+                TextRenderer.DrawText(e.Graphics, "a", new Font("Webdings", 15f, GraphicsUnit.Pixel), fuRect, foreColor, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
             }
+            e.Graphics.SmoothingMode = SmoothingMode.Default;
 
-            TextRenderer.DrawText(e.Graphics, Text, FontManager.GetStandardFont(), textRect, foreColor, FontManager.GetTextFormatFlags(TextAlign));
+            TextRenderer.DrawText(e.Graphics, Text, FontManager.GetStandardFont(), textRect, textColor, FontManager.GetTextFormatFlags(TextAlign));
         }
 
         #endregion

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
+﻿using System.Drawing;
 using YamuiFramework.HtmlRenderer.Core.Core;
 using YamuiFramework.HtmlRenderer.Core.Core.Entities;
 using YamuiFramework.HtmlRenderer.WinForms;
@@ -32,7 +28,7 @@ namespace YamuiFramework.Themes {
         }
 
         public static void OnImageLoad(HtmlImageLoadEventArgs e) {
-            Image tryImg = GetImage.GetInstance().Get(e.Src);
+            Image tryImg = ImageGetter.GetInstance().Get(e.Src);
             if (tryImg != null) {
                 e.Handled = true;
                 e.Callback(tryImg);

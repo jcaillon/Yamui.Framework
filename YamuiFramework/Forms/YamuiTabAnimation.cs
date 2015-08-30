@@ -54,6 +54,14 @@ namespace YamuiFramework.Forms {
         }
         #endregion
 
+        #region dispose
+        protected override void Dispose(bool disposing) {
+            LocationChanged -= Cover_LocationChanged;
+            ClientSizeChanged -= Cover_ClientSizeChanged;
+            base.Dispose(disposing);
+        }
+        #endregion
+
         #region Paint
         /// <summary>
         /// This is the same paint method as a yamuitabpage!!

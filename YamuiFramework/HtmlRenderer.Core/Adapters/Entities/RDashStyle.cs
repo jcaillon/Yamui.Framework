@@ -22,6 +22,6 @@ namespace YamuiFramework.HtmlRenderer.Core.Adapters.Entities
         Dot,
         DashDot,
         DashDotDot,
-        Custom,
+        Custom
     }
 }

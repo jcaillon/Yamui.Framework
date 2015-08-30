@@ -357,6 +357,7 @@ namespace YamuiFramework.HtmlRenderer.WinForms
         /// </summary>
         protected virtual void OnImageLoad(HtmlImageLoadEventArgs e)
         {
+            HtmlHandler.OnImageLoad(e);
             var handler = ImageLoad;
             if (handler != null)
                 handler(this, e);

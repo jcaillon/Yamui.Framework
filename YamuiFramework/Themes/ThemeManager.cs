@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
-using YamuiFramework.HtmlRenderer.Core.Core;
-using YamuiFramework.HtmlRenderer.WinForms;
 using YamuiFramework.Resources;
 
 namespace YamuiFramework.Themes {
@@ -63,7 +61,7 @@ namespace YamuiFramework.Themes {
         /// </summary>
         public static Image ThemePageImage {
             get {
-                return !string.IsNullOrEmpty(ImageName) ? GetImage.GetInstance().Get(ImageName) : null;
+                return !string.IsNullOrEmpty(ImageName) ? ImageGetter.GetInstance().Get(ImageName) : null;
             }
         }
 

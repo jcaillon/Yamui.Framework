@@ -47,7 +47,7 @@ namespace YamuiFramework.HtmlRenderer.Core.Adapters
             TopLeft,
             TopRight,
             BottomLeft,
-            BottomRight,
+            BottomRight
         }
     }
 }

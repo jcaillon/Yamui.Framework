@@ -85,10 +85,7 @@ namespace YamuiFramework.HtmlRenderer.Core.Core.Handlers
             {
                 return LoadStylesheetFromFile(htmlContainer, uri != null ? uri.AbsolutePath : src);
             }
-            else
-            {
-                return LoadStylesheetFromUri(htmlContainer, uri);
-            }
+            return LoadStylesheetFromUri(htmlContainer, uri);
         }
 
         /// <summary>
@@ -100,8 +97,7 @@ namespace YamuiFramework.HtmlRenderer.Core.Core.Handlers
         private static string LoadStylesheetFromFile(HtmlContainerInt htmlContainer, string path)
         {
             var fileInfo = CommonUtils.TryGetFileInfo(path);
-            if (fileInfo != null)
-            {
+            if (fileInfo != null) {
                 if (fileInfo.Exists)
                 {
                     using (var sr = new StreamReader(fileInfo.FullName))
@@ -109,12 +105,8 @@ namespace YamuiFramework.HtmlRenderer.Core.Core.Handlers
                         return sr.ReadToEnd();
                     }
                 }
-                else
-                {
-                    htmlContainer.ReportError(HtmlRenderErrorType.CssParsing, "No stylesheet found by path: " + path);
-                }
-            }
-            else
+                htmlContainer.ReportError(HtmlRenderErrorType.CssParsing, "No stylesheet found by path: " + path);
+            } else
             {
                 htmlContainer.ReportError(HtmlRenderErrorType.CssParsing, "Failed load image, invalid source: " + path);
             }

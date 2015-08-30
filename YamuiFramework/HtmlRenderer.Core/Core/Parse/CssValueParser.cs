@@ -304,24 +304,20 @@ namespace YamuiFramework.HtmlRenderer.Core.Core.Parse
         {
             try
             {
-                if (!string.IsNullOrEmpty(str))
-                {
+                if (!string.IsNullOrEmpty(str)) {
                     if (length > 1 && str[idx] == '#')
                     {
                         return GetColorByHex(str, idx, length, out color);
                     }
-                    else if (length > 10 && CommonUtils.SubStringEquals(str, idx, 4, "rgb(") && str[length - 1] == ')')
+                    if (length > 10 && CommonUtils.SubStringEquals(str, idx, 4, "rgb(") && str[length - 1] == ')')
                     {
                         return GetColorByRgb(str, idx, length, out color);
                     }
-                    else if (length > 13 && CommonUtils.SubStringEquals(str, idx, 5, "rgba(") && str[length - 1] == ')')
+                    if (length > 13 && CommonUtils.SubStringEquals(str, idx, 5, "rgba(") && str[length - 1] == ')')
                     {
                         return GetColorByRgba(str, idx, length, out color);
                     }
-                    else
-                    {
-                        return GetColorByName(str, idx, length, out color);
-                    }
+                    return GetColorByName(str, idx, length, out color);
                 }
             }
             catch

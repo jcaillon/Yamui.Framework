@@ -1,12 +1,12 @@
 ﻿using System.Drawing;
 
 namespace YamuiFramework.Resources {
-    class GetImage {
+    class ImageGetter {
 
-        private static GetImage _instance;
+        private static ImageGetter _instance;
 
-        public static GetImage GetInstance() {
-            return _instance ?? (_instance = new GetImage());
+        public static ImageGetter GetInstance() {
+            return _instance ?? (_instance = new ImageGetter());
         }
 
         public Image Get(string filename) {

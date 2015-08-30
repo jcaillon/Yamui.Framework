@@ -834,10 +834,7 @@ namespace YamuiFramework.HtmlRenderer.Core.Core.Dom
                 _widthSpecified = true;
                 return CssValueParser.ParseLength(_tableBox.Width, _tableBox.ParentBox.AvailableWidth, _tableBox);
             }
-            else
-            {
-                return _tableBox.ParentBox.AvailableWidth;
-            }
+            return _tableBox.ParentBox.AvailableWidth;
         }
 
         /// <summary>
@@ -857,10 +854,7 @@ namespace YamuiFramework.HtmlRenderer.Core.Core.Dom
                 _widthSpecified = true;
                 return CssValueParser.ParseLength(_tableBox.MaxWidth, _tableBox.ParentBox.AvailableWidth, _tableBox);
             }
-            else
-            {
-                return 9999f;
-            }
+            return 9999f;
         }
 
         /// <summary>
@@ -921,12 +915,10 @@ namespace YamuiFramework.HtmlRenderer.Core.Core.Dom
         {
             double f = 0f;
 
-            foreach (double t in _columnWidths)
-            {
+            foreach (double t in _columnWidths) {
                 if (double.IsNaN(t))
                     throw new Exception("CssTable Algorithm error: There's a NaN in column widths");
-                else
-                    f += t;
+                f += t;
             }
 
             //Take cell-spacing

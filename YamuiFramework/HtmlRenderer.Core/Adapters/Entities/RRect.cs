@@ -209,12 +209,10 @@ namespace YamuiFramework.HtmlRenderer.Core.Adapters.Entities
         /// </returns>
         public bool IsEmpty
         {
-            get
-            {
+            get {
                 if (Width > 0.0)
                     return Height <= 0.0;
-                else
-                    return true;
+                return true;
             }
         }
 
@@ -231,12 +229,10 @@ namespace YamuiFramework.HtmlRenderer.Core.Adapters.Entities
         /// <param name="right">
         ///     The <see cref="RRect" /> structure that is to the right of the equality operator.
         /// </param>
-        public static bool operator ==(RRect left, RRect right)
-        {
+        public static bool operator ==(RRect left, RRect right) {
             if (Math.Abs(left.X - right.X) < 0.001 && Math.Abs(left.Y - right.Y) < 0.001 && Math.Abs(left.Width - right.Width) < 0.001)
                 return Math.Abs(left.Height - right.Height) < 0.001;
-            else
-                return false;
+            return false;
         }
 
         /// <summary>
@@ -291,8 +287,7 @@ namespace YamuiFramework.HtmlRenderer.Core.Adapters.Entities
             var rectangleF = (RRect)obj;
             if (Math.Abs(rectangleF.X - X) < 0.001 && Math.Abs(rectangleF.Y - Y) < 0.001 && Math.Abs(rectangleF.Width - Width) < 0.001)
                 return Math.Abs(rectangleF.Height - Height) < 0.001;
-            else
-                return false;
+            return false;
         }
 
         /// <summary>
@@ -305,12 +300,10 @@ namespace YamuiFramework.HtmlRenderer.Core.Adapters.Entities
         /// </returns>
         /// <param name="x">The x-coordinate of the point to test. </param>
         /// <param name="y">The y-coordinate of the point to test. </param>
-        public bool Contains(double x, double y)
-        {
+        public bool Contains(double x, double y) {
             if (X <= x && x < X + Width && Y <= y)
                 return y < Y + Height;
-            else
-                return false;
+            return false;
         }
 
         /// <summary>
@@ -340,12 +333,10 @@ namespace YamuiFramework.HtmlRenderer.Core.Adapters.Entities
         /// <param name="rect">
         ///     The <see cref="RRect" /> to test.
         /// </param>
-        public bool Contains(RRect rect)
-        {
+        public bool Contains(RRect rect) {
             if (X <= rect.X && rect.X + rect.Width <= X + Width && Y <= rect.Y)
                 return rect.Y + rect.Height <= Y + Height;
-            else
-                return false;
+            return false;
         }
 
         /// <summary>
@@ -427,8 +418,7 @@ namespace YamuiFramework.HtmlRenderer.Core.Adapters.Entities
             double num2 = Math.Min(a.Y + a.Height, b.Y + b.Height);
             if (num1 >= x && num2 >= y)
                 return new RRect(x, y, num1 - x, num2 - y);
-            else
-                return Empty;
+            return Empty;
         }
 
         /// <summary>
@@ -438,12 +428,10 @@ namespace YamuiFramework.HtmlRenderer.Core.Adapters.Entities
         ///     This method returns true if there is any intersection.
         /// </returns>
         /// <param name="rect">The rectangle to test. </param>
-        public bool IntersectsWith(RRect rect)
-        {
+        public bool IntersectsWith(RRect rect) {
             if (rect.X < X + Width && X < rect.X + rect.Width && rect.Y < Y + Height)
                 return Y < rect.Y + rect.Height;
-            else
-                return false;
+            return false;
         }
 
         /// <summary>
