@@ -44,29 +44,6 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Animations\Animator\Animation.cs" />
-    <Compile Include="Animations\Animator\Animator.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Animations\Animator\Controller.cs" />
-    <Compile Include="Animations\Animator\DecorationControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Animations\Animator\DoubleBitmapControl.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Animations\Animator\DoubleBitmapControl.Designer.cs">
-      <DependentUpon>DoubleBitmapControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Animations\Animator\DoubleBitmapForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Animations\Animator\DoubleBitmapForm.designer.cs">
-      <DependentUpon>DoubleBitmapForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Animations\Animator\Flags.cs" />
-    <Compile Include="Animations\Animator\PointFConverter.cs" />
-    <Compile Include="Animations\Animator\TransfromHelper.cs" />
     <Compile Include="Animations\DelayedCall.cs" />
     <Compile Include="Animations\Transitions\IManagedType.cs" />
     <Compile Include="Animations\Transitions\ITransitionType.cs" />
@@ -148,7 +125,10 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Fonts\FontManager.cs" />
-    <Compile Include="Forms\SmokeScreen.cs">
+    <Compile Include="Forms\YamuiTabAnimation.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\YamuiSmokeScreen.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\YamuiForm.cs">
@@ -279,9 +259,6 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <EmbeddedResource Include="Animations\Animator\DoubleBitmapForm.resx">
-      <DependentUpon>DoubleBitmapForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\YamuiForm.resx">
       <DependentUpon>YamuiForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -302,7 +279,6 @@
     <None Include="Fonts\SEGOEUII.TTF" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Animations\Animator\readme.txt" />
     <Content Include="Animations\Transitions\readme.txt" />
     <Content Include="Resources\baseCss.css" />
     <Content Include="Resources\hellokitty.png" />

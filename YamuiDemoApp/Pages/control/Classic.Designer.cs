@@ -98,6 +98,7 @@
             this.yamuiCharButton5.Size = new System.Drawing.Size(30, 30);
             this.yamuiCharButton5.TabIndex = 41;
             this.yamuiCharButton5.Text = "yamuiCharButton5";
+            this.yamuiCharButton5.Click += new System.EventHandler(this.yamuiCharButton5_Click);
             // 
             // yamuiCharButton4
             // 

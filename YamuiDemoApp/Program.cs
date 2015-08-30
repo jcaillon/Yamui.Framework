@@ -6,7 +6,7 @@ namespace YamuiDemoApp {
     static class Program {
 
         public static YamuiForm MainForm;
-        public static SmokeScreen MainSmokeScreen;
+        public static YamuiSmokeScreen MainSmokeScreen;
 
         /// <summary>
         /// The main entry point for the application.

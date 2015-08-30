@@ -11,7 +11,7 @@ using YamuiFramework.Themes;
 namespace YamuiFramework.Controls {
     [Designer("YamuiFramework.Controls.YamuiProgressBarDesigner")]
     [ToolboxBitmap(typeof(ProgressBar))]
-    public class YamuiProgressBar : ProgressBar {
+    public class YamuiProgressBar : Control {
         #region Fields
 
         private ContentAlignment _textAlign = ContentAlignment.MiddleRight;
@@ -38,19 +38,26 @@ namespace YamuiFramework.Controls {
             set { _progressBarStyle = value; }
         }
 
-        public new int Value {
-            get { return base.Value; }
-            set { if (value > Maximum) return; base.Value = value; Invalidate(); }
+        [DefaultValue(0)]
+        [Category("Yamui")]
+        public int Maximum { get; set; }
+
+        private int _currentValue;
+        [DefaultValue(0)]
+        [Category("Yamui")]
+        public int CurrentValue {
+            get { return _currentValue; }
+            set { _currentValue = Math.Max(value, Maximum); Invalidate(); }
         }
 
         [Browsable(false)]
         public double ProgressTotalPercent {
-            get { return ((1 - (double)(Maximum - Value) / Maximum) * 100); }
+            get { return ((1 - (double)(Maximum - CurrentValue) / Maximum) * 100); }
         }
 
         [Browsable(false)]
         public double ProgressTotalValue {
-            get { return (1 - (double)(Maximum - Value) / Maximum); }
+            get { return (1 - (double)(Maximum - CurrentValue) / Maximum); }
         }
 
         [Browsable(false)]
@@ -59,7 +66,7 @@ namespace YamuiFramework.Controls {
         }
 
         private double ProgressBarWidth {
-            get { return (((double)Value / Maximum) * ClientRectangle.Width); }
+            get { return (((double)CurrentValue / Maximum) * ClientRectangle.Width); }
         }
 
         private int ProgressBarMarqueeWidth {
@@ -76,6 +83,7 @@ namespace YamuiFramework.Controls {
                 ControlStyles.ResizeRedraw |
                 ControlStyles.UserPaint |
                 ControlStyles.AllPaintingInWmPaint, true);
+            
         }
 
         #endregion
@@ -135,7 +143,7 @@ namespace YamuiFramework.Controls {
                 if (!DesignMode && Enabled) StartTimer();
                 if (!Enabled) StopTimer();
 
-                if (Value == Maximum) {
+                if (CurrentValue == Maximum) {
                     StopTimer();
                     DrawProgressContinuous(e.Graphics);
                 } else {

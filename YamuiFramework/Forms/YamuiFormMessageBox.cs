@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Drawing;
+using System.Threading;
 using System.Windows.Forms;
 using YamuiFramework.Animations.Transitions;
 using YamuiFramework.Controls;
@@ -12,8 +14,24 @@ using YamuiFramework.Themes;
 namespace YamuiFramework.Forms {
     public partial class YamuiFormMessageBox : YamuiForm {
 
+        #region Fields
+        public new Double Opacity {
+            get { return base.Opacity; }
+            set {
+                if (value < 0) {
+                    try { Close(); } catch (Exception) {
+                        // ignored
+                    }
+                    return;
+                }
+                base.Opacity = value;
+            }
+        }
+
         private static int _dialogResult = -1;
         private const int ButtonWidth = 110;
+        public static YamuiSmokeScreen OwnerSmokeScreen = null;
+        #endregion
 
         public YamuiFormMessageBox(string htmlContent, List<string> buttonsList) {
             InitializeComponent();
@@ -62,20 +80,17 @@ namespace YamuiFramework.Forms {
             
             // resize form and panel
             Size = new Size(fWidth, fHeight);
+            MinimumSize = Size;
             panelContent.Height = (int)predictedSize.Height;
 
-            // add outro animation..
+            // add outro animation
             Tag = false;
             Closing += (sender, args) => {
+                // cancel initialise close to run an animation, after that allow it
                 if ((bool)Tag) return;
                 Tag = true;
                 args.Cancel = true;
-                var t = new Transition(new TransitionType_Acceleration(200));
-                t.add(this, "Opacity", 0d);
-                t.TransitionCompletedEvent += (o, args1) => {
-                    Close();
-                };
-                t.run();
+                FadeOut(this);
             };
             
             Shown += (sender, args) => {
@@ -140,43 +155,51 @@ namespace YamuiFramework.Forms {
                 // center screen
                 msgbox.Location = new Point((Screen.PrimaryScreen.WorkingArea.Width - msgbox.Width) / 2 + Screen.PrimaryScreen.WorkingArea.Location.X, (Screen.PrimaryScreen.WorkingArea.Height - msgbox.Height) / 2 + Screen.PrimaryScreen.WorkingArea.Location.Y);
             }
-
             msgbox.panelContent.Text = text;
 
-            Transition t = new Transition(new TransitionType_Acceleration(200));
-            t.add(msgbox, "Opacity", 1d);
-            msgbox.Opacity = 0d;
-
+            FadeIn(msgbox, ownerForm);
             if (waitResponse) {
-                SmokeScreen ownerSmokeScreen = null;
-
-                // smokescreen intro anim
-                if (ownerForm != null) {
-                    ownerSmokeScreen = new SmokeScreen(ownerForm);
-                    Transition t2 = new Transition(new TransitionType_Acceleration(300));
-                    t2.add(ownerSmokeScreen, "Opacity", ownerSmokeScreen.Opacity);
-                    ownerSmokeScreen.Opacity = 0;
-                    Transition.runChain(t2, t);
-                } else {
-                    t.run();
-                }
                 msgbox.ShowDialog(new WindowWrapper(ownerHandle));
-
-                // smokescreen outro anim
-                if (ownerSmokeScreen != null) {
-                    t = new Transition(new TransitionType_Acceleration(300));
-                    t.add(ownerSmokeScreen, "Opacity", 0d);
-                    t.TransitionCompletedEvent += (sender, args) => {
-                        ownerSmokeScreen.Close();
-                    };
-                    t.run();
+                if (OwnerSmokeScreen != null) {
+                    OwnerSmokeScreen.Close();
+                    OwnerSmokeScreen = null;
                 }
             } else {
-                t.run();
                 msgbox.Show(new WindowWrapper(ownerHandle));
             }
 
             return _dialogResult;
+        }
+
+        private static void FadeIn(YamuiFormMessageBox msgBox, YamuiForm ownerForm) {
+            // transition on msgbox
+            Transition t = new Transition(new TransitionType_CriticalDamping(400));
+            t.add(msgBox, "Opacity", 1d);
+            msgBox.Opacity = 0d;
+
+            // if owner isn't a yamuiform then run anim on msgbox only
+            if (OwnerSmokeScreen != null) { t.run(); return; }
+            if (ownerForm == null) { t.run(); return; }
+
+            // otherwise had fadein of smokescreen for yamuiform
+            OwnerSmokeScreen = new YamuiSmokeScreen(ownerForm);
+            t.add(OwnerSmokeScreen, "Opacity", OwnerSmokeScreen.Opacity);
+            OwnerSmokeScreen.Opacity = 0d;
+            t.run();
+        }
+
+        private void FadeOut(YamuiFormMessageBox msgBox) {
+            // transition on msgbox
+            Transition t = new Transition(new TransitionType_CriticalDamping(400));
+            t.add(msgBox, "Opacity", -0.01d);
+            if (OwnerSmokeScreen == null) { t.run(); return; }
+            t.add(OwnerSmokeScreen, "Opacity", 0d);
+            t.run();
+        }
+
+        public static void ClseSmokeScreen() {
+            OwnerSmokeScreen.Close();
+            OwnerSmokeScreen = null;
         }
     }
 

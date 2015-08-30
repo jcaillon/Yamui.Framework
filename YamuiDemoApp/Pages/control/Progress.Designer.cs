@@ -130,7 +130,6 @@ namespace YamuiDemoApp.Pages.control {
             this.yamuiProgressBar3.Name = "yamuiProgressBar3";
             this.yamuiProgressBar3.ProgressBarStyle = System.Windows.Forms.ProgressBarStyle.Blocks;
             this.yamuiProgressBar3.Size = new System.Drawing.Size(540, 23);
-            this.yamuiProgressBar3.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
             this.yamuiProgressBar3.TabIndex = 15;
             // 
             // yamuiProgressBar2

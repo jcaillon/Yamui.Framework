@@ -12,7 +12,6 @@ using System.Security;
 using System.Security.Permissions;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
-using YamuiFramework.Animations.Animator;
 using YamuiFramework.Animations.Transitions;
 using YamuiFramework.Controls;
 using YamuiFramework.Fonts;
@@ -67,6 +66,10 @@ namespace YamuiFramework.Controls {
             }
         }
 
+        [Category("Yamui")]
+        [DefaultValue(false)]
+        public bool UseCustomBackColor { get; set; }
+
         private bool _showNormallyHiddenTabs;
         public bool ShowNormallyHiddenTabs {
             get { return _showNormallyHiddenTabs; }
@@ -98,6 +101,10 @@ namespace YamuiFramework.Controls {
 
         private bool _isHovered;
         private bool _isFocused;
+
+        // the following reference is used to always know the size and position of a secondary tabpage (for animation purposes)
+        private static YamuiTabPage _referencePage;
+        private static YamuiTabAnimation _referenceSmokeScreen;
         #endregion
 
         #region Constructor
@@ -112,12 +119,6 @@ namespace YamuiFramework.Controls {
 
             MouseMove += (sender, args) => UpdateHotTrack(args.Location);
 
-            _animator = new Animator();
-            _animator.AnimationType = AnimationType.Custom;
-            _animator.Interval = 35;
-            _animator.TimeStep = 0.04f;
-            _animator.MaxAnimationTime = 500;
-
             SetStuff();
         }
 
@@ -131,8 +132,6 @@ namespace YamuiFramework.Controls {
         #endregion
 
         #region "tab animator"
-        Animator _animator;
-
         protected override void OnSelecting(TabControlCancelEventArgs e) {
             
             // cancel the tab selecting if it was not set through SelectIndex
@@ -142,8 +141,7 @@ namespace YamuiFramework.Controls {
             }
             _fromSelectIndex = false;
 
-            Application.DoEvents();
-            _animator.WaitAllAnimations();
+            //Application.DoEvents();
 
             // if we switch from normallyHiddenPage, we want to show the normal menu again
             if (ShowNormallyHiddenTabs) {
@@ -165,19 +163,6 @@ namespace YamuiFramework.Controls {
             Update();
 
             _lastSelectedTab = e.TabPageIndex;
-
-            if (!ThemeManager.TabAnimationAllowed) return;
-            try {
-                Animation anim = new Animation();
-                anim.AnimateOnlyDifferences = true;
-                //anim.SlideCoeff = new PointF(0.03f, 0f);
-                anim.TimeCoeff = 4F;
-                anim.TransparencyCoeff = 1F;
-                _animator.BeginUpdate(this, false, anim, new Rectangle(0, ItemSize.Height, Width - 10, Height - ItemSize.Height - 10));
-                BeginInvoke(new MethodInvoker(() => _animator.EndUpdate(this)));
-            } catch (Exception) {
-                // ignored
-            }
 
             base.OnSelecting(e);
         }
@@ -214,48 +199,10 @@ namespace YamuiFramework.Controls {
         #endregion
 
         #region Paint Methods
-        protected void PaintTransparentBackground(Graphics graphics, Rectangle clipRect) {
-            graphics.Clear(Color.Transparent);
-            if ((Parent != null)) {
-                clipRect.Offset(Location);
-                PaintEventArgs e = new PaintEventArgs(graphics, clipRect);
-                GraphicsState state = graphics.Save();
-                graphics.SmoothingMode = SmoothingMode.HighSpeed;
-                try {
-                    graphics.TranslateTransform(-Location.X, -Location.Y);
-                    InvokePaintBackground(Parent, e);
-                    InvokePaint(Parent, e);
-                } finally {
-                    graphics.Restore(state);
-                    clipRect.Offset(-Location.X, -Location.Y);
-                }
-            }
-        }
-
-        protected override void OnPaintBackground(PaintEventArgs e) {}
-
-        protected void CustomOnPaintBackground(PaintEventArgs e) {
-            try {
-                Color backColor = ThemeManager.Current.TabsColorsNormalBackColor;
-                if (backColor != Color.Transparent)
-                    e.Graphics.Clear(backColor);
-                else
-                    PaintTransparentBackground(e.Graphics, DisplayRectangle);
-            } catch {
-                Invalidate();
-            }
-        }
-
         protected override void OnPaint(PaintEventArgs e) {
-            try {
-                CustomOnPaintBackground(e);
-                OnPaintForeground(e);
-            } catch {
-                Invalidate();
-            }
-        }
+            Color backColor = UseCustomBackColor ? BackColor : ThemeManager.Current.TabsColorsNormalBackColor;
+            e.Graphics.Clear(backColor);
 
-        protected virtual void OnPaintForeground(PaintEventArgs e) {
             if (_showNormallyHiddenTabs) _getRekt.Clear();
             for (var index = 0; index < TabPages.Count; index++) {
                 YamuiTabPage tabPage = (YamuiTabPage)TabPages[index];
@@ -281,14 +228,6 @@ namespace YamuiFramework.Controls {
                 thisTabRekt = GetRektOf(index);
             }
 
-            // redraw the back just in case
-            Color backColor = ThemeManager.Current.TabsColorsNormalBackColor;
-            if (backColor != Color.Transparent) {
-                using (SolidBrush b = new SolidBrush(backColor))
-                    graphics.FillRectangle(b, thisTabRekt);
-            } else
-                PaintTransparentBackground(graphics, thisTabRekt);
-
             Color foreColor = ThemeManager.TabsColors.ForeGround(_isFocused, (index == _hotTrackTab && _isHovered), index == SelectIndex);
             TextRenderer.DrawText(graphics, tabPage.Text, usedFont, thisTabRekt, foreColor, TextFormatFlags.Top | TextFormatFlags.Left);
         }
@@ -298,6 +237,23 @@ namespace YamuiFramework.Controls {
         protected override void OnSelectedIndexChanged(EventArgs e) {
             base.OnSelectedIndexChanged(e);
             Focus();
+
+            // animation of the tab
+            var x = (YamuiTabPage)SelectedTab;
+            if (_referencePage == null && x.Function == TabFunction.Secondary) _referencePage = (YamuiTabPage)SelectedTab;
+            if (!ThemeManager.TabAnimationAllowed) return;
+            try {
+                if (_referenceSmokeScreen == null)
+                    _referenceSmokeScreen = new YamuiTabAnimation(FindForm(), _referencePage);
+                var t = new Transition(new TransitionType_Acceleration(500));
+                _referenceSmokeScreen.Opacity = 1d;
+                t.add(_referenceSmokeScreen, "Opacity", 0d);
+                // we need to force the new tab to draw before we animate it
+                Application.DoEvents();
+                t.run();
+            } catch (Exception) {
+                // ignored
+            }
         }
 
         protected override void OnResize(EventArgs e) {

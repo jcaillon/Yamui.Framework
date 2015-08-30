@@ -2,13 +2,21 @@
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using YamuiFramework.Controls;
 
 namespace YamuiFramework.Forms {
-    public class SmokeScreen : Form {
+    public class YamuiSmokeScreen : Form {
 
-        public SmokeScreen(Form tocover) {
+        #region Constructor
+        public YamuiSmokeScreen(Form tocover) {
+            SetStyle(
+                ControlStyles.OptimizedDoubleBuffer |
+                ControlStyles.ResizeRedraw |
+                ControlStyles.UserPaint |
+                ControlStyles.AllPaintingInWmPaint, true);
+
             BackColor = Color.Black;
-            Opacity = 0.40;
+            Opacity = 0.5;
             FormBorderStyle = FormBorderStyle.None;
             ControlBox = false;
             ShowInTaskbar = false;
@@ -26,30 +34,43 @@ namespace YamuiFramework.Forms {
                 DwmSetWindowAttribute(tocover.Handle, DWMWA_TRANSITIONS_FORCEDISABLED, ref value, 4);
             }
         }
+        #endregion
+
+
+        #region Events
         private void Cover_LocationChanged(object sender, EventArgs e) {
             // Ensure the plexiglass follows the owner
             Location = Owner.PointToScreen(Point.Empty);
         }
+
         private void Cover_ClientSizeChanged(object sender, EventArgs e) {
             // Ensure the plexiglass keeps the owner covered
             ClientSize = Owner.ClientSize;
         }
+
         protected override void OnFormClosing(FormClosingEventArgs e) {
             // Restore owner
             Owner.LocationChanged -= Cover_LocationChanged;
             Owner.ClientSizeChanged -= Cover_ClientSizeChanged;
             if (!Owner.IsDisposed && Environment.OSVersion.Version.Major >= 6) {
-                int value = 1;
+                int value = 0;
                 DwmSetWindowAttribute(Owner.Handle, DWMWA_TRANSITIONS_FORCEDISABLED, ref value, 4);
             }
             base.OnFormClosing(e);
         }
+
         protected override void OnActivated(EventArgs e) {
             // Always keep the owner activated instead
             BeginInvoke(new Action(() => Owner.Activate()));
         }
+        #endregion
+
+
+        #region API call
         private const int DWMWA_TRANSITIONS_FORCEDISABLED = 3;
+
         [DllImport("dwmapi.dll")]
         private static extern int DwmSetWindowAttribute(IntPtr hWnd, int attr, ref int value, int attrLen);
+        #endregion
     }
 }

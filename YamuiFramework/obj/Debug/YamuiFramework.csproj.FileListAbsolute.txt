@@ -9,7 +9,6 @@ c:\users\julien\documents\visual studio 2013\Projects\YamuiFramework\YamuiFramew
 c:\users\julien\documents\visual studio 2013\Projects\YamuiFramework\YamuiFramework\obj\Debug\YamuiFramework.Forms.MetroForm.resources
 C:\Work\YamuiFramework\YamuiFramework\bin\Debug\YamuiFramework.dll
 C:\Work\YamuiFramework\YamuiFramework\bin\Debug\YamuiFramework.pdb
-C:\Work\YamuiFramework\YamuiFramework\obj\Debug\YamuiFramework.Animations.Animator.DoubleBitmapForm.resources
 C:\Work\YamuiFramework\YamuiFramework\obj\Debug\YamuiFramework.Forms.YamuiForm.resources
 C:\Work\YamuiFramework\YamuiFramework\obj\Debug\YamuiFramework.Forms.YamuiFormMessageBox.resources
 C:\Work\YamuiFramework\YamuiFramework\obj\Debug\YamuiFramework.Forms.YamuiTaskWindow.resources

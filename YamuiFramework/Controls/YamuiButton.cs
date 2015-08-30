@@ -161,7 +161,6 @@ namespace YamuiFramework.Controls {
                 IsPressed = true;
                 Invalidate();
             }
-
             base.OnKeyDown(e);
         }
 

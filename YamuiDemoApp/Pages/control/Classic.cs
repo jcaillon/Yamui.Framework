@@ -62,5 +62,16 @@ namespace YamuiDemoApp.Pages.control {
                 frm.ShowDialog(this);
             } // panel will be disposed and the form will "lighten" again...
         }
+
+        private void yamuiCharButton5_Click(object sender, EventArgs e) {
+            var x = (YamuiTabPage)this.Parent;
+            var t = new Transition(new TransitionType_Acceleration(3000));
+            var newSM = new YamuiTabAnimation(FindForm(), x);
+            t.add(newSM, "Opacity", 0d);
+            t.TransitionCompletedEvent += (o, args) => {
+                newSM.Close();
+            };
+            t.run();
+        }
     }
 }

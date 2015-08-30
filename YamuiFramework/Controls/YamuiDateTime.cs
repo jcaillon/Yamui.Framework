@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using YamuiFramework.Fonts;
+using YamuiFramework.HtmlRenderer.Core.Core.Dom;
 using YamuiFramework.Themes;
 
 namespace YamuiFramework.Controls {
@@ -32,7 +33,6 @@ namespace YamuiFramework.Controls {
                 ControlStyles.UserPaint |
                 ControlStyles.Selectable |
                 ControlStyles.AllPaintingInWmPaint, true);
-
         }
         #endregion
 

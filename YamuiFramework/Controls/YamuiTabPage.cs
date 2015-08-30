@@ -38,6 +38,10 @@ namespace YamuiFramework.Controls {
             }
         }
 
+        [Category("Yamui")]
+        [DefaultValue(false)]
+        public bool UseCustomBackColor { get; set; }
+
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         [Browsable(false)]
         public bool HiddenState { get; set; }
@@ -61,56 +65,21 @@ namespace YamuiFramework.Controls {
         #endregion
 
         #region Paint
-
-        protected void PaintTransparentBackground(Graphics graphics, Rectangle clipRect) {
-            var myParent = (YamuiTabControl)Parent;
-            graphics.Clear(Color.Transparent);
-            if ((myParent != null)) {
-                //clipRect.Offset(myParent.Location);
-                //clipRect.Offset(0, myParent.ItemSize.Height);
-                PaintEventArgs e = new PaintEventArgs(graphics, clipRect);
-                GraphicsState state = graphics.Save();
-                graphics.SmoothingMode = SmoothingMode.HighSpeed;
-                try {
-                    graphics.TranslateTransform(-myParent.Location.X, -myParent.Location.Y);
-                    InvokePaintBackground(myParent, e);
-                    InvokePaint(myParent, e);
-                } finally {
-                    graphics.Restore(state);
-                    //clipRect.Offset(-myParent.Location.X, -myParent.Location.Y);
-                }
-            }
-        }
-
+        /// <summary>
+        /// DO NOT forget to change the paint method of YamuiTabAnimation (in forms) if you change this one!!!
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnPaintBackground(PaintEventArgs e) { }
 
-        protected void CustomOnPaintBackground(PaintEventArgs e) {
-            try {
-                Color backColor = ThemeManager.Current.TabsColorsNormalBackColor;
-                if (backColor != Color.Transparent) {
-                    e.Graphics.Clear(backColor);
-                    var img = ThemeManager.ThemePageImage;
-                    if (img != null) {
-                        Rectangle rect = new Rectangle(ClientRectangle.Right - img.Width, ClientRectangle.Height - img.Height, img.Width, img.Height);
-                        e.Graphics.DrawImage(img, rect, 0, 0, img.Width, img.Height, GraphicsUnit.Pixel);
-                    }
-                } else
-                    PaintTransparentBackground(e.Graphics, DisplayRectangle);
-            } catch {
-                Invalidate();
-            }
-        }
-
         protected override void OnPaint(PaintEventArgs e) {
-            try {
-                CustomOnPaintBackground(e);
-                OnPaintForeground(e);
-            } catch {
-                Invalidate();
+            Color backColor = UseCustomBackColor ? BackColor : ThemeManager.Current.TabsColorsNormalBackColor;
+            e.Graphics.Clear(backColor);
+            var img = ThemeManager.ThemePageImage;
+            if (img != null) {
+                Rectangle rect = new Rectangle(ClientRectangle.Right - img.Width, ClientRectangle.Height - img.Height, img.Width, img.Height);
+                e.Graphics.DrawImage(img, rect, 0, 0, img.Width, img.Height, GraphicsUnit.Pixel);
             }
         }
-
-        protected virtual void OnPaintForeground(PaintEventArgs e) { }
         #endregion
     }
 
