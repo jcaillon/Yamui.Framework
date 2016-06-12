@@ -1,61 +1,50 @@
 ﻿using System;
-using System.Drawing;
+using System.Collections.Generic;
 using System.Windows.Forms;
-using YamuiFramework.Animations.Transitions;
+using YamuiDemoApp.Pages.control;
+using YamuiDemoApp.Pages.Navigation;
 using YamuiFramework.Controls;
 using YamuiFramework.Forms;
-using YamuiFramework.Themes;
 
 namespace YamuiDemoApp {
     public partial class Form1 : YamuiForm {
         public Form1() {
             InitializeComponent();
-        }
 
-        private void yamuiTabControl1_SelectedIndexChanged(object sender, EventArgs e) {
+            CreateContent(new List<YamuiMainMenu> {
+                new YamuiMainMenu("Control", null, false, new List<YamuiSecMenu> {
+                    new YamuiSecMenu("Classic", null, new Classic()),
+                    new YamuiSecMenu("Item controls", null, new ItemControl()),
+                    new YamuiSecMenu("Text", null, new Text()),
+                    new YamuiSecMenu("Progress", null, new Progress()),
+                }),
+                new YamuiMainMenu("Settings", null, true, new List<YamuiSecMenu> {
+                    new YamuiSecMenu("yamuiTabSecAppearance", "yamuiTabSecAppearance", new Pages.SettingAppearance()),
+                }),
+                new YamuiMainMenu("Navigation", null, false, new List<YamuiSecMenu> {
+                    new YamuiSecMenu("Other", null, new Other()),
+                }),
+            });
 
-        }
-
-        private void yamuiTabPage9_Click(object sender, EventArgs e) {
-
-        }
-
-        private void Form1_Load(object sender, EventArgs e) {
-            //ApplyHideSettingGlobally(this);
-        }
-
-        private void yamuiLink6_Click(object sender, EventArgs e) {
-            GoToPage("yamuiTabSecAppearance");
-        }
-
-        private void yamuiLink7_Click(object sender, EventArgs e) {
-            var toastNotification = new YamuiNotifications("<img src='high_importance' />This is a notification test", 5);
-            toastNotification.Show();
-        }
-
-        private void classic1_Load(object sender, EventArgs e) {
-
-        }
-
-        private void text1_Load(object sender, EventArgs e) {
-
-        }
-
-        private static bool lab = true;
-        private void yamuiLink8_Click(object sender, EventArgs e) {
-            statusLabel.UseCustomForeColor = true;
-            statusLabel.ForeColor = ThemeManager.Current.LabelsColorsNormalForeColor;
-            var t = new Transition(new TransitionType_Linear(500));
-            if (lab) 
-                t.add(statusLabel, "Text", "Hello world!");
-            else
-                t.add(statusLabel, "Text", "<b>WARNING :</b> this user is awesome");
-            t.add(statusLabel, "ForeColor", ThemeManager.AccentColor);
-            t.TransitionCompletedEvent += (o, args) => {
-                Transition.run(statusLabel, "ForeColor", ThemeManager.Current.LabelsColorsNormalForeColor, new TransitionType_CriticalDamping(400));
-            };
-            t.run();
-            lab = !lab;
+            CreateTopLinks(new List<string> {"APPEARANCES", "NOTIFICATIONS", "TEST"}, (sender, tabArgs) => {
+                switch (tabArgs.SelectedIndex) {
+                    case 0:
+                        ShowPage("yamuiTabSecAppearance");
+                        break;
+                    case 1:
+                        var toastNotification = new YamuiNotifications("<img src='high_importance' />This is a notification test", 5);
+                        toastNotification.Show();
+                        var toastNotification2 = new YamuiNotifications("<img src='poison' />Can i display a link? <br><a href='plswork?'>yop</a>", 0);
+                        toastNotification2.LinkClicked += (o, args) => {
+                            MessageBox.Show(args.Link);
+                        };
+                        toastNotification2.Show();
+                        break;
+                    case 2:
+                        Notify("hello it's a rather long text! omgplease work on first shot?! I stay for 5s and i go!", 5);
+                        break;
+                }
+            });
         }
     }
 }

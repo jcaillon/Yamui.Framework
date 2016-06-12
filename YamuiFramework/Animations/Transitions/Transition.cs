@@ -1,4 +1,23 @@
-﻿using System;
+﻿#region header
+// ========================================================================
+// Copyright (c) 2016 - Julien Caillon (julien.caillon@gmail.com)
+// This file (Transition.cs) is part of YamuiFramework.
+// 
+// YamuiFramework is a free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// YamuiFramework is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
+// ========================================================================
+#endregion
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -109,6 +128,18 @@ namespace YamuiFramework.Animations.Transitions
         {
             Utility.setValue(target, strPropertyName, initialValue);
             run(target, strPropertyName, destinationValue, transitionMethod);
+        }
+
+        /// <summary>
+        /// Sets the property passed in to the initial value passed in, then creates and 
+        /// immediately runs a transition on it. Also set an final action to execute when the transition ends
+        /// </summary>
+        public static void run(object target, string strPropertyName, object initialValue, object destinationValue, ITransitionType transitionMethod, EventHandler<Args> executeAtEnd) {
+            Utility.setValue(target, strPropertyName, initialValue);
+            Transition t = new Transition(transitionMethod);
+            t.TransitionCompletedEvent += executeAtEnd;
+            t.add(target, strPropertyName, destinationValue);
+            t.run();
         }
 
         /// <summary>
@@ -250,6 +281,7 @@ namespace YamuiFramework.Animations.Transitions
             }
 
             // c. 
+            bool propLeft = false;
             foreach (TransitionedPropertyInfo info in listTransitionedProperties)
             {
                 // We get the current value for this property...
@@ -258,7 +290,10 @@ namespace YamuiFramework.Animations.Transitions
                 // We set it...
                 PropertyUpdateArgs args = new PropertyUpdateArgs(info.target, info.propertyInfo, value);
                 setProperty(this, args);
+
+                propLeft = true;
             }
+            bCompleted = bCompleted && propLeft;
 
             // Has the transition completed?
             if (bCompleted)

@@ -1,9 +1,12 @@
-﻿namespace YamuiFramework.Forms {
+﻿using System.ComponentModel;
+using YamuiFramework.HtmlRenderer.WinForms;
+
+namespace YamuiFramework.Forms {
     partial class YamuiNotifications {
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -18,6 +21,8 @@
             Shown -= YamuiNotificationsShown;
             FormClosed -= YamuiNotificationsFormClosed;
             contentLabel.LinkClicked -= OnLinkClicked;
+            Closing -= YamuiNotificationsOnClosing;
+
             base.Dispose(disposing);
         }
 
@@ -29,7 +34,6 @@
         /// </summary>
         private void InitializeComponent() {
             this.contentLabel = new YamuiFramework.HtmlRenderer.WinForms.HtmlLabel();
-            this.progressPanel = new YamuiFramework.Controls.YamuiPanel();
             this.SuspendLayout();
             // 
             // contentLabel
@@ -47,26 +51,11 @@
             this.contentLabel.TabIndex = 0;
             this.contentLabel.Text = "htmlLabel1";
             // 
-            // progressPanel
-            // 
-            this.progressPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.progressPanel.BackColor = System.Drawing.Color.Fuchsia;
-            this.progressPanel.HorizontalScrollbarHighlightOnWheel = false;
-            this.progressPanel.HorizontalScrollbarSize = 10;
-            this.progressPanel.Location = new System.Drawing.Point(1, 40);
-            this.progressPanel.Name = "progressPanel";
-            this.progressPanel.Size = new System.Drawing.Size(228, 10);
-            this.progressPanel.TabIndex = 1;
-            this.progressPanel.UseCustomBackColor = true;
-            this.progressPanel.VerticalScrollbarHighlightOnWheel = false;
-            this.progressPanel.VerticalScrollbarSize = 10;
-            // 
             // YamuiNotifications
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(256, 51);
-            this.Controls.Add(this.progressPanel);
             this.Controls.Add(this.contentLabel);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -74,7 +63,7 @@
             this.Name = "YamuiNotifications";
             this.Padding = new System.Windows.Forms.Padding(5);
             this.Resizable = false;
-            this.ShowIcon = false;
+            this.ShowIcon = true;
             this.ShowInTaskbar = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
@@ -85,7 +74,6 @@
 
         #endregion
 
-        private HtmlRenderer.WinForms.HtmlLabel contentLabel;
-        private Controls.YamuiPanel progressPanel;
+        private HtmlLabel contentLabel;
     }
 }

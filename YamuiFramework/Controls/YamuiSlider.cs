@@ -1,4 +1,23 @@
-﻿using System;
+﻿#region header
+// ========================================================================
+// Copyright (c) 2016 - Julien Caillon (julien.caillon@gmail.com)
+// This file (YamuiSlider.cs) is part of YamuiFramework.
+// 
+// YamuiFramework is a free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// YamuiFramework is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
+// ========================================================================
+#endregion
+using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -166,8 +185,8 @@ namespace YamuiFramework.Controls {
         }
 
         protected virtual void OnPaintForeground(PaintEventArgs e) {
-            Color thumbColor = ThemeManager.ScrollBarsColors.ForeGround(_isFocused, _isHovered, _isPressed, Enabled);
-            Color barColor = ThemeManager.ScrollBarsColors.BackGround(_isFocused, _isHovered, _isPressed, Enabled);
+            Color thumbColor = YamuiThemeManager.Current.ScrollBarsFg(_isFocused, _isHovered, _isPressed, Enabled);
+            Color barColor = YamuiThemeManager.Current.ScrollBarsBg(_isFocused, _isHovered, _isPressed, Enabled);
             DrawTrackBar(e.Graphics, thumbColor, barColor);
         }
 

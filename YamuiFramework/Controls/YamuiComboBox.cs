@@ -1,4 +1,23 @@
-﻿using System;
+﻿#region header
+// ========================================================================
+// Copyright (c) 2016 - Julien Caillon (julien.caillon@gmail.com)
+// This file (YamuiComboBox.cs) is part of YamuiFramework.
+// 
+// YamuiFramework is a free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// YamuiFramework is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
+// ========================================================================
+#endregion
+using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Drawing;
@@ -13,7 +32,7 @@ namespace YamuiFramework.Controls {
 
     [Designer("YamuiFramework.Controls.YamuiComboBoxDesigner")]
     [ToolboxBitmap(typeof(ComboBox))]
-    public class YamuiComboBox : ComboBox {
+    public sealed class YamuiComboBox : ComboBox {
         #region Fields
 
         [DefaultValue(false)]
@@ -73,12 +92,15 @@ namespace YamuiFramework.Controls {
             // Stuff for the border color
             _dropDownCheck.Interval = 100;
             _dropDownCheck.Tick += dropDownCheck_Tick;
+
+            Font = FontManager.GetFont(FontFunction.Small);
         }
 
         #endregion
 
         #region Paint Methods
-        protected void PaintTransparentBackground(Graphics graphics, Rectangle clipRect) {
+
+        private void PaintTransparentBackground(Graphics graphics, Rectangle clipRect) {
             graphics.Clear(Color.Transparent);
             if ((Parent != null)) {
                 clipRect.Offset(Location);
@@ -98,7 +120,7 @@ namespace YamuiFramework.Controls {
 
         protected override void OnPaintBackground(PaintEventArgs e) {
             try {
-                Color backColor = ThemeManager.ButtonColors.BackGround(BackColor, UseCustomBackColor, _isFocused, _isHovered, _isPressed, Enabled);
+                Color backColor = YamuiThemeManager.Current.ButtonBg(BackColor, UseCustomBackColor, _isFocused, _isHovered, _isPressed, Enabled);
                 if (backColor != Color.Transparent)
                     e.Graphics.Clear(backColor);
                 else
@@ -117,11 +139,11 @@ namespace YamuiFramework.Controls {
             }
         }
 
-        protected virtual void OnPaintForeground(PaintEventArgs e) {
+        private void OnPaintForeground(PaintEventArgs e) {
             ItemHeight = GetPreferredSize(Size.Empty).Height;
 
-            Color borderColor = ThemeManager.ButtonColors.BorderColor(_isFocused, _isHovered, _isPressed, Enabled);
-            Color foreColor = ThemeManager.ButtonColors.ForeGround(ForeColor, UseCustomForeColor, _isFocused, _isHovered, _isPressed, Enabled);
+            Color borderColor = YamuiThemeManager.Current.ButtonBorder(_isFocused, _isHovered, _isPressed, Enabled);
+            Color foreColor = YamuiThemeManager.Current.ButtonFg(ForeColor, UseCustomForeColor, _isFocused, _isHovered, _isPressed, Enabled);
 
             // draw border
             if (borderColor != Color.Transparent)
@@ -144,13 +166,13 @@ namespace YamuiFramework.Controls {
         protected override void OnDrawItem(DrawItemEventArgs e) {
             if (e.Index >= 0) {
                 Color foreColor;
-                Color backColor = ThemeManager.Current.ButtonColorsNormalBackColor;
+                Color backColor = YamuiThemeManager.Current.ButtonNormalBack;
 
                 if ((e.State & DrawItemState.Selected) == DrawItemState.Selected) {
-                    backColor = ThemeManager.AccentColor;
-                    foreColor = ThemeManager.Current.ButtonColorsPressForeColor;
+                    backColor = YamuiThemeManager.Current.AccentColor;
+                    foreColor = YamuiThemeManager.Current.ButtonPressedFore;
                 } else {
-                    foreColor = ThemeManager.Current.ButtonColorsNormalForeColor;
+                    foreColor = YamuiThemeManager.Current.ButtonNormalFore;
                 }
 
                 using (SolidBrush b = new SolidBrush(backColor)) {
@@ -164,16 +186,11 @@ namespace YamuiFramework.Controls {
             }
         }
 
-        private void DrawTextPrompt() {
-            using (Graphics graphics = CreateGraphics()) {
-                DrawTextPrompt(graphics);
-            }
-        }
-
         private void DrawTextPrompt(Graphics g) {
-            if (_isPressed || SelectedIndex != -1) return;
-            Rectangle textRect = new Rectangle(2, 2, Width - 20, Height - 4);
-            TextRenderer.DrawText(g, _waterMark, FontManager.GetStandardWaterMarkFont(), textRect, SystemColors.GrayText, Color.Transparent, TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
+            if (!_isFocused && SelectedIndex == -1) {
+                Rectangle textRect = new Rectangle(2, 2, Width - 20, Height - 4);
+                TextRenderer.DrawText(g, _waterMark, FontManager.GetFont(FontFunction.WaterMark), textRect, SystemColors.GrayText, Color.Transparent, TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPadding);
+            }
         }
 
         #endregion
@@ -275,10 +292,10 @@ namespace YamuiFramework.Controls {
             base.GetPreferredSize(proposedSize);
 
             using (var g = CreateGraphics()) {
-                string measureText = Text.Length > 0 ? Text : "MeasureText";
+                string measureText = Text.Length > 0 ? Text : "Random";
                 proposedSize = new Size(int.MaxValue, int.MaxValue);
-                preferredSize = TextRenderer.MeasureText(g, measureText, FontManager.GetStandardFont(), proposedSize, TextFormatFlags.Left | TextFormatFlags.LeftAndRightPadding | TextFormatFlags.VerticalCenter);
-                preferredSize.Height += 4;
+                preferredSize = TextRenderer.MeasureText(g, measureText, FontManager.GetStandardFont(), proposedSize, TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPadding);
+                //preferredSize.Height += 4;
             }
 
             return preferredSize;
@@ -292,7 +309,9 @@ namespace YamuiFramework.Controls {
             base.WndProc(ref m);
 
             if (((m.Msg == WM_PAINT) || (m.Msg == OCM_COMMAND))) {
-                DrawTextPrompt();
+                using (Graphics graphics = CreateGraphics()) {
+                    DrawTextPrompt(graphics);
+                }
             }
 
             if (m.Msg == WM_CTLCOLORLISTBOX) {
@@ -303,7 +322,7 @@ namespace YamuiFramework.Controls {
 
         #endregion
 
-        #region " color border "
+        #region Border color
 
         /// <summary>
         /// Non client area border drawing
@@ -328,7 +347,7 @@ namespace YamuiFramework.Controls {
             ExcludeClipRect(dc, clientRect.Left, clientRect.Top, clientRect.Right, clientRect.Bottom);
 
             // Create a pen and select it
-            Color borderColor = ThemeManager.AccentColor;
+            Color borderColor = YamuiThemeManager.Current.AccentColor;
             IntPtr border = CreatePen(PenStyles.PS_SOLID, 1, RGB(borderColor.R,
                 borderColor.G, borderColor.B));
 

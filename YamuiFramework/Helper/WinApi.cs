@@ -1,18 +1,37 @@
-﻿using System;
+﻿#region header
+// ========================================================================
+// Copyright (c) 2016 - Julien Caillon (julien.caillon@gmail.com)
+// This file (WinApi.cs) is part of YamuiFramework.
+// 
+// YamuiFramework is a free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// YamuiFramework is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
+// ========================================================================
+#endregion
+using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Security;
 
-namespace YamuiFramework.Native
-{
+namespace YamuiFramework.Helper {
+
     [SuppressUnmanagedCodeSecurity]
-    internal static class WinApi
-    {
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    internal static class WinApi {
         #region Structs
 
         [StructLayout(LayoutKind.Sequential)]
-        public struct POINT
-        {
+        public struct POINT {
             public Int32 x;
             public Int32 y;
 
@@ -20,127 +39,52 @@ namespace YamuiFramework.Native
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        public struct SIZE
-        {
+        public struct SIZE {
             public Int32 cx;
             public Int32 cy;
 
             public SIZE(Int32 cx, Int32 cy) { this.cx = cx; this.cy = cy; }
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public struct ARGB
-        {
-            public byte Blue;
-            public byte Green;
-            public byte Red;
-            public byte Alpha;
-        }
-
-        [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public struct BLENDFUNCTION
-        {
-            public byte BlendOp;
-            public byte BlendFlags;
-            public byte SourceConstantAlpha;
-            public byte AlphaFormat;
-        }
-
         [StructLayout(LayoutKind.Sequential)]
-        public struct TCHITTESTINFO
-        {
+        public struct TCHITTESTINFO {
             public Point pt;
             public uint flags;
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        public struct RECT
-        {
+        public struct RECT {
             public int Left;
             public int Top;
             public int Right;
             public int Bottom;
+            public RECT(int left, int top, int right, int bottom) {
+                Left = left;
+                Top = top;
+                Right = right;
+                Bottom = bottom;
+            }
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        public struct NCCALCSIZE_PARAMS
-        {
-            public RECT rect0;
-            public RECT rect1;
-            public RECT rect2;
-            public IntPtr lppos;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct MINMAXINFO
-        {
+        public struct MINMAXINFO {
             public POINT ptReserved;
             public POINT ptMaxSize;
             public POINT ptMaxPosition;
             public POINT ptMinTrackSize;
             public POINT ptMaxTrackSize;
         }
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct APPBARDATA
-        {
-            public uint cbSize;
-            public IntPtr hWnd;
-            public uint uCallbackMessage;
-            public ABE uEdge;
-            public RECT rc;
-            public int lParam;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct WindowPos
-        {
-            public int hwnd;
-            public int hWndInsertAfter;
-            public int x;
-            public int y;
-            public int cx;
-            public int cy;
-            public int flags;
-        }
-
         #endregion
 
         #region Enums
-
-        public enum ABM : uint
-        {
-            New = 0x00000000,
-            Remove = 0x00000001,
-            QueryPos = 0x00000002,
-            SetPos = 0x00000003,
-            GetState = 0x00000004,
-            GetTaskbarPos = 0x00000005,
-            Activate = 0x00000006,
-            GetAutoHideBar = 0x00000007,
-            SetAutoHideBar = 0x00000008,
-            WindowPosChanged = 0x00000009,
-            SetState = 0x0000000A
-        }
-
-        public enum ABE : uint
-        {
-            Left = 0,
-            Top = 1,
-            Right = 2,
-            Bottom = 3
-        }
-
-        public enum ScrollBar
-        {
+        public enum ScrollBar {
             SB_HORZ = 0,
             SB_VERT = 1,
             SB_CTL = 2,
             SB_BOTH = 3
         }
 
-        public enum HitTest
-        {
+        public enum HitTest {
             HTNOWHERE = 0,
             HTCLIENT = 1,
             HTCAPTION = 2,
@@ -163,13 +107,11 @@ namespace YamuiFramework.Native
             HTTRANSPARENT = -1
         }
 
-        public enum TabControlHitTest
-        {
+        public enum TabControlHitTest {
             TCHT_NOWHERE = 1
         }
 
-        public enum Messages : uint
-        {
+        public enum Messages : uint {
             WM_NULL = 0x0,
             WM_CREATE = 0x1,
             WM_DESTROY = 0x2,
@@ -398,13 +340,6 @@ namespace YamuiFramework.Native
             SC_MAXIMIZE = 0xF030,
             SC_RESTORE = 0xF120
         }
-
-        public enum Bool
-        {
-            False = 0,
-            True
-        };
-
         #endregion
 
         #region Fields
@@ -435,9 +370,53 @@ namespace YamuiFramework.Native
         public const int WH_CALLWNDPROC = 4;
         public const int GWL_WNDPROC = -4;
 
+        /* used for the "always on top" function */
+        public static readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
+        public const UInt32 SWP_NOSIZE = 0x0001;
+        public const UInt32 SWP_NOMOVE = 0x0002;
+        public const UInt32 TOPMOST_FLAGS = SWP_NOMOVE | SWP_NOSIZE;
+
+        // Changes the client size of a control
+        public const int EM_SETRECT = 0xB3;
         #endregion
 
         #region API Calls
+
+        [DllImport("user32.dll")]
+        public static extern long GetWindowRect(IntPtr hWnd, ref Rectangle lpRect);
+
+        public static Rectangle GetWindowRect(IntPtr hWnd) {
+            Rectangle output = new Rectangle();
+            GetWindowRect(hWnd, ref output);
+            return output;
+        }
+
+        /// <summary>
+        /// Retrieves the cursor's position, in screen coordinates.
+        /// </summary>
+        /// <see>See MSDN documentation for further information.</see>
+        [DllImport("user32.dll")]
+        private static extern bool GetCursorPos(out POINT lpPoint);
+
+        public static Point GetCursorPosition() {
+            POINT lpPoint;
+            GetCursorPos(out lpPoint);
+            return new Point(lpPoint.x, lpPoint.y);
+        }
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetActiveWindow();
+
+        // Changes the client size of a control
+        [DllImport("User32.dll", EntryPoint = "SendMessage", CharSet = CharSet.Auto)]
+        public static extern int SendMessageRefRect(IntPtr hWnd, uint msg, int wParam, ref RECT rect);
+
+
+        // will be used to set a window to always stay on top
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+
         /// <summary>
         /// Gets the handle of the window that currently has focus.
         /// </summary>
@@ -445,7 +424,7 @@ namespace YamuiFramework.Native
         /// The handle of the window that currently has focus.
         /// </returns>
         [DllImport("user32")]
-        internal static extern IntPtr GetForegroundWindow();
+        public static extern IntPtr GetForegroundWindow();
 
         /// <summary>
         /// Activates the specified window.
@@ -457,42 +436,7 @@ namespace YamuiFramework.Native
         /// True if the window was focused; False otherwise.
         /// </returns>
         [DllImport("user32")]
-        internal static extern bool SetForegroundWindow(IntPtr hWnd);
-
-        [DllImport("Gdi32.dll", EntryPoint = "CreateRoundRectRgn")]
-        internal static extern IntPtr CreateRoundRectRgn
-        (
-            int nLeftRect, // x-coordinate of upper-left corner
-            int nTopRect, // y-coordinate of upper-left corner
-            int nRightRect, // x-coordinate of lower-right corner
-            int nBottomRect, // y-coordinate of lower-right corner
-            int nWidthEllipse, // width of ellipse
-            int nHeightEllipse // height of ellipse
-        );
-
-        [DllImport("user32.dll", ExactSpelling = true, SetLastError = true)]
-        public static extern Bool UpdateLayeredWindow(IntPtr hwnd, IntPtr hdcDst, ref POINT pptDst, ref SIZE psize, IntPtr hdcSrc, ref POINT pprSrc, Int32 crKey, ref BLENDFUNCTION pblend, Int32 dwFlags);
-
-        [DllImport("user32.dll", ExactSpelling = true, SetLastError = true)]
-        public static extern IntPtr GetDC(IntPtr hWnd);
-
-        [DllImport("gdi32.dll", ExactSpelling = true, SetLastError = true)]
-        public static extern IntPtr CreateCompatibleDC(IntPtr hDC);
-
-        [DllImport("gdi32.dll", ExactSpelling = true, SetLastError = true)]
-        public static extern Bool DeleteDC(IntPtr hdc);
-
-        [DllImport("gdi32.dll", ExactSpelling = true)]
-        public static extern IntPtr SelectObject(IntPtr hDC, IntPtr hObject);
-
-        [DllImport("gdi32.dll", ExactSpelling = true, SetLastError = true)]
-        public static extern Bool DeleteObject(IntPtr hObject);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        public static extern UInt32 GetWindowLong(IntPtr hWnd, int nIndex);
-
-        [DllImport("user32.dll")]
-        public static extern int SetWindowLong(IntPtr hWnd, int nIndex, UInt32 dwNewLong);
+        public static extern bool SetForegroundWindow(IntPtr hWnd);
 
         [DllImport("user32.dll")]
         public static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
@@ -510,75 +454,16 @@ namespace YamuiFramework.Native
         public static extern bool ReleaseCapture();
 
         [DllImport("user32.dll")]
-        public static extern IntPtr SetCapture(IntPtr hWnd);
-
-        [DllImport("user32.dll")]
         public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
 
         [DllImport("user32.dll")]
         public static extern int SendMessage(IntPtr wnd, int msg, bool param, int lparam);
 
-        [DllImport("shell32.dll", SetLastError = true)]
-        public static extern IntPtr SHAppBarMessage(ABM dwMessage, [In] ref APPBARDATA pData);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
         [DllImport("user32.dll")]
-        public static extern IntPtr GetDCEx(IntPtr hwnd, IntPtr hrgnclip, uint fdwOptions);
+        public static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wp, IntPtr lp);
 
         [DllImport("user32.dll")]
         public static extern bool ShowScrollBar(IntPtr hWnd, int bar, int cmd);
-
-        [DllImport("User32.dll", CharSet = CharSet.Auto)]
-        public static extern IntPtr GetWindowDC(IntPtr handle);
-
-        [DllImport("User32.dll", CharSet = CharSet.Auto)]
-        public static extern IntPtr ReleaseDC(IntPtr handle, IntPtr hDC);
-
-        [DllImport("User32.dll", CharSet = CharSet.Auto)]
-        public static extern int GetClassName(IntPtr hwnd, char[] className, int maxCount);
-
-        [DllImport("User32.dll", CharSet = CharSet.Auto)]
-        public static extern IntPtr GetWindow(IntPtr hwnd, int uCmd);
-
-        [DllImport("User32.dll", CharSet = CharSet.Auto)]
-        public static extern bool IsWindowVisible(IntPtr hwnd);
-
-        [DllImport("user32", CharSet = CharSet.Auto)]
-        public static extern int GetClientRect(IntPtr hwnd, ref RECT lpRect);
-
-        [DllImport("user32", CharSet = CharSet.Auto)]
-        public static extern int GetClientRect(IntPtr hwnd, [In, Out] ref Rectangle rect);
-
-        [DllImport("user32", CharSet = CharSet.Auto)]
-        public static extern bool MoveWindow(IntPtr hwnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
-
-        [DllImport("user32", CharSet = CharSet.Auto)]
-        public static extern bool UpdateWindow(IntPtr hwnd);
-
-        [DllImport("user32", CharSet = CharSet.Auto)]
-        public static extern bool InvalidateRect(IntPtr hwnd, ref Rectangle rect, bool bErase);
-
-        [DllImport("user32", CharSet = CharSet.Auto)]
-        public static extern bool ValidateRect(IntPtr hwnd, ref Rectangle rect);
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        internal static extern bool GetWindowRect(IntPtr hWnd, [In, Out] ref Rectangle rect);
-
-        #endregion
-
-        #region Helper Methods
-
-        public static int LoWord(int dwValue)
-        {
-            return dwValue & 0xffff;
-        }
-
-        public static int HiWord(int dwValue)
-        {
-            return (dwValue >> 16) & 0xffff;
-        }
-
         #endregion
     }
 }

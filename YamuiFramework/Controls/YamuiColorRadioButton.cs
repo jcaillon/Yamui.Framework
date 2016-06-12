@@ -1,4 +1,23 @@
-﻿using System;
+﻿#region header
+// ========================================================================
+// Copyright (c) 2016 - Julien Caillon (julien.caillon@gmail.com)
+// This file (YamuiColorRadioButton.cs) is part of YamuiFramework.
+// 
+// YamuiFramework is a free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// YamuiFramework is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
+// ========================================================================
+#endregion
+using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Drawing;
@@ -73,13 +92,13 @@ namespace YamuiFramework.Controls {
         protected virtual void OnPaintForeground(PaintEventArgs e) {
 
             if (!Checked && _isHovered)
-                using (SolidBrush b = new SolidBrush(ThemeManager.Current.ButtonColorsHoverBackColor))
+                using (SolidBrush b = new SolidBrush(YamuiThemeManager.Current.ButtonHoverBack))
                     e.Graphics.FillRectangle(b, new Rectangle(0, 0, Width, Height));
 
             Rectangle boxRect = (!Checked) ? new Rectangle(5, 5, Width - 10, Height - 10) : new Rectangle(0, 0, Width, Height);
 
             if (UseBorder) {
-                using (SolidBrush b = new SolidBrush(ThemeManager.AccentColor))
+                using (SolidBrush b = new SolidBrush(YamuiThemeManager.Current.AccentColor))
                     e.Graphics.FillRectangle(b, boxRect);
                 boxRect = (!Checked) ? new Rectangle(10, 10, Width - 20, Height - 20) : new Rectangle(5, 5, Width - 10, Height - 10);
             }

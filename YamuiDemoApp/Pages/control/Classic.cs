@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using YamuiFramework.Animations.Transitions;
 using YamuiFramework.Controls;
 using YamuiFramework.Forms;
+using YamuiFramework.Helper;
 using YamuiFramework.Themes;
 
 namespace YamuiDemoApp.Pages.control {
@@ -14,12 +17,12 @@ namespace YamuiDemoApp.Pages.control {
         }
 
         private void yamuiButton5_Click(object sender, EventArgs e) {
-            if (!Transition.IsTransitionRunning())
-                Transition.run(yamuiButton4, "DoPressed", true, new TransitionType_Flash(3, 300));
+            yamuiButton4.UseCustomBackColor = true;
+            Transition.run(yamuiButton4, "BackColor", YamuiThemeManager.Current.ButtonNormalBack, YamuiThemeManager.Current.AccentColor, new TransitionType_Flash(3, 300), (o, args) => { yamuiButton4.UseCustomBackColor = false;  });
         }
 
         private void yamuiButton1_Click(object sender, EventArgs e) {
-            ThemeManager.TabAnimationAllowed = false;
+            YamuiThemeManager.TabAnimationAllowed = false;
         }
 
         private void yamuiButton4_Click(object sender, EventArgs e) {
@@ -32,28 +35,31 @@ namespace YamuiDemoApp.Pages.control {
 
         private void yamuiCharButton3_Click(object sender, EventArgs e) {
             //var smk = new SmokeScreen(FindForm());
-            YamuiFormMessageBox.ShwDlg(FindForm().Handle, MsgType.Error, "ERrooor", "Wtf did you do you fool!", new List<string> {"fu", "ok"}, true);
+            YamuiFormMessageBox.ShwDlg(Screen.PrimaryScreen, FindForm().Handle, MessageImage.Error, "Erreur", @"Wtf did you do you fool!?<br>This is a new line with <b>BOLD</b> stuff<br><br>WARNING	D:\Work\ProgressFiles\compiler\sc20sdan.w	?	?	?	214	lWARNING--le mot clé TRANSACTION est utilisé à l'intérieur du niveau réel de transaction. <br>WARNING	D:\Work\ProgressFiles\compiler\sc20sdan.w	?	?	?	214	lWARNING--le mot clé TRANSACTION est utilisé à l'intérieur du niveau réel de transaction.<br>WARNING	D:\Work\ProgressFiles\compiler\sc20sdan.w	?	?	?	214	lWARNING--le mot clé TRANSACTION est utilisé à l'intérieur du niveau réel de transaction.<br>WARNING	D:\Work\ProgressFiles\compiler\sc20sdan.w	?	?	?	214	lWARNING--le mot clé TRANSACTION est utilisé à l'intérieur du niveau réel de transaction.<br>WARNING	D:\Work\ProgressFiles\compiler\sc20sdan.w	?	?	?	214	lWARNING--le mot clé TRANSACTION est utilisé à l'intérieur du niveau réel de transaction.<br>WARNING	D:\Work\ProgressFiles\compiler\sc20sdan.w	?	?	?	214	lWARNING--le mot clé TRANSACTION est utilisé à l'intérieur du niveau réel de transaction.<br>WARNING	D:\Work\ProgressFiles\compiler\sc20sdan.w	?	?	?	214	lWARNING--le mot clé TRANSACTION est utilisé à l'intérieur du niveau réel de transaction.<br>WARNING	D:\Work\ProgressFiles\compiler\sc20sdan.w	?	?	?	214	lWARNING--le mot clé TRANSACTION est utilisé à l'intérieur du niveau réel de transaction.<br>WARNING	D:\Work\ProgressFiles\compiler\sc20sdan.w	?	?	?	214	lWARNING--le mot clé TRANSACTION est utilisé à l'intérieur du niveau réel de transaction.<br>WARNING	D:\Work\ProgressFiles\compiler\sc20sdan.w	?	?	?	214	lWARNING--le mot clé TRANSACTION est utilisé à l'intérieur du niveau réel de transaction.<a href='efzefzef'>test a link</a>", new List<string> { "fu", "ok" }, true, (o, args) => {
+                MessageBox.Show(args.Link);
+                var x = (YamuiFormMessageBox) o; x.Close();
+            });
         }
 
         private void yamuiCharButton4_Click(object sender, EventArgs e) {
             // take a screenshot of the form and darken it:
-            Bitmap bmp = new Bitmap(this.ClientRectangle.Width, this.ClientRectangle.Height);
+            Bitmap bmp = new Bitmap(ClientRectangle.Width, ClientRectangle.Height);
             using (Graphics G = Graphics.FromImage(bmp)) {
-                G.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceOver;
-                G.CopyFromScreen(this.PointToScreen(new Point(0, 0)), new Point(0, 0), this.ClientRectangle.Size);
+                G.CompositingMode = CompositingMode.SourceOver;
+                G.CopyFromScreen(PointToScreen(new Point(0, 0)), new Point(0, 0), ClientRectangle.Size);
                 double percent = 0.60;
                 Color darken = Color.FromArgb((int)(255 * percent), Color.Black);
                 using (Brush brsh = new SolidBrush(darken)) {
-                    G.FillRectangle(brsh, this.ClientRectangle);
+                    G.FillRectangle(brsh, ClientRectangle);
                 }
             }
 
             // put the darkened screenshot into a Panel and bring it to the front:
             using (Panel p = new Panel()) {
                 p.Location = new Point(0, 0);
-                p.Size = this.ClientRectangle.Size;
+                p.Size = ClientRectangle.Size;
                 p.BackgroundImage = bmp;
-                this.Controls.Add(p);
+                Controls.Add(p);
                 p.BringToFront();
 
                 // display your dialog somehow:
@@ -64,14 +70,51 @@ namespace YamuiDemoApp.Pages.control {
         }
 
         private void yamuiCharButton5_Click(object sender, EventArgs e) {
-            var x = (YamuiTabPage)this.Parent;
-            var t = new Transition(new TransitionType_Acceleration(3000));
-            var newSM = new YamuiTabAnimation(FindForm(), x);
-            t.add(newSM, "Opacity", 0d);
-            t.TransitionCompletedEvent += (o, args) => {
-                newSM.Close();
-            };
-            t.run();
+
+        }
+
+        private void yamuiButton5_ButtonPressed(object sender, EventArgs e) {
+            yamuiButton4.UseCustomBackColor = true;
+            Transition.run(yamuiButton4, "BackColor", YamuiThemeManager.Current.ButtonNormalBack, YamuiThemeManager.Current.AccentColor, new TransitionType_Flash(3, 300), (o, args) => { yamuiButton4.UseCustomBackColor = false; });
+        }
+
+        private void yamuiCharButton1_Click(object sender, EventArgs e) {
+            var menu = new YamuiMenu(Cursor.Position, new List<YamuiMenuItem> {
+                new YamuiMenuItem {
+                    ItemName = "zefefzefzef zedf item 1",
+                    Children = new List<YamuiMenuItem> {
+                        new YamuiMenuItem {ItemName = "child 1"}
+                    }
+                },
+                new YamuiMenuItem {
+                    ItemName = "item 2",
+                },
+                new YamuiMenuItem {
+                    ItemName = "item 3",
+                    Children = new List<YamuiMenuItem> {
+                        new YamuiMenuItem {ItemName = "child 1"},
+                        new YamuiMenuItem {ItemName = "child 2"}
+                    }
+                }
+            });
+            menu.Show();
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct POINT {
+            public Int32 x;
+            public Int32 y;
+            public POINT(Int32 x, Int32 y) { this.x = x; this.y = y; }
+        }
+
+
+        [DllImport("user32.dll")]
+        private static extern bool GetCursorPos(out POINT lpPoint);
+
+        public static Point GetCursorPosition() {
+            POINT lpPoint;
+            GetCursorPos(out lpPoint);
+            return new Point(lpPoint.x, lpPoint.y);
         }
     }
 }

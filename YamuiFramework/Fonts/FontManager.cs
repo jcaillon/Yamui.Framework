@@ -1,69 +1,86 @@
-﻿using System;
+﻿#region header
+// ========================================================================
+// Copyright (c) 2016 - Julien Caillon (julien.caillon@gmail.com)
+// This file (FontManager.cs) is part of YamuiFramework.
+// 
+// YamuiFramework is a free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// YamuiFramework is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
+// ========================================================================
+#endregion
+using System;
 using System.Drawing;
 using System.Drawing.Text;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace YamuiFramework.Fonts {
-    public enum LabelFunction {
+
+    public enum FontFunction {
+        AppliTitle,
         Small,
         Normal,
         Heading,
         Title,
         FormTitle,
         TopLink,
-        Link
+        Link,
+        AutoCompletion,
+        MenuMain,
+        MenuSecondary,
+        WaterMark
     }
 
-    public enum TabFunction {
-        Main,
-        Secondary,
-        SecondaryNotSelected
-    }
-
-    class FontManager {
+    public static class FontManager {
 
         public static Font GetStandardFont() {
-            return GetFont(FontStyle.Regular, 12f);
+            return GetFont(FontFunction.Normal);
         }
 
-        public static Font GetLabelFont(LabelFunction lbFunction) {
+        public static Font GetFont(FontFunction lbFunction) {
             switch (lbFunction) {
-                case LabelFunction.Title:
+                case FontFunction.AppliTitle:
+                    return GetOtherFont(@"REDCIRCL", FontStyle.Regular, 20f);
+                case FontFunction.Title:
                     return GetFont(FontStyle.Bold, 18f);
-                case LabelFunction.Heading:
+                case FontFunction.Heading:
                     return GetFont(FontStyle.Bold, 14f);
-                case LabelFunction.FormTitle:
+                case FontFunction.FormTitle:
                     return GetFont(FontStyle.Bold, 13f);
-                case LabelFunction.TopLink:
+                case FontFunction.TopLink:
                     return GetFont(FontStyle.Regular, 11f);
-                case LabelFunction.Link:
+                case FontFunction.Link:
                     return GetFont(FontStyle.Regular | FontStyle.Underline, 12f);
-                case LabelFunction.Small:
+                case FontFunction.Small:
                     return GetFont(FontStyle.Regular, 10f);
+                case FontFunction.AutoCompletion:
+                    return GetFont(FontStyle.Regular, 12f);
+                case FontFunction.MenuMain:
+                    return GetFont(FontStyle.Regular, 24f);
+                case FontFunction.MenuSecondary:
+                    return GetFont(FontStyle.Bold, 11f);
+                case FontFunction.WaterMark:
+                    return GetFont(FontStyle.Italic, 12f);
                 default:
                     return GetFont(FontStyle.Regular, 12f);
             }
         }
 
-        public static Font GetTabControlFont(TabFunction tabFunction) {
-            switch (tabFunction) {
-                case TabFunction.Main:
-                    return GetFont(FontStyle.Regular, 24f);
-                case TabFunction.Secondary:
-                    return GetFont(FontStyle.Bold, 11f);
-                default:
-                    return GetFont(FontStyle.Regular, 11f);
-            }
-        }
-
-        public static Font GetStandardWaterMarkFont() {
-            return GetFont(FontStyle.Italic, 12f);
-        }
-
         public static Font GetFont(FontStyle fontStyle, float size) {
-            return _fontResolver.ResolveFont("Segoe UI", size, fontStyle, GraphicsUnit.Pixel);
+            return _fontResolver.ResolveFont(@"Segoe UI", size, fontStyle, GraphicsUnit.Pixel);
+        }
+
+        public static Font GetOtherFont(string familyName, FontStyle fontStyle, float size) {
+            return _fontResolver.ResolveFont(familyName, size, fontStyle, GraphicsUnit.Pixel);
         }
 
         #region TextFormatForDrawText
@@ -113,7 +130,6 @@ namespace YamuiFramework.Fonts {
                     controlFlags |= TextFormatFlags.Bottom | TextFormatFlags.Right;
                     break;
             }
-
             return controlFlags;
         }
 
@@ -146,66 +162,43 @@ namespace YamuiFramework.Fonts {
         internal class FontResolver : IFontResolver {
             public Font ResolveFont(string familyName, float emSize, FontStyle fontStyle, GraphicsUnit unit) {
                 Font fontTester = new Font(familyName, emSize, fontStyle, unit);
-                if (fontTester.Name == familyName || !TryResolve(ref familyName, ref fontStyle)) {
+                if (fontTester.Name == familyName)
                     return fontTester;
-                }
-                fontTester.Dispose();
 
-                FontFamily fontFamily = GetFontFamily(familyName);
-                return new Font(fontFamily, emSize, fontStyle, unit);
+                var familyFont = GetFontFamily(familyName);
+                if (familyFont != null)
+                    fontTester = new Font(familyFont, emSize, fontStyle, unit);
+                return fontTester;
             }
 
-            private const string SegoeRegular = "SEGOEUI";
-            private const string SegoeItalic = "SEGOEUII";
-            private const string SegoeBold = "SEGOEUIB";
-
-            private readonly PrivateFontCollection _fontCollection = new PrivateFontCollection();
-
-            private static bool TryResolve(ref string familyName, ref FontStyle fontStyle) {
-                if (familyName == "Segoe UI Light") {
-                    familyName = SegoeItalic;
-                    if (fontStyle != FontStyle.Bold) fontStyle = FontStyle.Regular;
-                    return true;
-                }
-
-                if (familyName != "Segoe UI") return false;
-                switch (fontStyle) {
-                    case FontStyle.Bold:
-                        familyName = SegoeBold;
-                        return true;
-                    case FontStyle.Italic:
-                        familyName = SegoeItalic;
-                        return true;
-                }
-
-                familyName = SegoeRegular;
-                return true;
-            }
+            private PrivateFontCollection _pfc = new PrivateFontCollection();
 
             private FontFamily GetFontFamily(string familyName) {
-                lock (_fontCollection) {
-                    foreach (FontFamily fontFamily in _fontCollection.Families)
+                lock (_pfc) {
+                    foreach (FontFamily fontFamily in _pfc.Families)
                         if (fontFamily.Name == familyName) return fontFamily;
 
-                    string resourceName = GetType().Namespace + ".Fonts." + familyName.Replace(' ', '_') + ".ttf";
-
-                    Stream fontStream = null;
-                    IntPtr data = IntPtr.Zero;
-                    try {
-                        fontStream = GetType().Assembly.GetManifestResourceStream(resourceName);
-                        if (fontStream != null) {
-                            int bytes = (int) fontStream.Length;
-                            data = Marshal.AllocCoTaskMem(bytes);
-                            byte[] fontdata = new byte[bytes];
-                            fontStream.Read(fontdata, 0, bytes);
-                            Marshal.Copy(fontdata, 0, data, bytes);
-                            _fontCollection.AddMemoryFont(data, bytes);
-                        }
-                        return _fontCollection.Families[_fontCollection.Families.Length - 1];
-                    } finally {
-                        if (fontStream != null) fontStream.Dispose();
-                        if (data != IntPtr.Zero) Marshal.FreeCoTaskMem(data);
+                    byte[] fontdata;
+                    switch (familyName) {
+                        case @"REDCIRCL":
+                            fontdata = ResourceFont.REDCIRCL;
+                            break;
+                        default:
+                            return null;
                     }
+
+                    int fontLength = fontdata.Length;
+
+                    // create an unsafe memory block for the font data and copy the bytes to the unsafe memory block
+                    IntPtr data = Marshal.AllocCoTaskMem(fontLength);
+                    Marshal.Copy(fontdata, 0, data, fontLength);
+
+                    // pass the font to the font collection
+                    _pfc.AddMemoryFont(data, fontLength);
+
+                    Marshal.FreeCoTaskMem(data);
+
+                    return _pfc.Families[0];
                 }
             }
         }

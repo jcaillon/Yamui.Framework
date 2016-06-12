@@ -1,18 +1,27 @@
-﻿// "Therefore those skilled at the unorthodox
-// are infinite as heaven and earth,
-// inexhaustible as the great rivers.
-// When they come to an end,
-// they begin again,
-// like the days and months;
-// they die and are reborn,
-// like the four seasons."
+﻿#region header
+// ========================================================================
+// Copyright (c) 2016 - Julien Caillon (julien.caillon@gmail.com)
+// This file (HtmlContainerInt.cs) is part of YamuiFramework.
 // 
-// - Sun Tsu,
-// "The Art of War"
-
+// YamuiFramework is a free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// YamuiFramework is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
+// ========================================================================
+#endregion
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Text.RegularExpressions;
 using YamuiFramework.HtmlRenderer.Core.Adapters;
 using YamuiFramework.HtmlRenderer.Core.Adapters.Entities;
 using YamuiFramework.HtmlRenderer.Core.Core.Dom;
@@ -872,9 +881,19 @@ namespace YamuiFramework.HtmlRenderer.Core.Core
                 }
                 else
                 {
-                    var nfo = new ProcessStartInfo(link.HrefLink);
-                    nfo.UseShellExecute = true;
-                    Process.Start(nfo);
+                    if (!string.IsNullOrEmpty(link.HrefLink) && Directory.Exists(link.HrefLink)) {
+                        Process.Start("explorer.exe", "\"" + link.HrefLink + "\"");
+                    }
+                    else {
+                        if (!string.IsNullOrEmpty(link.HrefLink) && File.Exists(link.HrefLink)) {
+                            var process = new ProcessStartInfo(link.HrefLink) {UseShellExecute = true};
+                            Process.Start(process);
+                        } else {
+                            if (new Regex(@"^(ht|f)tp(s?)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&amp;%\$#_]*)?$").Match(link.HrefLink).Success) {
+                                Process.Start(link.HrefLink);
+                            }
+                        }
+                    }
                 }
             }
         }

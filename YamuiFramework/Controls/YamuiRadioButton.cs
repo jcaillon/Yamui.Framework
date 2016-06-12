@@ -1,4 +1,23 @@
-﻿using System;
+﻿#region header
+// ========================================================================
+// Copyright (c) 2016 - Julien Caillon (julien.caillon@gmail.com)
+// This file (YamuiRadioButton.cs) is part of YamuiFramework.
+// 
+// YamuiFramework is a free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// YamuiFramework is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
+// ========================================================================
+#endregion
+using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Drawing;
@@ -7,6 +26,8 @@ using System.Windows.Forms;
 using System.Windows.Forms.Design;
 using YamuiFramework.Fonts;
 using YamuiFramework.Themes;
+
+// Credits to : http://sourceforge.net/projects/bsfccontrollibr/
 
 namespace YamuiFramework.Controls
 {
@@ -81,9 +102,9 @@ namespace YamuiFramework.Controls
         }
 
         protected virtual void OnPaintForeground(PaintEventArgs e) {
-            Color borderColor = ThemeManager.ButtonColors.BorderColor(_isFocused, _isHovered, _isPressed, Enabled);
-            Color foreColor = ThemeManager.ButtonColors.ForeGround(ForeColor, UseCustomForeColor, _isFocused, _isHovered, _isPressed, Enabled);
-            Color backColor = ThemeManager.ButtonColors.BackGround(BackColor, UseCustomBackColor, _isFocused, _isHovered, _isPressed, Enabled);
+            Color borderColor = YamuiThemeManager.Current.ButtonBorder(_isFocused, _isHovered, _isPressed, Enabled);
+            Color foreColor = YamuiThemeManager.Current.ButtonFg(ForeColor, UseCustomForeColor, _isFocused, _isHovered, _isPressed, Enabled);
+            Color backColor = YamuiThemeManager.Current.ButtonBg(BackColor, UseCustomBackColor, _isFocused, _isHovered, _isPressed, Enabled);
 
             // Paint the back + border of the checkbox
             using (SolidBrush b = new SolidBrush(backColor)) {
@@ -99,7 +120,7 @@ namespace YamuiFramework.Controls
 
             // paint the form inside
             if (Checked) {
-                using (SolidBrush b = new SolidBrush(ThemeManager.AccentColor)) {
+                using (SolidBrush b = new SolidBrush(YamuiThemeManager.Current.AccentColor)) {
                     Rectangle boxRect = new Rectangle(4, Height / 2 - 2, 5, 5);
                     e.Graphics.FillRectangle(b, boxRect);
                 }

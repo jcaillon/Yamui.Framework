@@ -1,26 +1,50 @@
-﻿using System;
-using System.Collections;
+﻿#region header
+// ========================================================================
+// Copyright (c) 2016 - Julien Caillon (julien.caillon@gmail.com)
+// This file (YamuiDateTime.cs) is part of YamuiFramework.
+// 
+// YamuiFramework is a free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// YamuiFramework is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
+// ========================================================================
+#endregion
+using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-using System.Windows.Forms.Design;
 using YamuiFramework.Fonts;
 using YamuiFramework.Themes;
 
 namespace YamuiFramework.Controls {
-    [Designer("YamuiFramework.Controls.YamuiToggleDesigner")]
-    [ToolboxBitmap(typeof(CheckBox))]
-
-    public class YamuiToggle : CheckBox {
+    [ToolboxBitmap(typeof(DateTimePicker))]
+    public class YamuiDateTimePicker : DateTimePicker {
         #region Fields
+        [DefaultValue(false)]
+        [Category("Yamui")]
+        public bool UseCustomBackColor { get; set; }
+
+        [DefaultValue(false)]
+        [Category("Yamui")]
+        public bool UseCustomForeColor { get; set; }
+
         private bool _isHovered;
         private bool _isPressed;
         private bool _isFocused;
+
         #endregion
 
         #region Constructor
-        public YamuiToggle() {
+        public YamuiDateTimePicker() {
             SetStyle(ControlStyles.SupportsTransparentBackColor |
                 ControlStyles.OptimizedDoubleBuffer |
                 ControlStyles.ResizeRedraw |
@@ -28,7 +52,6 @@ namespace YamuiFramework.Controls {
                 ControlStyles.Selectable |
                 ControlStyles.AllPaintingInWmPaint, true);
         }
-
         #endregion
 
         #region Paint Methods
@@ -54,7 +77,11 @@ namespace YamuiFramework.Controls {
 
         protected void CustomOnPaintBackground(PaintEventArgs e) {
             try {
-                PaintTransparentBackground(e.Graphics, DisplayRectangle);
+                Color backColor = YamuiThemeManager.Current.ButtonBg(BackColor, UseCustomBackColor, _isFocused, _isHovered, _isPressed, Enabled);
+                if (backColor != Color.Transparent)
+                    e.Graphics.Clear(backColor);
+                else
+                    PaintTransparentBackground(e.Graphics, DisplayRectangle);
             } catch {
                 Invalidate();
             }
@@ -70,40 +97,47 @@ namespace YamuiFramework.Controls {
         }
 
         protected virtual void OnPaintForeground(PaintEventArgs e) {
-            Color textColor = ThemeManager.ButtonColors.ForeGround(ForeColor, false, _isFocused, _isHovered, _isPressed, Enabled);
-            Color foreColor = ThemeManager.ButtonColors.ForeGround(ForeColor, false, _isFocused, _isHovered, Checked, Enabled);
-            Color borderColor = ThemeManager.ButtonColors.BorderColor(_isFocused, _isHovered, _isPressed, Enabled);
-            Color unfilledColor = ThemeManager.Current.ButtonColorsNormalBackColor;
-            if (unfilledColor == ThemeManager.Current.FormColorBackColor) unfilledColor = borderColor;
-            Color fillColor = Checked ? ThemeManager.AccentColor : unfilledColor;
+            Color borderColor = YamuiThemeManager.Current.ButtonBorder(_isFocused, _isHovered, _isPressed, Enabled);
+            Color foreColor = YamuiThemeManager.Current.ButtonFg(ForeColor, UseCustomForeColor, _isFocused, _isHovered, _isPressed, Enabled);
 
-            Rectangle textRect = new Rectangle(42, 0, Width - 42, Height);
-            Rectangle backRect = new Rectangle(0, 0, 39, Height);
+            if (borderColor != Color.Transparent)
+                using (Pen p = new Pen(borderColor)) {
+                    Rectangle borderRect = new Rectangle(0, 0, Width - 1, Height - 1);
+                    e.Graphics.DrawRectangle(p, borderRect);
+                }
 
-            // draw the back
-            e.Graphics.SmoothingMode = SmoothingMode.HighQuality;           
-            using (SolidBrush b = new SolidBrush(fillColor)) {
-                e.Graphics.FillRectangle(b, new Rectangle(Height / 2, 0, backRect.Width - Height, Height));
-                e.Graphics.FillEllipse(b, new Rectangle(0, 0, Height, Height));
-                e.Graphics.FillEllipse(b, new Rectangle(backRect.Width - Height, 0, Height, Height));
-            }
-            // draw foreground ellipse
             using (SolidBrush b = new SolidBrush(foreColor)) {
-                if (!Checked)
-                    e.Graphics.FillEllipse(b, new Rectangle(2, 2, Height - 4, Height - 4));
-                else
-                    e.Graphics.FillEllipse(b, new Rectangle(backRect.Width - Height + 2, 2, Height - 4, Height - 4));
+                e.Graphics.FillPolygon(b, new[] { new Point(Width - 20, (Height / 2) - 2), new Point(Width - 9, (Height / 2) - 2), new Point(Width - 15, (Height / 2) + 4) });
+                //e.Graphics.FillPolygon(b, new Point[] { new Point(Width - 15, (Height / 2) - 5), new Point(Width - 21, (Height / 2) + 2), new Point(Width - 9, (Height / 2) + 2) });
             }
-            // draw checked.. or not
-            if (Checked) {
-                var fuRect = ClientRectangle;
-                fuRect.Width = 15;
-                fuRect.Offset(10, -3);
-                TextRenderer.DrawText(e.Graphics, "a", new Font("Webdings", 15f, GraphicsUnit.Pixel), fuRect, foreColor, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
-            }
-            e.Graphics.SmoothingMode = SmoothingMode.Default;
 
-            TextRenderer.DrawText(e.Graphics, Text, FontManager.GetStandardFont(), textRect, textColor, FontManager.GetTextFormatFlags(TextAlign));
+            int check = 0;
+
+            if (ShowCheckBox) {
+                check = 15;
+                using (Pen p = new Pen(borderColor)) {
+                    Rectangle boxRect = new Rectangle(3, Height / 2 - 6, 12, 12);
+                    e.Graphics.DrawRectangle(p, boxRect);
+                }
+                if (Checked) {
+                    Color fillColor = YamuiThemeManager.Current.AccentColor;
+                    using (SolidBrush b = new SolidBrush(fillColor)) {
+                        Rectangle boxRect = new Rectangle(4, Height / 2 - 2, 5, 5);
+                        e.Graphics.FillRectangle(b, boxRect);
+                    }
+                } else {
+                    foreColor = YamuiThemeManager.Current.ButtonDisabledFore;
+                }
+            }
+
+            Rectangle textRect = new Rectangle(2 + check, 2, Width - 20, Height - 4);
+
+            TextRenderer.DrawText(e.Graphics, Text, FontManager.GetStandardFont(), textRect, foreColor, TextFormatFlags.Left | TextFormatFlags.VerticalCenter);
+        }
+
+        protected override void OnValueChanged(EventArgs eventargs) {
+            base.OnValueChanged(eventargs);
+            Invalidate();
         }
 
         #endregion
@@ -111,6 +145,7 @@ namespace YamuiFramework.Controls {
         #region Managing isHovered, isPressed, isFocused
 
         #region Focus Methods
+
         protected override void OnGotFocus(EventArgs e) {
             _isFocused = true;
             Invalidate();
@@ -195,55 +230,19 @@ namespace YamuiFramework.Controls {
 
         #region Overridden Methods
 
-        protected override void OnEnabledChanged(EventArgs e) {
-            base.OnEnabledChanged(e);
-            Invalidate();
-        }
-
-        protected override void OnCheckedChanged(EventArgs e) {
-            base.OnCheckedChanged(e);
-            Invalidate();
-        }
-
         public override Size GetPreferredSize(Size proposedSize) {
             Size preferredSize;
             base.GetPreferredSize(proposedSize);
 
             using (var g = CreateGraphics()) {
+                string measureText = Text.Length > 0 ? Text : "MeasureText";
                 proposedSize = new Size(int.MaxValue, int.MaxValue);
-                preferredSize = TextRenderer.MeasureText(g, Text, FontManager.GetStandardFont(), proposedSize, FontManager.GetTextFormatFlags(TextAlign));
-                preferredSize.Width += 42;
+                preferredSize = TextRenderer.MeasureText(g, measureText, FontManager.GetStandardFont(), proposedSize, TextFormatFlags.Left | TextFormatFlags.LeftAndRightPadding | TextFormatFlags.VerticalCenter);
+                preferredSize.Height += 10;
             }
 
             return preferredSize;
         }
-
         #endregion
-    }
-
-    internal class YamuiToggleDesigner : ControlDesigner {
-        protected override void PreFilterProperties(IDictionary properties) {
-            properties.Remove("ImeMode");
-            properties.Remove("Padding");
-            properties.Remove("FlatAppearance");
-            properties.Remove("FlatStyle");
-
-            properties.Remove("UseCompatibleTextRendering");
-            properties.Remove("Image");
-            properties.Remove("ImageAlign");
-            properties.Remove("ImageIndex");
-            properties.Remove("ImageKey");
-            properties.Remove("ImageList");
-            properties.Remove("TextImageRelation");
-
-            properties.Remove("UseVisualStyleBackColor");
-
-            properties.Remove("Font");
-            properties.Remove("RightToLeft");
-
-            properties.Remove("ThreeState");
-
-            base.PreFilterProperties(properties);
-        }
     }
 }

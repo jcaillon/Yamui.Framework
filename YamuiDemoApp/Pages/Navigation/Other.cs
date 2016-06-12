@@ -1,6 +1,5 @@
 ﻿using System;
 using YamuiFramework.Controls;
-using YamuiFramework.Forms;
 
 namespace YamuiDemoApp.Pages.Navigation {
     public partial class Other : YamuiPage {

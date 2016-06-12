@@ -1,28 +1,45 @@
+#region header
+// ========================================================================
+// Copyright (c) 2016 - Julien Caillon (julien.caillon@gmail.com)
+// This file (YamuiForm.cs) is part of YamuiFramework.
+// 
+// YamuiFramework is a free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// YamuiFramework is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
+// ========================================================================
+#endregion
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Drawing.Text;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
 using System.Security;
+using System.Timers;
 using System.Web.UI.Design.WebControls;
 using System.Windows.Forms;
+using YamuiFramework.Animations.Transitions;
 using YamuiFramework.Controls;
+using YamuiFramework.Fonts;
+using YamuiFramework.Helper;
 using YamuiFramework.HtmlRenderer.WinForms;
-using YamuiFramework.Native;
 using YamuiFramework.Themes;
+using Timer = System.Timers.Timer;
 
 namespace YamuiFramework.Forms {
 
     public class YamuiForm : Form {
 
         #region Fields
-        [Category("Yamui")]
-        public bool UseGoBackButton { get; set; }
 
         private bool _isMovable = true;
 
@@ -34,11 +51,22 @@ namespace YamuiFramework.Forms {
 
         [Category("Yamui")]
         [DefaultValue(false)]
-        public bool UseCustomBackColor { get; set; }
-
-        [Category("Yamui")]
-        [DefaultValue(false)]
         public bool UseCustomBorderColor { get; set; }
+
+        /// <summary>
+        /// Set this to true to show the "close all notifications button",
+        /// to use with OnCloseAllVisible
+        /// </summary>
+        [Browsable(false)]
+        [DefaultValue(false)]
+        public bool ShowCloseAllVisibleButton { get; set; }
+
+        /// <summary>
+        /// To use with ShowCloseAllVisibleButton,
+        /// Action to do when the user click the button
+        /// </summary>
+        [Browsable(false)]
+        public Action OnCloseAllVisible { get; set; }
 
         public new Padding Padding {
             get { return base.Padding; }
@@ -49,40 +77,70 @@ namespace YamuiFramework.Forms {
         }
 
         protected override Padding DefaultPadding {
-            get { return new Padding(40, 40, BorderWidth + 10, BorderWidth + 10); }
+            get { return new Padding(8, 40, BorderWidth + 16, BorderWidth + 16); }
         }
-
-        private bool _isResizable = true;
 
         [Category("Yamui")]
         public bool Resizable {
             get { return _isResizable; }
             set { _isResizable = value; }
         }
+        private bool _isResizable = true;
 
-        private const int BorderWidth = 1;
+        [Category("Yamui")]
+        [DefaultValue(true)]
+        public bool SetMinSizeOnLoad { get; set; }
 
-        private List<int[]> _formHistory = new List<int[]>();
+        /// <summary>
+        /// is set to true when this form is the parent of a yamuimsgbox
+        /// </summary>
+        [Browsable(false)]
+        public bool HasModalOpened { get; set; }
 
-        private YamuiGoBackButton _goBackButton;
+        private const int BorderWidth = 2;
+
+        /// <summary>
+        /// Tooltip for close buttons
+        /// </summary>
+        private HtmlToolTip _mainFormToolTip = new HtmlToolTip();
+
+        private YamuiTab _contentTab;
+
+        private YamuiTabButtons _topLinks;
+
+        private YamuiNotifLabel _bottomNotif;
+
         #endregion
 
-        #region Constructor
+        #region Constructor / destructor
 
         public YamuiForm() {
-            // why those styles? check here: https://sites.google.com/site/craigandera/craigs-stuff/windows-forms/flicker-free-control-drawing
+            // why those styles? check here: 
+            // https://sites.google.com/site/craigandera/craigs-stuff/windows-forms/flicker-free-control-drawing
             SetStyle(
-                ControlStyles.OptimizedDoubleBuffer |
-                ControlStyles.ResizeRedraw |
                 ControlStyles.UserPaint |
-                ControlStyles.AllPaintingInWmPaint, true);
+                ControlStyles.AllPaintingInWmPaint |
+                ControlStyles.OptimizedDoubleBuffer |
+                ControlStyles.ResizeRedraw
+                , true);
 
             FormBorderStyle = FormBorderStyle.None;
             StartPosition = FormStartPosition.CenterScreen;
             TransparencyKey = Color.Fuchsia;
 
+            _mainFormToolTip.ShowAlways = true;
+
+            // icon
+            if (YamuiThemeManager.GlobalIcon != null)
+                Icon = YamuiThemeManager.GlobalIcon;
+
             Shown += OnShown;
         }
+
+        ~YamuiForm() {
+            Shown -= OnShown;
+        }
+
         #endregion
 
         #region Paint Methods
@@ -90,58 +148,19 @@ namespace YamuiFramework.Forms {
         protected override void OnPaintBackground(PaintEventArgs e) { }
 
         protected override void OnPaint(PaintEventArgs e) {
-            var backColor = UseCustomBackColor ? BackColor : ThemeManager.Current.FormColorBackColor;
-            var foreColor = ThemeManager.Current.FormColorForeColor;
-            var borderColor = UseCustomBorderColor ? ForeColor : ThemeManager.AccentColor;
+            var backColor = YamuiThemeManager.Current.FormBack;
+            var foreColor = YamuiThemeManager.Current.FormFore;
+            var borderColor = UseCustomBorderColor ? ForeColor : YamuiThemeManager.Current.FormBorder;
 
+            // background
             e.Graphics.Clear(backColor);
 
-            /*
-            // Top border
-            using (SolidBrush b = ThemeManager.AccentColor)
-            {
-                Rectangle topRect = new Rectangle(0, 0, Width, borderWidth);
-                e.Graphics.FillRectangle(b, topRect);
-            }
-            */
-            /*
-             * Color.FromArgb(40,
-                ((basic.R / 255 * diluant.R) + diluant.R) / 2,
-                ((basic.G / 255 * diluant.G) + diluant.G) / 2,
-                ((basic.B / 255 * diluant.B) + diluant.B) / 2);
-             * 
-            // gradient
-            Rectangle headeRectangle = new Rectangle(0, 0, ClientRectangle.Width, 20);
-            using (LinearGradientBrush brush = new LinearGradientBrush(headeRectangle, MergeColors(backColor, MetroPaint.GetStyleColor(Style)), backColor, LinearGradientMode.Vertical)) {
-                e.Graphics.FillRectangle(brush, headeRectangle);
-            }
-             * */
-            /*
-            if (ThemeManager.ThemePageImage != null) {
-                Rectangle imgRectangle = new Rectangle(ClientRectangle.Right - ThemeManager.ThemePageImage.Width, ClientRectangle.Height - ThemeManager.ThemePageImage.Height, ThemeManager.ThemePageImage.Width, ThemeManager.ThemePageImage.Height);
-                e.Graphics.DrawImage(ThemeManager.ThemePageImage, imgRectangle, 0, 0, ThemeManager.ThemePageImage.Width, ThemeManager.ThemePageImage.Height, GraphicsUnit.Pixel);
-            }*/
-
-            /*
-            // draw my logo
-            ColorMap[] colorMap = new ColorMap[1];
-            colorMap[0] = new ColorMap();
-            colorMap[0].OldColor = Color.Black;
-            colorMap[0].NewColor = ThemeManager.AccentColor;
-            ImageAttributes attr = new ImageAttributes();
-            attr.SetRemapTable(colorMap);
-            Image logoImage = Properties.Resources.bull_ant;
-            rect = new Rectangle(ClientRectangle.Right - (100 + logoImage.Width), 0 + 2, logoImage.Width, logoImage.Height);
-            e.Graphics.DrawImage(logoImage, rect, 0, 0, logoImage.Width, logoImage.Height, GraphicsUnit.Pixel, attr);
-            //e.Graphics.DrawImage(Properties.Resources.bull_ant, ClientRectangle.Right - (100 + Properties.Resources.bull_ant.Width), 0 + 5);
-            */
-
             // draw the border with Style color
-            var rect = new Rectangle(new Point(0, 0), new Size(Width - BorderWidth, Height - BorderWidth));
-            var pen = new Pen(borderColor, BorderWidth);
+            var rect = new Rectangle(new Point(0, 0), new Size(Width, Height));
+            var pen = new Pen(borderColor, BorderWidth) {Alignment = PenAlignment.Inset};
             e.Graphics.DrawRectangle(pen, rect);
 
-            // draw the resize pixel stuff on the bottom right
+            // draw the resize pixels icon on the bottom right
             if (Resizable && (SizeGripStyle == SizeGripStyle.Auto || SizeGripStyle == SizeGripStyle.Show)) {
                 using (var b = new SolidBrush(foreColor)) {
                     var resizeHandleSize = new Size(2, 2);
@@ -160,106 +179,222 @@ namespace YamuiFramework.Forms {
         #endregion
 
         #region For the user
+
         /// <summary>
         /// Go to page pagename
         /// </summary>
-        /// <param name="pageName"></param>
-        public void GoToPage(string pageName) {
-            try {
-                YamuiTabPage page = null;
-                foreach (var control in GetAll(this, typeof(YamuiTabPage))) {
-                    if (control.Name == pageName)
-                        page = (YamuiTabPage)control;
+        public void ShowPage(string pageName) {
+            if (_contentTab != null)
+                _contentTab.ShowPage(pageName);
+        }
+
+        protected override void OnClosing(CancelEventArgs e) {
+            if (_contentTab != null)
+                _contentTab.ExecuteOnClose();
+            base.OnClosing(e);
+        }
+
+        /// <summary>
+        /// Automatically generates the tabs/pages
+        /// </summary>
+        public void CreateContent(List<YamuiMainMenu> menuDescriber) {
+            _contentTab = new YamuiTab(menuDescriber, this) {
+                Dock = DockStyle.Fill
+            };
+            Controls.Add(_contentTab);
+            _contentTab.Init();
+        }
+
+        /// <summary>
+        /// Automatically generates top links
+        /// </summary>
+        public void CreateTopLinks(List<string> links, EventHandler<TabPressedEventArgs> onTabPressed, int xPosFromRight = 120, int yPosFromTop = 10) {
+            _topLinks = new YamuiTabButtons(links, -1) {
+                Font = FontManager.GetFont(FontFunction.TopLink),
+                Height = 15,
+                SpaceBetweenText = 14,
+                DrawSeparator = true,
+                WriteFromRight = true,
+                UseLinksColors = true,
+                Anchor = AnchorStyles.Top | AnchorStyles.Right,
+                TabStop = false
+            };
+            _topLinks.TabPressed += onTabPressed;
+            _topLinks.Width = _topLinks.GetWidth() + 10;
+            _topLinks.Location = new Point(Width - xPosFromRight - _topLinks.Width, yPosFromTop);
+            Controls.Add(_topLinks);
+        }
+
+        /// <summary>
+        /// Displays an animated notification on the bottom of the form
+        /// you can choose how much time the notif will last (in seconds)
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="stickDurationSecs"></param>
+        public void Notify(string message, int stickDurationSecs) {
+            if (_bottomNotif == null) {
+                _bottomNotif = new YamuiNotifLabel {
+                    Font = FontManager.GetFont(FontFunction.Normal),
+                    Text = "",
+                    Size = new Size(Width - 21, 16),
+                    Location = new Point(1, Height - 17),
+                    Anchor = AnchorStyles.Bottom | AnchorStyles.Left,
+                };
+                Controls.Add(_bottomNotif);
+            }
+            _bottomNotif.Duration = stickDurationSecs;
+            _bottomNotif.AnimText = message;
+        }
+
+        public Control FindFocusedControl() {
+            if (_contentTab == null)
+                return ActiveControl;
+            Control control = _contentTab;
+            var container = control as IContainerControl;
+            while (container != null) {
+                control = container.ActiveControl;
+                container = control as IContainerControl;
+            }
+            return control;
+        }
+
+        #endregion
+
+        #region Bottom notif
+
+        /// <summary>
+        /// Small class to animate a text display
+        /// </summary>
+        internal class YamuiNotifLabel : UserControl {
+
+            #region public fields
+
+            /// <summary>
+            /// Min 3s, the duration the text stays
+            /// </summary>
+            public int Duration { get; set; }
+
+            /// <summary>
+            /// The final text you want to display
+            /// </summary>
+            public string AnimText {
+                set {
+                    LinearBlink = 0;
+                    ForeColor = YamuiThemeManager.Current.LabelNormalFore;
+                    var t = new Transition(new TransitionType_Linear(500));
+                    t.add(this, "Text", value);
+                    t.add(this, "ForeColor", YamuiThemeManager.Current.AccentColor);
+                    if (!string.IsNullOrEmpty(value))
+                        t.add(this, "LinearBlink", 100);
+                    else
+                        LinearBlink = 21;
+                    t.TransitionCompletedEvent += OnTransitionCompletedEvent;
+                    t.run();
+
+                    // end of duration event
+                    if (!string.IsNullOrEmpty(value)) {
+                        if (_durationTimer == null) {
+                            _durationTimer = new Timer {
+                                AutoReset = false
+                            };
+                            _durationTimer.Elapsed += DurationTimerOnElapsed;
+                        }
+                        _durationTimer.Stop();
+                        _durationTimer.Interval = Math.Max(Duration, 3) * 1000;
+                        _durationTimer.Start();
+                    }
                 }
-                if (page == null) return;
-                YamuiTabControl secControl = (YamuiTabControl)page.Parent;
-                YamuiTabControl mainControl = (YamuiTabControl)secControl.Parent.Parent;
-                GoToPage(mainControl, (YamuiTabPage)secControl.Parent, secControl, page, true);
-            } catch (Exception) {
-                // ignored
             }
-        }
 
-        public void GoToPage(int pageMainInt, int pageSecInt) {
-            YamuiTabControl mainControl = (YamuiTabControl)GetFirst(this, typeof(YamuiTabControl));
-            if (mainControl == null || mainControl.TabCount < pageMainInt || mainControl.TabPages[pageMainInt] == null) return;
-            YamuiTabControl secControl = (YamuiTabControl)GetFirst(mainControl.TabPages[pageMainInt], typeof(YamuiTabControl));
-            if (secControl == null) return;
-            GoToPage(mainControl, (YamuiTabPage)mainControl.TabPages[pageMainInt], secControl, (YamuiTabPage)secControl.TabPages[pageSecInt], false);
-        }
-
-        public void GoToPage(YamuiTabControl tabMain, YamuiTabPage pageMain, YamuiTabControl tabSecondary, YamuiTabPage pageSecondary, bool histoSave) {
-
-            // if we want to display a hidden page            
-            if (pageMain.HiddenPage)
-                pageMain.HiddenState = false;
-
-            if (pageSecondary.HiddenPage)
-                pageSecondary.HiddenState = false;
-
-            var pageMainInt = tabMain.GetIndexOf(pageMain);
-            var pageSecInt = tabSecondary.GetIndexOf(pageSecondary);
-
-            if (histoSave)
-                SaveCurrentPathInHistory();
-
-            // if we change both pages, we can't do the animation for both!
-            if (pageMainInt != tabMain.SelectIndex && pageSecInt != tabSecondary.SelectIndex) {
-                var initState = ThemeManager.TabAnimationAllowed;
-                ThemeManager.TabAnimationAllowed = false;
-                tabSecondary.SelectIndex = pageSecInt;
-                ThemeManager.TabAnimationAllowed = initState;
-            } else if (pageSecInt != tabSecondary.SelectIndex)
-                tabSecondary.SelectIndex = pageSecInt;
-
-            if (pageMainInt != tabMain.SelectIndex)
-                tabMain.SelectIndex = pageMainInt;
-        }
-
-        /// <summary>
-        /// Use the history list to go back to previous tabs
-        /// </summary>
-        public void GoBack() {
-            if (_formHistory.Count == 0) return;
-            var lastPage = _formHistory.Last();
-            GoToPage(lastPage[0], lastPage[1]);
-            _formHistory.Remove(_formHistory.Last());
-            if (_formHistory.Count == 0 && _goBackButton != null) _goBackButton.FakeDisabled = true;
-        }
-
-        /// <summary>
-        /// Keep an history of the tabs visited through a list handled here
-        /// </summary>
-        public void SaveCurrentPathInHistory() {
-            YamuiTabControl mainControl = (YamuiTabControl)GetFirst(this, typeof(YamuiTabControl));
-            if (mainControl == null) return;
-            var pageMainInt = mainControl.SelectedIndex;
-            YamuiTabControl secControl = (YamuiTabControl)GetFirst(mainControl.TabPages[pageMainInt], typeof(YamuiTabControl));
-            if (secControl == null) return;
-            var pageSecInt = secControl.SelectedIndex;
-            // save only if different from the previous 
-            if (_formHistory.Count > 0) {
-                var lastPage = _formHistory.Last();
-                if (lastPage[0] == pageMainInt && lastPage[1] == pageSecInt) return;
+            /// <summary>
+            /// For animation purposes, don't use
+            /// </summary>
+            public int LinearBlink {
+                get { return _linearBlink; }
+                set {
+                    _linearBlink = value;
+                    if (_linearBlink == 0) {
+                        _linearCount = 20;
+                        _linearBool = false;
+                    }
+                    if (_linearBlink >= _linearCount) {
+                        _linearBool = !_linearBool;
+                        _linearCount += 20;
+                    }
+                    BackColor = !_linearBool ? YamuiThemeManager.Current.AccentColor : YamuiThemeManager.Current.FormBack;
+                }
             }
-            _formHistory.Add(new[] { pageMainInt, pageSecInt });
-            if (_goBackButton.FakeDisabled) _goBackButton.FakeDisabled = false;
-        }
 
-        private IEnumerable<Control> GetAll(Control control, Type type) {
-            var controls = control.Controls.Cast<Control>();
-            return controls.SelectMany(ctrl => GetAll(ctrl, type)).Concat(controls).Where(c => c.GetType() == type);
-        }
+            #endregion
 
-        private Control GetFirst(Control control, Type type) {
-            foreach (var control1 in control.Controls) {
-                if (control1.GetType() == type) return (Control)control1;
+            #region private
+
+            private int _linearBlink;
+            private bool _linearBool;
+            private int _linearCount;
+
+            private Timer _durationTimer;
+
+            private void OnTransitionCompletedEvent(object sender, Transition.Args args) {
+                if (string.IsNullOrEmpty(Text))
+                    return;
+                var t = new Transition(new TransitionType_Linear(500));
+                t.add(this, "ForeColor", YamuiThemeManager.Current.LabelNormalFore);
+                t.run();
+                LinearBlink = 0;
+                var t2 = new Transition(new TransitionType_Linear(2000));
+                t2.add(this, "LinearBlink", 401);
+                t2.run();
             }
-            return null;
+
+            private void DurationTimerOnElapsed(object sender, ElapsedEventArgs elapsedEventArgs) {
+                AnimText = "";
+            }
+
+            #endregion
+
+            #region constructor / destructor
+
+            public YamuiNotifLabel() {
+                SetStyle(
+                    ControlStyles.UserPaint |
+                    ControlStyles.AllPaintingInWmPaint |
+                    ControlStyles.OptimizedDoubleBuffer |
+                    ControlStyles.SupportsTransparentBackColor |
+                    ControlStyles.ResizeRedraw
+                    , true);
+            }
+
+            ~YamuiNotifLabel() {
+                _durationTimer.Dispose();
+                _durationTimer = null;
+            }
+
+            #endregion
+
+            #region paint
+
+            protected override void OnPaint(PaintEventArgs e) {
+                e.Graphics.Clear(YamuiThemeManager.Current.FormBack);
+
+                // blinking square
+                using (SolidBrush b = new SolidBrush(BackColor)) {
+                    Rectangle boxRect = new Rectangle(0, 0, 10, Height);
+                    e.Graphics.FillRectangle(b, boxRect);
+                }
+
+                // text
+                TextRenderer.DrawText(e.Graphics, Text, Font, new Rectangle(12, 0, ClientSize.Width - 12, ClientSize.Height), ForeColor, TextFormatFlags.Top | TextFormatFlags.Left | TextFormatFlags.NoPadding);
+            }
+
+            #endregion
+
         }
+
         #endregion
 
         #region Management Methods
+
         /// <summary>
         /// allows to do stuff only when everything is fully loaded
         /// </summary>
@@ -268,20 +403,14 @@ namespace YamuiFramework.Forms {
         private void OnShown(object sender, EventArgs eventArgs) {
             // Processes all Windows messages currently in the message queue.
             Application.DoEvents();
-
-            // only then activate the animations
-            ThemeManager.TabAnimationAllowed = true;
         }
 
+        /// <summary>
+        /// On load of the form
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnLoad(EventArgs e) {
             base.OnLoad(e);
-
-            if (UseGoBackButton) {
-                _goBackButton = new YamuiGoBackButton();
-                Controls.Add(_goBackButton);
-                _goBackButton.Location = new Point(8, Padding.Top + 6);
-                _goBackButton.Size = new Size(27, 27);
-            }
 
             if (DesignMode) return;
 
@@ -298,6 +427,7 @@ namespace YamuiFramework.Forms {
                     break;
             }
 
+            // display windows buttons
             RemoveCloseButton();
             if (ControlBox) {
                 AddWindowButton(WindowButtons.Close);
@@ -305,47 +435,14 @@ namespace YamuiFramework.Forms {
                     AddWindowButton(WindowButtons.Maximize);
                 if (MinimizeBox)
                     AddWindowButton(WindowButtons.Minimize);
+                if (ShowCloseAllVisibleButton)
+                    AddWindowButton(WindowButtons.CloseAllVisible);
                 UpdateWindowButtonPosition();
             }
 
-
-            // add the fonts to the html renderer
-            try {
-                HtmlRender.AddFontFamily(GetFontFamily("SEGOEUI"));
-                HtmlRender.AddFontFamily(GetFontFamily("SEGOEUII"));
-                HtmlRender.AddFontFamily(GetFontFamily("SEGOEUIB"));
-            } catch (Exception) {
-                // ignored
-            }
-        }
-
-        private readonly PrivateFontCollection _fontCollection = new PrivateFontCollection();
-
-        private FontFamily GetFontFamily(string familyName) {
-            lock (_fontCollection) {
-                foreach (FontFamily fontFamily in _fontCollection.Families)
-                    if (fontFamily.Name == familyName) return fontFamily;
-
-                string resourceName = GetType().Namespace + ".Fonts." + familyName.Replace(' ', '_') + ".ttf";
-
-                Stream fontStream = null;
-                IntPtr data = IntPtr.Zero;
-                try {
-                    fontStream = GetType().Assembly.GetManifestResourceStream(resourceName);
-                    if (fontStream != null) {
-                        int bytes = (int) fontStream.Length;
-                        data = Marshal.AllocCoTaskMem(bytes);
-                        byte[] fontdata = new byte[bytes];
-                        fontStream.Read(fontdata, 0, bytes);
-                        Marshal.Copy(fontdata, 0, data, bytes);
-                        _fontCollection.AddMemoryFont(data, bytes);
-                    }
-                    return _fontCollection.Families[_fontCollection.Families.Length - 1];
-                } finally {
-                    if (fontStream != null) fontStream.Dispose();
-                    if (data != IntPtr.Zero) Marshal.FreeCoTaskMem(data);
-                }
-            }
+            // set minimum size
+            if (SetMinSizeOnLoad)
+                MinimumSize = Size;
         }
 
         [SecuritySafeCritical]
@@ -420,13 +517,12 @@ namespace YamuiFramework.Forms {
                         YamuiFormButton btn;
                         _windowButtonList.TryGetValue(WindowButtons.Maximize, out btn);
                         if (WindowState == FormWindowState.Normal && btn != null) {
-                            btn.Text = "1";
+                            btn.Text = @"1";
                         }
-                        if (WindowState == FormWindowState.Maximized && btn != null) btn.Text = "2";
+                        if (WindowState == FormWindowState.Maximized && btn != null) btn.Text = @"2";
                     }
                     break;
             }
-
             if (m.Msg == WmNchittest && (int)m.Result == Htclient) // drag the form
                 m.Result = (IntPtr)Htcaption;
         }
@@ -445,15 +541,12 @@ namespace YamuiFramework.Forms {
         private WinApi.HitTest HitTestNca(IntPtr hwnd, IntPtr wparam, IntPtr lparam) {
             var vPoint = new Point((short)lparam, (short)((int)lparam >> 16));
             var vPadding = Math.Max(Padding.Right, Padding.Bottom);
-
             if (Resizable) {
                 if (RectangleToScreen(new Rectangle(ClientRectangle.Width - vPadding, ClientRectangle.Height - vPadding, vPadding, vPadding)).Contains(vPoint))
                     return WinApi.HitTest.HTBOTTOMRIGHT;
             }
-
             if (RectangleToScreen(new Rectangle(BorderWidth, BorderWidth, ClientRectangle.Width - 2 * BorderWidth, 50)).Contains(vPoint))
                 return WinApi.HitTest.HTCAPTION;
-
             return WinApi.HitTest.HTCLIENT;
         }
 
@@ -474,36 +567,26 @@ namespace YamuiFramework.Forms {
 
         #endregion
 
-        #region go back button
-        private class YamuiGoBackButton : YamuiCharButton {
-            public YamuiGoBackButton() {
-                UseWingdings = true;
-                ButtonChar = "ç";
-                FakeDisabled = true;
-                ButtonPressed += (sender, args) => {
-                    if (!FakeDisabled)
-                        TryToGoBack();
-                };
-                Focus();
-            }
-
-            private void TryToGoBack() {
-                try {
-                    YamuiForm ownerForm = (YamuiForm)FindForm();
-                    if (ownerForm != null) ownerForm.GoBack();
-                } catch (Exception) {
-                    // ignored
-                }
-            }
-        }
-        #endregion
-
         #region Window Buttons
+
+        [SecuritySafeCritical]
+        public void RemoveCloseButton() {
+            var hMenu = WinApi.GetSystemMenu(Handle, false);
+            if (hMenu == IntPtr.Zero) return;
+
+            var n = WinApi.GetMenuItemCount(hMenu);
+            if (n <= 0) return;
+
+            WinApi.RemoveMenu(hMenu, (uint)(n - 1), WinApi.MfByposition | WinApi.MfRemove);
+            WinApi.RemoveMenu(hMenu, (uint)(n - 2), WinApi.MfByposition | WinApi.MfRemove);
+            WinApi.DrawMenuBar(Handle);
+        }
 
         private enum WindowButtons {
             Minimize,
             Maximize,
-            Close
+            Close,
+            CloseAllVisible
         }
 
         private Dictionary<WindowButtons, YamuiFormButton> _windowButtonList;
@@ -517,15 +600,23 @@ namespace YamuiFramework.Forms {
 
             var newButton = new YamuiFormButton();
 
-            if (button == WindowButtons.Close) {
-                newButton.Text = "r";
-            } else if (button == WindowButtons.Minimize) {
-                newButton.Text = "0";
-            } else if (button == WindowButtons.Maximize) {
-                if (WindowState == FormWindowState.Normal)
-                    newButton.Text = "1";
-                else
-                    newButton.Text = "2";
+            switch (button) {
+                case WindowButtons.Close:
+                    newButton.Text = @"r";
+                    _mainFormToolTip.SetToolTip(newButton, "<b>Close</b> this window");
+                    break;
+                case WindowButtons.Minimize:
+                    newButton.Text = @"0";
+                    _mainFormToolTip.SetToolTip(newButton, "<b>Minimize</b> this window");
+                    break;
+                case WindowButtons.Maximize:
+                    newButton.Text = WindowState == FormWindowState.Normal ? @"1" : @"2";
+                    _mainFormToolTip.SetToolTip(newButton, "<b>" + (WindowState == FormWindowState.Normal ? "Maximize" : "Restore") + "</b> this window");
+                    break;
+                case WindowButtons.CloseAllVisible:
+                    newButton.Text = ((char)(126)).ToString();
+                    _mainFormToolTip.SetToolTip(newButton, "<b>Close all visible</b> notification windows");
+                    break;
             }
 
             newButton.Tag = button;
@@ -540,21 +631,25 @@ namespace YamuiFramework.Forms {
 
         private void WindowButton_Click(object sender, EventArgs e) {
             var btn = sender as YamuiFormButton;
-            if (btn != null) {
-                var btnFlag = (WindowButtons)btn.Tag;
-                if (btnFlag == WindowButtons.Close) {
+            if (btn == null) return;
+            if (((MouseEventArgs)e).Button != MouseButtons.Left) return;
+            var btnFlag = (WindowButtons)btn.Tag;
+            switch (btnFlag) {
+                case WindowButtons.Close:
                     Close();
-                } else if (btnFlag == WindowButtons.Minimize) {
+                    break;
+                case WindowButtons.Minimize:
                     WindowState = FormWindowState.Minimized;
-                } else if (btnFlag == WindowButtons.Maximize) {
-                    if (WindowState == FormWindowState.Normal) {
-                        WindowState = FormWindowState.Maximized;
-                        btn.Text = "2";
-                    } else {
-                        WindowState = FormWindowState.Normal;
-                        btn.Text = "1";
-                    }
-                }
+                    break;
+                case WindowButtons.Maximize:
+                    WindowState = WindowState == FormWindowState.Normal ? FormWindowState.Maximized : FormWindowState.Normal;
+                    btn.Text = WindowState == FormWindowState.Normal ? @"1" : @"2";
+                    _mainFormToolTip.SetToolTip(btn, "<b>" + (WindowState == FormWindowState.Normal ? "Maximize" : "Restore") + "</b> this window");
+                    break;
+                case WindowButtons.CloseAllVisible:
+                    if (OnCloseAllVisible != null)
+                        OnCloseAllVisible();
+                    break;
             }
         }
 
@@ -568,31 +663,29 @@ namespace YamuiFramework.Forms {
 
             YamuiFormButton firstButton = null;
 
-            if (_windowButtonList.Count == 1) {
-                foreach (var button in _windowButtonList) {
-                    button.Value.Location = firstButtonLocation;
+            foreach (var button in priorityOrder) {
+                var buttonExists = _windowButtonList.ContainsKey(button.Value);
+
+                if (firstButton == null && buttonExists) {
+                    firstButton = _windowButtonList[button.Value];
+                    firstButton.Location = firstButtonLocation;
+                    continue;
                 }
-            } else {
-                foreach (var button in priorityOrder) {
-                    var buttonExists = _windowButtonList.ContainsKey(button.Value);
 
-                    if (firstButton == null && buttonExists) {
-                        firstButton = _windowButtonList[button.Value];
-                        firstButton.Location = firstButtonLocation;
-                        continue;
-                    }
+                if (firstButton == null || !buttonExists) continue;
 
-                    if (firstButton == null || !buttonExists) continue;
+                _windowButtonList[button.Value].Location = new Point(lastDrawedButtonPosition, BorderWidth);
+                lastDrawedButtonPosition = lastDrawedButtonPosition - 25;
+            }
 
-                    _windowButtonList[button.Value].Location = new Point(lastDrawedButtonPosition, BorderWidth);
-                    lastDrawedButtonPosition = lastDrawedButtonPosition - 25;
-                }
+            if (_windowButtonList.ContainsKey(WindowButtons.CloseAllVisible)) {
+                _windowButtonList[WindowButtons.CloseAllVisible].Location = new Point(ClientRectangle.Width - BorderWidth - 25, BorderWidth + 25);
             }
 
             Refresh();
         }
 
-        private class YamuiFormButton : Label {
+        public class YamuiFormButton : Label {
             #region Constructor
 
             public YamuiFormButton() {
@@ -605,34 +698,16 @@ namespace YamuiFramework.Forms {
             #endregion
 
             #region Paint Methods
-            protected void PaintTransparentBackground(Graphics graphics, Rectangle clipRect) {
-                graphics.Clear(Color.Transparent);
-                if ((Parent != null)) {
-                    clipRect.Offset(Location);
-                    PaintEventArgs e = new PaintEventArgs(graphics, clipRect);
-                    GraphicsState state = graphics.Save();
-                    graphics.SmoothingMode = SmoothingMode.HighSpeed;
-                    try {
-                        graphics.TranslateTransform(-Location.X, -Location.Y);
-                        InvokePaintBackground(Parent, e);
-                        InvokePaint(Parent, e);
-                    } finally {
-                        graphics.Restore(state);
-                        clipRect.Offset(-Location.X, -Location.Y);
-                    }
-                }
-            }
-
             protected override void OnPaint(PaintEventArgs e) {
                 if (_isPressed)
-                    e.Graphics.Clear(ThemeManager.AccentColor);
+                    e.Graphics.Clear(YamuiThemeManager.Current.AccentColor);
                 else if (_isHovered)
-                    e.Graphics.Clear(ThemeManager.Current.ButtonColorsHoverBackColor);
+                    e.Graphics.Clear(YamuiThemeManager.Current.ButtonHoverBack);
                 else
-                    e.Graphics.Clear(ThemeManager.Current.FormColorBackColor);
-                    //PaintTransparentBackground(e.Graphics, DisplayRectangle);
+                    e.Graphics.Clear(YamuiThemeManager.Current.FormBack);
+                //PaintTransparentBackground(e.Graphics, DisplayRectangle);
 
-                Color foreColor = ThemeManager.ButtonColors.ForeGround(ForeColor, false, false, _isHovered, _isPressed, Enabled);
+                Color foreColor = YamuiThemeManager.Current.ButtonFg(ForeColor, false, false, _isHovered, _isPressed, Enabled);
                 TextRenderer.DrawText(e.Graphics, Text, new Font("Webdings", 9.25f), ClientRectangle, foreColor, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
             }
 
@@ -652,7 +727,6 @@ namespace YamuiFramework.Forms {
                     _isPressed = true;
                     Invalidate();
                 }
-
                 base.OnMouseDown(e);
             }
 
@@ -714,29 +788,9 @@ namespace YamuiFramework.Forms {
 
         #endregion
 
-        #region Helper Methods
-
-        [SecuritySafeCritical]
-        public void RemoveCloseButton() {
-            var hMenu = WinApi.GetSystemMenu(Handle, false);
-            if (hMenu == IntPtr.Zero) return;
-
-            var n = WinApi.GetMenuItemCount(hMenu);
-            if (n <= 0) return;
-
-            WinApi.RemoveMenu(hMenu, (uint)(n - 1), WinApi.MfByposition | WinApi.MfRemove);
-            WinApi.RemoveMenu(hMenu, (uint)(n - 2), WinApi.MfByposition | WinApi.MfRemove);
-            WinApi.DrawMenuBar(Handle);
-        }
-
-        private Rectangle MeasureText(Graphics g, Rectangle clientRectangle, Font font, string text, TextFormatFlags flags) {
-            var proposedSize = new Size(int.MaxValue, int.MinValue);
-            var actualSize = TextRenderer.MeasureText(g, text, font, proposedSize, flags);
-            return new Rectangle(clientRectangle.X, clientRectangle.Y, actualSize.Width, actualSize.Height);
-        }
-
-        #endregion
     }
+
+    #region Designer
 
     internal class YamuiFormDesigner : FormViewDesigner {
         protected override void PreFilterProperties(IDictionary properties) {
@@ -745,4 +799,7 @@ namespace YamuiFramework.Forms {
             base.PreFilterProperties(properties);
         }
     }
+
+    #endregion
+
 }

@@ -1,15 +1,22 @@
-// "Therefore those skilled at the unorthodox
-// are infinite as heaven and earth,
-// inexhaustible as the great rivers.
-// When they come to an end,
-// they begin again,
-// like the days and months;
-// they die and are reborn,
-// like the four seasons."
+#region header
+// ========================================================================
+// Copyright (c) 2016 - Julien Caillon (julien.caillon@gmail.com)
+// This file (HtmlPanel.cs) is part of YamuiFramework.
 // 
-// - Sun Tsu,
-// "The Art of War"
-
+// YamuiFramework is a free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// YamuiFramework is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
+// ========================================================================
+#endregion
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -127,6 +134,35 @@ namespace YamuiFramework.HtmlRenderer.WinForms
             _htmlContainer.ScrollChange += OnScrollChange;
             _htmlContainer.StylesheetLoad += OnStylesheetLoad;
             _htmlContainer.ImageLoad += OnImageLoad;
+
+            // subscribe to an event called when the BaseCss sheet changes
+            YamuiThemeManager.OnCssSheetChanged += YamuiThemeManagerOnOnCssSheetChanged;
+        }
+
+        private void YamuiThemeManagerOnOnCssSheetChanged() {
+            if (_text != null)
+                Text = _text;
+        }
+
+        /// <summary>
+        /// Gets or sets the text of this panel
+        /// </summary>
+        [Browsable(true)]
+        [Description("Sets the html of this control.")]
+        public override string Text {
+            get { return _text; }
+            set {
+                if (value == null) return; ;
+                _text = value;
+                base.Text = value;
+                if (!IsDisposed) {
+                    VerticalScroll.Value = VerticalScroll.Minimum;
+                    _htmlContainer.SetHtml((_text.StartsWith(@"<html") ? _text : @"<html><body>" + _text + @"</body><html>"), YamuiThemeManager.BaseCssData);
+                    PerformLayout();
+                    Invalidate();
+                    InvokeMouseMove();
+                }
+            }
         }
 
         /// <summary>
@@ -325,30 +361,6 @@ namespace YamuiFramework.HtmlRenderer.WinForms
         {
             get { return base.AutoScroll; }
             set { base.AutoScroll = value; }
-        }
-
-        /// <summary>
-        /// Gets or sets the text of this panel
-        /// </summary>
-        [Browsable(true)]
-        [Description("Sets the html of this control.")]
-        public override string Text
-        {
-            get { return _text; }
-            set
-            {
-                if (value == null) return;;
-                _text = value;
-                base.Text = value;
-                if (!IsDisposed)
-                {
-                    VerticalScroll.Value = VerticalScroll.Minimum;
-                    _htmlContainer.SetHtml((_text.StartsWith(@"<html") ? _text : @"<html><body><div class='yamui-text'>" + _text + @"</div></body><html>"), HtmlHandler.GetBaseCssData());
-                    PerformLayout();
-                    Invalidate();
-                    InvokeMouseMove();
-                }
-            }
         }
 
         /// <summary>
@@ -655,7 +667,7 @@ namespace YamuiFramework.HtmlRenderer.WinForms
         /// Propagate the image load event from root container.
         /// </summary>
         protected virtual void OnImageLoad(HtmlImageLoadEventArgs e) {
-            HtmlHandler.OnImageLoad(e);
+            YamuiThemeManager.OnHtmlImageLoad(e);
             var handler = ImageLoad;
             if (handler != null)
                 handler(this, e);

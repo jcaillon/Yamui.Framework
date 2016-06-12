@@ -1,20 +1,28 @@
-// "Therefore those skilled at the unorthodox
-// are infinite as heaven and earth,
-// inexhaustible as the great rivers.
-// When they come to an end,
-// they begin again,
-// like the days and months;
-// they die and are reborn,
-// like the four seasons."
+#region header
+// ========================================================================
+// Copyright (c) 2016 - Julien Caillon (julien.caillon@gmail.com)
+// This file (HtmlLabel.cs) is part of YamuiFramework.
 // 
-// - Sun Tsu,
-// "The Art of War"
-
+// YamuiFramework is a free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// YamuiFramework is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
+// ========================================================================
+#endregion
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Text;
+using System.Net.Mime;
 using System.Windows.Forms;
 using YamuiFramework.HtmlRenderer.Core.Adapters.Entities;
 using YamuiFramework.HtmlRenderer.Core.Core;
@@ -140,6 +148,64 @@ namespace YamuiFramework.HtmlRenderer.WinForms
             _htmlContainer.ImageLoad += OnImageLoad;
 
             ResumeLayout(false);
+
+            TabStop = false;
+
+            // subscribe to an event called when the BaseCss sheet changes
+            YamuiThemeManager.OnCssSheetChanged += YamuiThemeManagerOnOnCssSheetChanged;
+        }
+
+        private void YamuiThemeManagerOnOnCssSheetChanged() {
+            if (_text != null)
+                Text = _text;
+        }
+
+        /// <summary>
+        /// Gets or sets the html of this control.
+        /// </summary>
+        [Description("Sets the html of this control.")]
+        public override string Text {
+            get { return _text; }
+            set {
+                _text = value;
+                base.Text = value;
+                if (!IsDisposed) {
+                    if (_text.StartsWith(@"<div class='yamui-text'>"))
+                        _htmlContainer.SetHtml(_text, YamuiThemeManager.BaseCssData);
+                    else
+                        _htmlContainer.SetHtml(@"<div class='yamui-text'>" + _text + @"</div>", YamuiThemeManager.BaseCssData);
+                    PerformLayout();
+                    Invalidate();
+                }
+            }
+        }
+
+        /// <summary>
+        /// adapts width to content (the label needs to be in AutoSizeHeight only)
+        /// </summary>
+        public void SetNeededSize(string content, int minWidth, int maxWidth) {
+            // find max height taken by the html
+            Width = maxWidth;
+            Text = content;
+            var prefHeight = Height;
+
+            // now we got the final height, resize width until height changes
+            int j = 0;
+            int detla = maxWidth / 20;
+            int curWidth = maxWidth;
+            do {
+                curWidth -= detla;
+                Width = Math.Max(Math.Min(maxWidth, curWidth), minWidth);
+                PerformLayout();
+                //Invalidate();
+                if (Height > prefHeight) {
+                    curWidth += detla;
+                    detla /= 2;
+                }
+                j++;
+            } while (j < 20);
+
+            Width += 10;
         }
 
         /// <summary>
@@ -378,29 +444,6 @@ namespace YamuiFramework.HtmlRenderer.WinForms
         }
 
         /// <summary>
-        /// Gets or sets the html of this control.
-        /// </summary>
-        [Description("Sets the html of this control.")]
-        public override string Text
-        {
-            get { return _text; }
-            set
-            {
-                _text = value;
-                base.Text = value;
-                if (!IsDisposed)
-                {
-                    if (_text.StartsWith(@"<div class='yamui-text'>"))
-                        _htmlContainer.SetHtml(_text, HtmlHandler.GetBaseCssData());
-                    else
-                        _htmlContainer.SetHtml(@"<div class='yamui-text'>" + _text + @"</div>", HtmlHandler.GetBaseCssData());
-                    PerformLayout();
-                    Invalidate();
-                }
-            }
-        }
-
-        /// <summary>
         /// Get the currently selected text segment in the html.
         /// </summary>
         [Browsable(false)]
@@ -434,7 +477,7 @@ namespace YamuiFramework.HtmlRenderer.WinForms
         /// </summary>
         /// <param name="elementId">the id of the element to get its rectangle</param>
         /// <returns>the rectangle of the element or null if not found</returns>
-        public virtual RectangleF? GetElementRectangle(string elementId)
+        public RectangleF? GetElementRectangle(string elementId)
         {
             return _htmlContainer != null ? _htmlContainer.GetElementRectangle(elementId) : null;
         }
@@ -604,7 +647,7 @@ namespace YamuiFramework.HtmlRenderer.WinForms
         /// </summary>
         protected virtual void OnImageLoad(HtmlImageLoadEventArgs e)
         {
-            HtmlHandler.OnImageLoad(e);
+            YamuiThemeManager.OnHtmlImageLoad(e);
             var handler = ImageLoad;
             if (handler != null)
                 handler(this, e);

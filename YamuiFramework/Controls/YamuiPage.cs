@@ -1,72 +1,62 @@
-﻿using System;
-using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Drawing2D;
+﻿#region header
+// ========================================================================
+// Copyright (c) 2016 - Julien Caillon (julien.caillon@gmail.com)
+// This file (YamuiPage.cs) is part of YamuiFramework.
+// 
+// YamuiFramework is a free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// YamuiFramework is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
+// ========================================================================
+#endregion
 using System.Windows.Forms;
 using YamuiFramework.Themes;
 
-namespace YamuiFramework.Controls
-{
-    public class YamuiPage : UserControl
-    {
-        #region Fields
-        [DefaultValue(false)]
-        [Category("Yamui")]
-        public bool UseCustomBackColor { get; set; }
+namespace YamuiFramework.Controls {
+
+    public class YamuiPage : UserControl {
+
+        #region constructor
+
+        public YamuiPage() {
+            SetStyle(ControlStyles.UserPaint |
+                     ControlStyles.AllPaintingInWmPaint |
+                     ControlStyles.ResizeRedraw |
+                     ControlStyles.OptimizedDoubleBuffer, true);
+        }
+
+        #endregion
+
+        #region Virtual methods
+
+        /// <summary>
+        /// Method called by YamuiTab when the page changes to this page
+        /// </summary>
+        public virtual void OnShow() { }
+
+        /// <summary>
+        /// Method called by YamuiTab when the page changes from this one and when the form closes
+        /// </summary>
+        public virtual void OnHide() { }
+
         #endregion
 
         #region Paint
-        protected void PaintTransparentBackground(Graphics graphics, Rectangle clipRect) {
-            graphics.Clear(Color.Transparent);
-            if ((Parent != null)) {
-                clipRect.Offset(Location);
-                PaintEventArgs e = new PaintEventArgs(graphics, clipRect);
-                GraphicsState state = graphics.Save();
-                graphics.SmoothingMode = SmoothingMode.HighSpeed;
-                try {
-                    graphics.TranslateTransform(-Location.X, -Location.Y);
-                    InvokePaintBackground(Parent, e);
-                    InvokePaint(Parent, e);
-                } finally {
-                    graphics.Restore(state);
-                    clipRect.Offset(-Location.X, -Location.Y);
-                }
-            }
-        }
-
-        protected override void OnPaintBackground(PaintEventArgs e) { }
-
-        protected void CustomOnPaintBackground(PaintEventArgs e) {
-            try {
-                if (DesignMode) {
-                    e.Graphics.Clear(ThemeManager.Current.FormColorBackColor);
-                    return;
-                }
-                if (UseCustomBackColor) 
-                    e.Graphics.Clear(BackColor);
-                else
-                    PaintTransparentBackground(e.Graphics, DisplayRectangle);
-            } catch {
-                Invalidate();
-            }
-        }
 
         protected override void OnPaint(PaintEventArgs e) {
-            try {
-                CustomOnPaintBackground(e);
-                OnPaintForeground(e);
-            } catch {
-                Invalidate();
-            }
+            // paint background
+            e.Graphics.Clear(YamuiThemeManager.Current.FormBack);
         }
 
-        protected virtual void OnPaintForeground(PaintEventArgs e) {}
-
-        protected override void OnEnabledChanged(EventArgs e)
-        {
-            base.OnEnabledChanged(e);
-            Invalidate();
-        }
         #endregion
+
     }
 }

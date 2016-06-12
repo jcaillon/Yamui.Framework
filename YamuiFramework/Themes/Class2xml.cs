@@ -1,4 +1,23 @@
-﻿using System;
+﻿#region header
+// ========================================================================
+// Copyright (c) 2016 - Julien Caillon (julien.caillon@gmail.com)
+// This file (Class2xml.cs) is part of YamuiFramework.
+// 
+// YamuiFramework is a free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// YamuiFramework is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
+// ========================================================================
+#endregion
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -8,13 +27,24 @@ namespace YamuiFramework.Themes {
     /// <summary>
     /// A class to read and write an object instance
     /// </summary>
-    class Class2Xml<T> {
+    public class Class2Xml<T> {
 
         private const string KeyString = "Key";
         private const string ValueString = "Value";
         private const string RootString = "Root";
         private const string InstanceListItemString = "Item";
         private const string PrefixToParentOfDico = "Dico";
+
+        /// <summary>
+        /// Saves an object of type <T> into an xml
+        /// </summary>
+        /// <param name="instance"></param>
+        /// <param name="filename"></param>
+        /// <param name="valueInAttribute"></param>
+        public static void SaveToFile(T instance, string filename, bool valueInAttribute = false) {
+            var x = new List<T> { instance };
+            SaveToFile(x, filename, valueInAttribute);
+        }
 
         /// <summary>
         /// Method to save a list of object of type <T> into an xml
@@ -71,11 +101,23 @@ namespace YamuiFramework.Themes {
             Load(instance, XDocument.Parse(xmlContent), valueInAttribute);
         }
 
-        public static void LoadFromFile(List<T> instance, string filename, bool valueInAttribute) {
+        /// <summary>
+        /// Reads an xml to instanciate an object
+        /// </summary>
+        /// <param name="instance"></param>
+        /// <param name="filename"></param>
+        /// <param name="valueInAttribute"></param>
+        public static void LoadFromFile(T instance, string filename, bool valueInAttribute = false) {
+            var x = new List<T> {instance};
+            LoadFromFile(x, filename, valueInAttribute);
+            instance = x[0];
+        }
+
+        public static void LoadFromFile(List<T> instance, string filename, bool valueInAttribute = false) {
             Load(instance, XDocument.Load(filename), valueInAttribute);
         }
 
-        private static void Load(List<T> instance, XDocument document, bool valueInAttribute) {
+        private static void Load(List<T> instance, XDocument document, bool valueInAttribute = false) {
             XElement rootElement = document.Root;
             if (rootElement == null) return;
 
@@ -113,7 +155,7 @@ namespace YamuiFramework.Themes {
             }
         }
 
-        private static Dictionary<string, string> XmlToDictionary(XElement baseElm, bool valueInAttribute) {
+        private static Dictionary<string, string> XmlToDictionary(XElement baseElm, bool valueInAttribute = false) {
             Dictionary<string, string> dict = new Dictionary<string, string>();
             foreach (XElement elm in baseElm.Elements()) {
                 string dictKey = "";
@@ -135,7 +177,7 @@ namespace YamuiFramework.Themes {
             return dict;
         }
 
-        private static XElement DictToXml(Dictionary<string, string> inputDict, string elmName, string subElmName, bool valueInAttribute) {
+        private static XElement DictToXml(Dictionary<string, string> inputDict, string elmName, string subElmName, bool valueInAttribute = false) {
             XElement outElm = new XElement(elmName);
             Dictionary<string, string>.KeyCollection keys = inputDict.Keys;
             foreach (string key in keys) {

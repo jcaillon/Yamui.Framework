@@ -1,4 +1,23 @@
-﻿using System;
+﻿#region header
+// ========================================================================
+// Copyright (c) 2016 - Julien Caillon (julien.caillon@gmail.com)
+// This file (YamuiLabel.cs) is part of YamuiFramework.
+// 
+// YamuiFramework is a free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// YamuiFramework is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
+// ========================================================================
+#endregion
+using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Drawing;
@@ -31,14 +50,14 @@ namespace YamuiFramework.Controls {
         [Category("Yamui")]
         public bool UseCustomForeColor { get; set; }
 
-        private LabelFunction _function = LabelFunction.Normal;
-        [DefaultValue(LabelFunction.Normal)]
+        private FontFunction _function = FontFunction.Normal;
+        [DefaultValue(FontFunction.Normal)]
         [Category("Yamui")]
-        public LabelFunction Function {
+        public FontFunction Function {
             get { return _function; }
             set {
                 _function = value;
-                Margin = _function == LabelFunction.Heading ? new Padding(5, 18, 5, 7) : new Padding(3, 3, 3, 3);
+                Margin = _function == FontFunction.Heading ? new Padding(5, 18, 5, 7) : new Padding(3, 3, 3, 3);
             }
         }
 
@@ -68,6 +87,7 @@ namespace YamuiFramework.Controls {
                 ControlStyles.ResizeRedraw |
                 ControlStyles.UserPaint |
                 ControlStyles.AllPaintingInWmPaint, true);
+            TabStop = false;
         }
 
         #endregion
@@ -95,31 +115,22 @@ namespace YamuiFramework.Controls {
         protected override void OnPaintBackground(PaintEventArgs e) { }
 
         protected void CustomOnPaintBackground(PaintEventArgs e) {
-            try {
-                Color backColor = ThemeManager.LabelsColors.BackGround(BackColor, UseCustomBackColor);
-                if (backColor != Color.Transparent) {
-                    e.Graphics.Clear(backColor);
-                } else
-                    PaintTransparentBackground(e.Graphics, DisplayRectangle);
-            } catch {
-                Invalidate();
-            }
+            Color backColor = YamuiThemeManager.Current.LabelsBg(BackColor, UseCustomBackColor);
+            if (backColor != Color.Transparent) {
+                e.Graphics.Clear(backColor);
+            } else
+                PaintTransparentBackground(e.Graphics, DisplayRectangle);
         }
 
         protected override void OnPaint(PaintEventArgs e) {
-            try {
-                CustomOnPaintBackground(e);
-                OnPaintForeground(e);
-            } catch {
-                Invalidate();
-            }
+            CustomOnPaintBackground(e);
+            OnPaintForeground(e);
         }
 
         protected virtual void OnPaintForeground(PaintEventArgs e) {
+            Color foreColor = YamuiThemeManager.Current.LabelsFg(ForeColor, UseCustomForeColor, false, false, false, !FakeDisabled);
 
-            Color foreColor = ThemeManager.LabelsColors.ForeGround(ForeColor, UseCustomForeColor, false, false, false, !FakeDisabled);
-
-            TextRenderer.DrawText(e.Graphics, Text, FontManager.GetLabelFont(Function), ClientRectangle, foreColor, FontManager.GetTextFormatFlags(TextAlign, _wrapToLine));
+            TextRenderer.DrawText(e.Graphics, Text, FontManager.GetFont(Function), ClientRectangle, foreColor, FontManager.GetTextFormatFlags(TextAlign, _wrapToLine));
         }
 
         #endregion
@@ -131,7 +142,7 @@ namespace YamuiFramework.Controls {
 
             using (var g = CreateGraphics()) {
                 proposedSize = new Size(int.MaxValue, int.MaxValue);
-                preferredSize = TextRenderer.MeasureText(g, Text, FontManager.GetLabelFont(Function), proposedSize, FontManager.GetTextFormatFlags(TextAlign));
+                preferredSize = TextRenderer.MeasureText(g, Text, FontManager.GetFont(Function), proposedSize, FontManager.GetTextFormatFlags(TextAlign));
             }
 
             return preferredSize;

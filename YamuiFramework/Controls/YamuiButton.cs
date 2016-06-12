@@ -1,4 +1,23 @@
-﻿using System;
+﻿#region header
+// ========================================================================
+// Copyright (c) 2016 - Julien Caillon (julien.caillon@gmail.com)
+// This file (YamuiButton.cs) is part of YamuiFramework.
+// 
+// YamuiFramework is a free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// YamuiFramework is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
+// ========================================================================
+#endregion
+using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Drawing;
@@ -6,17 +25,16 @@ using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 using YamuiFramework.Fonts;
-using YamuiFramework.HtmlRenderer.Core.Core.Entities;
 using YamuiFramework.Themes;
 
 namespace YamuiFramework.Controls {
-
     [Designer("YamuiFramework.Controls.YamuiButtonDesigner")]
-    [ToolboxBitmap(typeof(Button))]
+    [ToolboxBitmap(typeof (Button))]
     [DefaultEvent("ButtonPressed")]
     public class YamuiButton : Button {
 
         #region Fields
+
         [DefaultValue(false)]
         [Category("Yamui")]
         public bool UseCustomBackColor { get; set; }
@@ -29,19 +47,15 @@ namespace YamuiFramework.Controls {
         [Category("Yamui")]
         public bool Highlight { get; set; }
 
-        private event EventHandler<ButtonPressedEventArgs> _onButtonPressed;
+        [DefaultValue(false)]
+        [Category("Yamui")]
+        public bool AcceptsRightClick { get; set; }
+
         /// <summary>
         /// You should register to this event to know when the button has been pressed (clicked or enter or space)
         /// </summary>
         [Category("Yamui")]
-        public event EventHandler<ButtonPressedEventArgs> ButtonPressed {
-           add {
-               _onButtonPressed += value;
-           }
-           remove {
-               _onButtonPressed -= value;
-           }
-        }
+        public event EventHandler<EventArgs> ButtonPressed;
 
         /// <summary>
         /// This public prop is only defined so we can set it from the transitions (animation component)
@@ -50,12 +64,16 @@ namespace YamuiFramework.Controls {
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool DoPressed {
             get { return IsPressed; }
-            set { IsPressed = value; Invalidate(); }
+            set {
+                IsPressed = value;
+                Invalidate();
+            }
         }
 
         public bool IsHovered;
         public bool IsPressed;
         public bool IsFocused;
+
         #endregion
 
         #region Constructor
@@ -74,13 +92,45 @@ namespace YamuiFramework.Controls {
 
         #endregion
 
+        #region methods
+
+        /// <summary>
+        /// Call this method to activate the OnPressedButton event manually
+        /// </summary>
+        public void HandlePressedButton() {
+            OnButtonPressed(new EventArgs());
+        }
+
+        private void OnButtonPressed(EventArgs eventArgs) {
+            if (ButtonPressed != null) {
+                Enabled = false;
+                try {
+                    ButtonPressed(this, eventArgs);
+                } finally {
+                    Enabled = true;
+                }
+            }
+        }
+
+        #endregion
+
+        #region Overridden Methods
+
+        protected override void OnEnabledChanged(EventArgs e) {
+            base.OnEnabledChanged(e);
+            Invalidate();
+        }
+
+        #endregion
+
         #region Paint Methods
+
         protected void PaintTransparentBackground(Graphics graphics, Rectangle clipRect) {
             graphics.Clear(Color.Transparent);
             if ((Parent != null)) {
                 clipRect.Offset(Location);
-                PaintEventArgs e = new PaintEventArgs(graphics, clipRect);
-                GraphicsState state = graphics.Save();
+                var e = new PaintEventArgs(graphics, clipRect);
+                var state = graphics.Save();
                 graphics.SmoothingMode = SmoothingMode.HighSpeed;
                 try {
                     graphics.TranslateTransform(-Location.X, -Location.Y);
@@ -93,39 +143,29 @@ namespace YamuiFramework.Controls {
             }
         }
 
-        protected override void OnPaintBackground(PaintEventArgs e) { }
+        protected override void OnPaint(PaintEventArgs e) {
 
-        protected virtual void CustomOnPaintBackground(PaintEventArgs e) {
-            Color backColor = ThemeManager.ButtonColors.BackGround(BackColor, UseCustomBackColor, IsFocused, IsHovered, IsPressed, Enabled);
+            // background
+            var backColor = YamuiThemeManager.Current.ButtonBg(BackColor, UseCustomBackColor, IsFocused, IsHovered, IsPressed, Enabled);
             if (backColor != Color.Transparent)
                 e.Graphics.Clear(backColor);
             else
                 PaintTransparentBackground(e.Graphics, DisplayRectangle);
-        }
 
-        protected override void OnPaint(PaintEventArgs e) {
-            try {
-                CustomOnPaintBackground(e);
-                OnPaintForeground(e);
-            } catch {
-                Invalidate();
-            }
-        }
-
-        protected virtual void OnPaintForeground(PaintEventArgs e) {
-            Color borderColor = ThemeManager.ButtonColors.BorderColor(IsFocused, IsHovered, IsPressed, Enabled);
-            Color foreColor = ThemeManager.ButtonColors.ForeGround(ForeColor, UseCustomForeColor, IsFocused, IsHovered, IsPressed, Enabled);
+            // foreground
+            var borderColor = YamuiThemeManager.Current.ButtonBorder(IsFocused, IsHovered, IsPressed, Enabled);
+            var foreColor = YamuiThemeManager.Current.ButtonFg(ForeColor, UseCustomForeColor, IsFocused, IsHovered, IsPressed, Enabled);
 
             if (borderColor != Color.Transparent)
-                using (Pen p = new Pen(borderColor)) {
-                    Rectangle borderRect = new Rectangle(0, 0, Width - 1, Height - 1);
+                using (var p = new Pen(borderColor)) {
+                    var borderRect = new Rectangle(0, 0, Width - 1, Height - 1);
                     e.Graphics.DrawRectangle(p, borderRect);
                 }
 
             // highlight is a border with more width
             if (Highlight && !IsHovered && !IsPressed && Enabled) {
-                using (Pen p = new Pen(ThemeManager.AccentColor, 4)) {
-                    Rectangle borderRect = new Rectangle(2, 2, Width - 4, Height - 4);
+                using (var p = new Pen(YamuiThemeManager.Current.AccentColor, 4)) {
+                    var borderRect = new Rectangle(2, 2, Width - 4, Height - 4);
                     e.Graphics.DrawRectangle(p, borderRect);
                 }
             }
@@ -133,12 +173,6 @@ namespace YamuiFramework.Controls {
             TextRenderer.DrawText(e.Graphics, Text, FontManager.GetStandardFont(), ClientRectangle, foreColor, FontManager.GetTextFormatFlags(TextAlign));
         }
 
-        private void HandlePressedButton() {
-            if (_onButtonPressed != null) {
-                var args = new ButtonPressedEventArgs(this.Tag);
-                _onButtonPressed(this, args);
-            }
-        }
         #endregion
 
         #region Managing isHovered, isPressed, isFocused
@@ -176,6 +210,7 @@ namespace YamuiFramework.Controls {
         #endregion
 
         #region Keyboard Methods
+
         // This is mandatory to be able to handle the ENTER key in key events!!
         protected override void OnPreviewKeyDown(PreviewKeyDownEventArgs e) {
             if (e.KeyCode == Keys.Enter) e.IsInputKey = true;
@@ -183,17 +218,19 @@ namespace YamuiFramework.Controls {
         }
 
         protected override void OnKeyDown(KeyEventArgs e) {
-            e.Handled = true;
             if (e.KeyCode == Keys.Space || e.KeyCode == Keys.Enter) {
-                HandlePressedButton();
                 IsPressed = true;
                 Invalidate();
+                e.Handled = true;
             }
             base.OnKeyDown(e);
         }
 
         protected override void OnKeyUp(KeyEventArgs e) {
-            //Remove this code cause this prevents the focus color
+            if (IsPressed) {
+                OnButtonPressed(e);
+                e.Handled = true;
+            }
             IsPressed = false;
             Invalidate();
             base.OnKeyUp(e);
@@ -210,8 +247,7 @@ namespace YamuiFramework.Controls {
         }
 
         protected override void OnMouseDown(MouseEventArgs e) {
-            if (e.Button == MouseButtons.Left) {
-                HandlePressedButton();
+            if (e.Button == MouseButtons.Left || (AcceptsRightClick && e.Button == MouseButtons.Right)) {
                 IsPressed = true;
                 Invalidate();
             }
@@ -219,6 +255,9 @@ namespace YamuiFramework.Controls {
         }
 
         protected override void OnMouseUp(MouseEventArgs e) {
+            if (IsPressed) {
+                OnButtonPressed(e);
+            }
             IsPressed = false;
             Invalidate();
             base.OnMouseUp(e);
@@ -234,26 +273,9 @@ namespace YamuiFramework.Controls {
         #endregion
 
         #endregion
-
-        #region Overridden Methods
-        protected override void OnEnabledChanged(EventArgs e) {
-            base.OnEnabledChanged(e);
-            Invalidate();
-        }
-        #endregion
-    }
-
-    public sealed class ButtonPressedEventArgs : EventArgs
-    {
-        public readonly object _buttonTag;
-
-        public ButtonPressedEventArgs(object buttonTag) {
-            _buttonTag = buttonTag;
-        }
     }
 
     internal class YamuiButtonDesigner : ControlDesigner {
-
         protected override void PreFilterProperties(IDictionary properties) {
             properties.Remove("ImeMode");
             properties.Remove("Padding");

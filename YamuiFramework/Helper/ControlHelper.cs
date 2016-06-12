@@ -1,21 +1,60 @@
-﻿using System;
+﻿#region header
+// ========================================================================
+// Copyright (c) 2016 - Julien Caillon (julien.caillon@gmail.com)
+// This file (ControlHelper.cs) is part of YamuiFramework.
+// 
+// YamuiFramework is a free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// YamuiFramework is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
+// ========================================================================
+#endregion
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace YamuiFramework.Native {
-    public class ControlHelper {
+namespace YamuiFramework.Helper {
 
+    internal static class ControlHelper {
+
+        /// <summary>
+        /// List all the controls children of "control" of type "type"
+        /// this is recursive, so it find them all
+        /// </summary>
+        /// <param name="control"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static IEnumerable<Control> GetAll(Control control, Type type) {
-            var controls = control.Controls.Cast<Control>();
-            return controls.SelectMany(ctrl => GetAll(ctrl, type)).Concat(controls).Where(c => c.GetType() == type);
+            try {
+                var controls = control.Controls.Cast<Control>();
+                var enumerable = controls as IList<Control> ?? controls.ToList();
+                return enumerable.SelectMany(ctrl => GetAll(ctrl, type)).Concat(enumerable).Where(c => c.GetType() == type);
+            } catch (Exception) {
+                return null;
+            }
         }
 
+        /// <summary>
+        /// Get the first control of the type type it can find
+        /// </summary>
+        /// <param name="control"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static Control GetFirst(Control control, Type type) {
-            foreach (var control1 in control.Controls) {
-                if (control1.GetType() == type) return (Control)control1;
+            try {
+                return control.Controls.Cast<object>().Where(control1 => control1.GetType() == type).Cast<Control>().FirstOrDefault();
+            } catch (Exception) {
+                return null;
             }
-            return null;
         }
     }
 }
