@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using YamuiFramework.Animations.Transitions;
 using YamuiFramework.Controls;
+using YamuiFramework.Controls.YamuiList;
 using YamuiFramework.Forms;
 using YamuiFramework.Helper;
 using YamuiFramework.Themes;
@@ -32,15 +33,6 @@ namespace YamuiDemoApp.Pages.control {
             t.add(yamuiButton5, "Text", (yamuiButton5.Text == @"What the hell???") ? "Holy molly" : "What the hell???");
             t.run();
         }
-
-        private void yamuiCharButton3_Click(object sender, EventArgs e) {
-            //var smk = new SmokeScreen(FindForm());
-            YamuiFormMessageBox.ShwDlg(Screen.PrimaryScreen, FindForm().Handle, MessageImage.Error, "Erreur", @"Wtf did you do you fool!?<br>This is a new line with <b>BOLD</b> stuff<br><br>WARNING	D:\Work\ProgressFiles\compiler\sc20sdan.w	?	?	?	214	lWARNING--le mot clé TRANSACTION est utilisé à l'intérieur du niveau réel de transaction. <br>WARNING	D:\Work\ProgressFiles\compiler\sc20sdan.w	?	?	?	214	lWARNING--le mot clé TRANSACTION est utilisé à l'intérieur du niveau réel de transaction.<br>WARNING	D:\Work\ProgressFiles\compiler\sc20sdan.w	?	?	?	214	lWARNING--le mot clé TRANSACTION est utilisé à l'intérieur du niveau réel de transaction.<br>WARNING	D:\Work\ProgressFiles\compiler\sc20sdan.w	?	?	?	214	lWARNING--le mot clé TRANSACTION est utilisé à l'intérieur du niveau réel de transaction.<br>WARNING	D:\Work\ProgressFiles\compiler\sc20sdan.w	?	?	?	214	lWARNING--le mot clé TRANSACTION est utilisé à l'intérieur du niveau réel de transaction.<br>WARNING	D:\Work\ProgressFiles\compiler\sc20sdan.w	?	?	?	214	lWARNING--le mot clé TRANSACTION est utilisé à l'intérieur du niveau réel de transaction.<br>WARNING	D:\Work\ProgressFiles\compiler\sc20sdan.w	?	?	?	214	lWARNING--le mot clé TRANSACTION est utilisé à l'intérieur du niveau réel de transaction.<br>WARNING	D:\Work\ProgressFiles\compiler\sc20sdan.w	?	?	?	214	lWARNING--le mot clé TRANSACTION est utilisé à l'intérieur du niveau réel de transaction.<br>WARNING	D:\Work\ProgressFiles\compiler\sc20sdan.w	?	?	?	214	lWARNING--le mot clé TRANSACTION est utilisé à l'intérieur du niveau réel de transaction.<br>WARNING	D:\Work\ProgressFiles\compiler\sc20sdan.w	?	?	?	214	lWARNING--le mot clé TRANSACTION est utilisé à l'intérieur du niveau réel de transaction.<a href='efzefzef'>test a link</a>", new List<string> { "fu", "ok" }, true, (o, args) => {
-                MessageBox.Show(args.Link);
-                var x = (YamuiFormMessageBox) o; x.Close();
-            });
-        }
-
         private void yamuiCharButton4_Click(object sender, EventArgs e) {
             // take a screenshot of the form and darken it:
             Bitmap bmp = new Bitmap(ClientRectangle.Width, ClientRectangle.Height);
@@ -79,24 +71,26 @@ namespace YamuiDemoApp.Pages.control {
         }
 
         private void yamuiCharButton1_Click(object sender, EventArgs e) {
-            var menu = new YamuiMenu(Cursor.Position, new List<YamuiMenuItem> {
+            var menu = new YamuiMenu();
+            menu.SpawnLocation = Cursor.Position;
+            menu.MenuList = new List<YamuiMenuItem> {
                 new YamuiMenuItem {
-                    ItemName = "zefefzefzef zedf item 1",
-                    Children = new List<YamuiMenuItem> {
-                        new YamuiMenuItem {ItemName = "child 1"}
+                    DisplayText = "zefefzefzef zedf item 1",
+                    Children = new List<FilteredTypeTreeListItem> {
+                        new YamuiMenuItem {DisplayText = "child 1"}
                     }
                 },
                 new YamuiMenuItem {
-                    ItemName = "item 2",
+                    DisplayText = "item 2",
                 },
                 new YamuiMenuItem {
-                    ItemName = "item 3",
-                    Children = new List<YamuiMenuItem> {
-                        new YamuiMenuItem {ItemName = "child 1"},
-                        new YamuiMenuItem {ItemName = "child 2"}
+                    DisplayText = "item 3",
+                    Children = new List<FilteredTypeTreeListItem> {
+                        new YamuiMenuItem {DisplayText = "child 1"},
+                        new YamuiMenuItem {DisplayText = "child 2"}
                     }
                 }
-            });
+            };
             menu.Show();
         }
 

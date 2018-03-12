@@ -7,7 +7,7 @@ using YamuiFramework.Controls;
 using YamuiFramework.Forms;
 
 namespace YamuiDemoApp {
-    public partial class Form1 : YamuiForm {
+    public partial class Form1 : YamuiMainAppli {
         public Form1() {
             InitializeComponent();
 
@@ -22,7 +22,9 @@ namespace YamuiDemoApp {
                     new YamuiSecMenu("yamuiTabSecAppearance", "yamuiTabSecAppearance", new Pages.SettingAppearance()),
                 }),
                 new YamuiMainMenu("Navigation", null, false, new List<YamuiSecMenu> {
-                    new YamuiSecMenu("Other", null, new Other()),
+                    new YamuiSecMenu("Other", null, new UserControl1()),
+                    new YamuiSecMenu("Other", null, new UserControl2()),
+                    new YamuiSecMenu("Other", null, new UserControl3()),
                 }),
             });
 
@@ -32,12 +34,9 @@ namespace YamuiDemoApp {
                         ShowPage("yamuiTabSecAppearance");
                         break;
                     case 1:
-                        var toastNotification = new YamuiNotifications("<img src='high_importance' />This is a notification test", 5);
+                        var toastNotification = new YamuiNotification("title", "<img src='high_importance' />This is a notification test", 5);
                         toastNotification.Show();
-                        var toastNotification2 = new YamuiNotifications("<img src='poison' />Can i display a link? <br><a href='plswork?'>yop</a>", 0);
-                        toastNotification2.LinkClicked += (o, args) => {
-                            MessageBox.Show(args.Link);
-                        };
+                        var toastNotification2 = new YamuiNotification("title", "<img src='poison' />Can i display a link? <br><a href='plswork?'>yop</a>", 0);
                         toastNotification2.Show();
                         break;
                     case 2:

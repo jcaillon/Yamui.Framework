@@ -12,7 +12,7 @@ namespace YamuiDemoApp {
 
     static class Program {
 
-        public static YamuiForm MainForm;
+        public static YamuiMainAppli MainForm;
 
         /// <summary>
         /// The main entry point for the application.

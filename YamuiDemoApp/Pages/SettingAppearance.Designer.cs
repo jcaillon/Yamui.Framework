@@ -26,15 +26,12 @@ namespace YamuiDemoApp.Pages {
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            this.yamuiScrollPage1 = new YamuiFramework.Controls.YamuiScrollPanel();
             this.comboTheme = new YamuiFramework.Controls.YamuiComboBox();
             this.yamuiComboBox3 = new YamuiFramework.Controls.YamuiComboBox();
             this.yamuiLabel22 = new YamuiFramework.Controls.YamuiLabel();
             this._simplePanelAccentColor = new YamuiFramework.Controls.YamuiSimplePanel();
             this.yamuiLabel21 = new YamuiFramework.Controls.YamuiLabel();
             this.yamuiLabel20 = new YamuiFramework.Controls.YamuiLabel();
-            this.yamuiScrollPage1.ContentPanel.SuspendLayout();
-            this.yamuiScrollPage1.SuspendLayout();
             this.SuspendLayout();
             // 
             // yamuiScrollPage1
@@ -42,26 +39,15 @@ namespace YamuiDemoApp.Pages {
             // 
             // yamuiScrollPage1.ContentPanel
             // 
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this.comboTheme);
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this.yamuiComboBox3);
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this.yamuiLabel22);
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this._simplePanelAccentColor);
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this.yamuiLabel21);
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this.yamuiLabel20);
-            this.yamuiScrollPage1.ContentPanel.Location = new System.Drawing.Point(0, 0);
-            this.yamuiScrollPage1.ContentPanel.Name = "ContentPanel";
-            this.yamuiScrollPage1.ContentPanel.OwnerPanel = this.yamuiScrollPage1;
-            this.yamuiScrollPage1.ContentPanel.Size = new System.Drawing.Size(715, 315);
-            this.yamuiScrollPage1.ContentPanel.TabIndex = 0;
-            this.yamuiScrollPage1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.yamuiScrollPage1.Location = new System.Drawing.Point(0, 0);
-            this.yamuiScrollPage1.Name = "yamuiScrollPage1";
-            this.yamuiScrollPage1.Size = new System.Drawing.Size(715, 315);
-            this.yamuiScrollPage1.TabIndex = 0;
+            this.Controls.Add(this.comboTheme);
+            this.Controls.Add(this.yamuiComboBox3);
+            this.Controls.Add(this.yamuiLabel22);
+            this.Controls.Add(this._simplePanelAccentColor);
+            this.Controls.Add(this.yamuiLabel21);
+            this.Controls.Add(this.yamuiLabel20);
             // 
             // comboTheme
             // 
-            this.comboTheme.ItemHeight = 15;
             this.comboTheme.Location = new System.Drawing.Point(0, 29);
             this.comboTheme.Name = "comboTheme";
             this.comboTheme.Size = new System.Drawing.Size(180, 21);
@@ -69,7 +55,6 @@ namespace YamuiDemoApp.Pages {
             // 
             // yamuiComboBox3
             // 
-            this.yamuiComboBox3.ItemHeight = 15;
             this.yamuiComboBox3.Location = new System.Drawing.Point(0, 256);
             this.yamuiComboBox3.Name = "yamuiComboBox3";
             this.yamuiComboBox3.Size = new System.Drawing.Size(121, 21);
@@ -118,21 +103,14 @@ namespace YamuiDemoApp.Pages {
             // 
             // SettingAppearance
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.yamuiScrollPage1);
             this.Name = "SettingAppearance";
             this.Size = new System.Drawing.Size(715, 315);
-            this.yamuiScrollPage1.ContentPanel.ResumeLayout(false);
-            this.yamuiScrollPage1.ContentPanel.PerformLayout();
-            this.yamuiScrollPage1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
 
         #endregion
-
-        private YamuiScrollPanel yamuiScrollPage1;
+        
         private YamuiComboBox comboTheme;
         private YamuiComboBox yamuiComboBox3;
         private YamuiLabel yamuiLabel22;

@@ -30,7 +30,6 @@ namespace YamuiDemoApp.Pages.control {
             this.htmlToolTip1 = new YamuiFramework.HtmlRenderer.WinForms.HtmlToolTip();
             this.yamuiTextBox1 = new YamuiFramework.Controls.YamuiTextBox();
             this.yamuiLabel18 = new YamuiFramework.Controls.YamuiLabel();
-            this.yamuiScrollPage1 = new YamuiFramework.Controls.YamuiScrollPanel();
             this.htmlPanel1 = new YamuiFramework.HtmlRenderer.WinForms.HtmlPanel();
             this.htmlLabel1 = new YamuiFramework.HtmlRenderer.WinForms.HtmlLabel();
             this.yamuiLabel15 = new YamuiFramework.Controls.YamuiLabel();
@@ -45,8 +44,6 @@ namespace YamuiDemoApp.Pages.control {
             this.yamuiTextBox4 = new YamuiFramework.Controls.YamuiTextBox();
             this.yamuiLabel13 = new YamuiFramework.Controls.YamuiLabel();
             this.yamuiTextBox5 = new YamuiFramework.Controls.YamuiTextBox();
-            this.yamuiScrollPage1.ContentPanel.SuspendLayout();
-            this.yamuiScrollPage1.SuspendLayout();
             this.SuspendLayout();
             // 
             // htmlToolTip1
@@ -54,13 +51,14 @@ namespace YamuiDemoApp.Pages.control {
             this.htmlToolTip1.AllowLinksHandling = true;
             this.htmlToolTip1.AutoPopDelay = 90000;
             this.htmlToolTip1.BaseStylesheet = null;
+            this.htmlToolTip1.InitialDelay = 300;
             this.htmlToolTip1.MaximumSize = new System.Drawing.Size(0, 0);
             this.htmlToolTip1.OwnerDraw = true;
             this.htmlToolTip1.ReshowDelay = 100;
-            this.htmlToolTip1.TooltipCssClass = "htmltooltip";
             // 
             // yamuiTextBox1
             // 
+            this.yamuiTextBox1.AllowDrop = true;
             this.yamuiTextBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.yamuiTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.yamuiTextBox1.CustomBackColor = System.Drawing.Color.Empty;
@@ -91,38 +89,27 @@ namespace YamuiDemoApp.Pages.control {
             // 
             // yamuiScrollPage1.ContentPanel
             // 
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this.htmlPanel1);
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this.htmlLabel1);
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this.yamuiLabel15);
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this.yamuiLink1);
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this.yamuiLink2);
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this.yamuiLabel12);
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this.yamuiLabel18);
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this.yamuiTextBox1);
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this.yamuiLabel17);
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this.yamuiTextBox2);
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this.yamuiLabel16);
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this.yamuiTextBox3);
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this.yamuiLabel14);
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this.yamuiTextBox4);
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this.yamuiLabel13);
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this.yamuiTextBox5);
-            this.yamuiScrollPage1.ContentPanel.Location = new System.Drawing.Point(0, 0);
-            this.yamuiScrollPage1.ContentPanel.Name = "ContentPanel";
-            this.yamuiScrollPage1.ContentPanel.OwnerPanel = this.yamuiScrollPage1;
-            this.yamuiScrollPage1.ContentPanel.Size = new System.Drawing.Size(709, 327);
-            this.yamuiScrollPage1.ContentPanel.TabIndex = 0;
-            this.yamuiScrollPage1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.yamuiScrollPage1.Location = new System.Drawing.Point(0, 0);
-            this.yamuiScrollPage1.Name = "yamuiScrollPage1";
-            this.yamuiScrollPage1.Size = new System.Drawing.Size(709, 327);
-            this.yamuiScrollPage1.TabIndex = 0;
+            this.Controls.Add(this.htmlPanel1);
+            this.Controls.Add(this.htmlLabel1);
+            this.Controls.Add(this.yamuiLabel15);
+            this.Controls.Add(this.yamuiLink1);
+            this.Controls.Add(this.yamuiLink2);
+            this.Controls.Add(this.yamuiLabel12);
+            this.Controls.Add(this.yamuiLabel18);
+            this.Controls.Add(this.yamuiTextBox1);
+            this.Controls.Add(this.yamuiLabel17);
+            this.Controls.Add(this.yamuiTextBox2);
+            this.Controls.Add(this.yamuiLabel16);
+            this.Controls.Add(this.yamuiTextBox3);
+            this.Controls.Add(this.yamuiLabel14);
+            this.Controls.Add(this.yamuiTextBox4);
+            this.Controls.Add(this.yamuiLabel13);
+            this.Controls.Add(this.yamuiTextBox5);
             // 
             // htmlPanel1
             // 
             this.htmlPanel1.AutoScroll = true;
-            this.htmlPanel1.AutoScrollMinSize = new System.Drawing.Size(338, 30);
-            this.htmlPanel1.BackColor = System.Drawing.Color.Transparent;
+            this.htmlPanel1.AutoScrollMinSize = new System.Drawing.Size(338, 46);
             this.htmlPanel1.BaseStylesheet = null;
             this.htmlPanel1.Location = new System.Drawing.Point(347, 80);
             this.htmlPanel1.Name = "htmlPanel1";
@@ -153,9 +140,15 @@ namespace YamuiDemoApp.Pages.control {
             // 
             // yamuiLink1
             // 
+            this.yamuiLink1.BackGrndImage = null;
             this.yamuiLink1.Function = YamuiFramework.Fonts.FontFunction.Link;
+            this.yamuiLink1.GreyScaleBackGrndImage = null;
+            this.yamuiLink1.IsFocused = false;
+            this.yamuiLink1.IsHovered = false;
+            this.yamuiLink1.IsPressed = false;
             this.yamuiLink1.Location = new System.Drawing.Point(203, 122);
             this.yamuiLink1.Name = "yamuiLink1";
+            this.yamuiLink1.SetImgSize = new System.Drawing.Size(0, 0);
             this.yamuiLink1.Size = new System.Drawing.Size(118, 23);
             this.yamuiLink1.TabIndex = 44;
             this.yamuiLink1.Text = "This is a classic link";
@@ -163,10 +156,16 @@ namespace YamuiDemoApp.Pages.control {
             // 
             // yamuiLink2
             // 
+            this.yamuiLink2.BackGrndImage = null;
             this.yamuiLink2.Enabled = false;
             this.yamuiLink2.Function = YamuiFramework.Fonts.FontFunction.Link;
+            this.yamuiLink2.GreyScaleBackGrndImage = null;
+            this.yamuiLink2.IsFocused = false;
+            this.yamuiLink2.IsHovered = false;
+            this.yamuiLink2.IsPressed = false;
             this.yamuiLink2.Location = new System.Drawing.Point(203, 143);
             this.yamuiLink2.Name = "yamuiLink2";
+            this.yamuiLink2.SetImgSize = new System.Drawing.Size(0, 0);
             this.yamuiLink2.Size = new System.Drawing.Size(118, 23);
             this.yamuiLink2.TabIndex = 45;
             this.yamuiLink2.Text = "This is a disabled link";
@@ -194,6 +193,7 @@ namespace YamuiDemoApp.Pages.control {
             // 
             // yamuiTextBox2
             // 
+            this.yamuiTextBox2.AllowDrop = true;
             this.yamuiTextBox2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.yamuiTextBox2.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.yamuiTextBox2.CustomBackColor = System.Drawing.Color.Empty;
@@ -220,6 +220,8 @@ namespace YamuiDemoApp.Pages.control {
             // 
             // yamuiTextBox3
             // 
+            this.yamuiTextBox3.AcceptsReturn = true;
+            this.yamuiTextBox3.AllowDrop = true;
             this.yamuiTextBox3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.yamuiTextBox3.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.yamuiTextBox3.CustomBackColor = System.Drawing.Color.Empty;
@@ -227,7 +229,7 @@ namespace YamuiDemoApp.Pages.control {
             this.yamuiTextBox3.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.yamuiTextBox3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
             this.yamuiTextBox3.Location = new System.Drawing.Point(0, 80);
-            this.yamuiTextBox3.MultiLines = true;
+            this.yamuiTextBox3.Multiline = true;
             this.yamuiTextBox3.Name = "yamuiTextBox3";
             this.yamuiTextBox3.Size = new System.Drawing.Size(157, 80);
             this.yamuiTextBox3.TabIndex = 36;
@@ -247,6 +249,7 @@ namespace YamuiDemoApp.Pages.control {
             // 
             // yamuiTextBox4
             // 
+            this.yamuiTextBox4.AllowDrop = true;
             this.yamuiTextBox4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.yamuiTextBox4.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.yamuiTextBox4.CustomBackColor = System.Drawing.Color.Empty;
@@ -274,6 +277,7 @@ namespace YamuiDemoApp.Pages.control {
             // 
             // yamuiTextBox5
             // 
+            this.yamuiTextBox5.AllowDrop = true;
             this.yamuiTextBox5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.yamuiTextBox5.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.yamuiTextBox5.CustomBackColor = System.Drawing.Color.Empty;
@@ -291,14 +295,8 @@ namespace YamuiDemoApp.Pages.control {
             // 
             // Text
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.yamuiScrollPage1);
             this.Name = "Text";
-            this.Size = new System.Drawing.Size(709, 327);
-            this.yamuiScrollPage1.ContentPanel.ResumeLayout(false);
-            this.yamuiScrollPage1.ContentPanel.PerformLayout();
-            this.yamuiScrollPage1.ResumeLayout(false);
+            this.Size = new System.Drawing.Size(692, 327);
             this.ResumeLayout(false);
 
         }
@@ -306,7 +304,6 @@ namespace YamuiDemoApp.Pages.control {
         #endregion
 
         private HtmlToolTip htmlToolTip1;
-        private YamuiScrollPanel yamuiScrollPage1;
         private HtmlPanel htmlPanel1;
         private HtmlLabel htmlLabel1;
         private YamuiLabel yamuiLabel15;

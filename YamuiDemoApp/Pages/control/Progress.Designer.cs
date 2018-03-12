@@ -27,7 +27,6 @@ namespace YamuiDemoApp.Pages.control {
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            this.yamuiScrollPage1 = new YamuiFramework.Controls.YamuiScrollPanel();
             this.yamuiProgressIndicator2 = new YamuiFramework.Controls.YamuiProgressIndicator();
             this.yamuiProgressIndicator1 = new YamuiFramework.Controls.YamuiProgressIndicator();
             this.yamuiLabel4 = new YamuiFramework.Controls.YamuiLabel();
@@ -36,8 +35,6 @@ namespace YamuiDemoApp.Pages.control {
             this.yamuiProgressBar2 = new YamuiFramework.Controls.YamuiProgressBar();
             this.yamuiLabel5 = new YamuiFramework.Controls.YamuiLabel();
             this.yamuiProgressBar3 = new YamuiFramework.Controls.YamuiProgressBar();
-            this.yamuiScrollPage1.ContentPanel.SuspendLayout();
-            this.yamuiScrollPage1.SuspendLayout();
             this.SuspendLayout();
             // 
             // yamuiScrollPage1
@@ -45,24 +42,14 @@ namespace YamuiDemoApp.Pages.control {
             // 
             // yamuiScrollPage1.ContentPanel
             // 
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this.yamuiProgressIndicator2);
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this.yamuiProgressIndicator1);
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this.yamuiLabel4);
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this.yamuiLabel9);
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this.yamuiProgressBar1);
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this.yamuiProgressBar2);
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this.yamuiLabel5);
-            this.yamuiScrollPage1.ContentPanel.Controls.Add(this.yamuiProgressBar3);
-            this.yamuiScrollPage1.ContentPanel.Location = new System.Drawing.Point(0, 0);
-            this.yamuiScrollPage1.ContentPanel.Name = "ContentPanel";
-            this.yamuiScrollPage1.ContentPanel.OwnerPanel = this.yamuiScrollPage1;
-            this.yamuiScrollPage1.ContentPanel.Size = new System.Drawing.Size(715, 315);
-            this.yamuiScrollPage1.ContentPanel.TabIndex = 0;
-            this.yamuiScrollPage1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.yamuiScrollPage1.Location = new System.Drawing.Point(0, 0);
-            this.yamuiScrollPage1.Name = "yamuiScrollPage1";
-            this.yamuiScrollPage1.Size = new System.Drawing.Size(715, 315);
-            this.yamuiScrollPage1.TabIndex = 0;
+            this.Controls.Add(this.yamuiProgressIndicator2);
+            this.Controls.Add(this.yamuiProgressIndicator1);
+            this.Controls.Add(this.yamuiLabel4);
+            this.Controls.Add(this.yamuiLabel9);
+            this.Controls.Add(this.yamuiProgressBar1);
+            this.Controls.Add(this.yamuiProgressBar2);
+            this.Controls.Add(this.yamuiLabel5);
+            this.Controls.Add(this.yamuiProgressBar3);
             // 
             // yamuiProgressIndicator2
             // 
@@ -78,7 +65,6 @@ namespace YamuiDemoApp.Pages.control {
             // yamuiProgressIndicator1
             // 
             this.yamuiProgressIndicator1.AnimateInterval = 300;
-            this.yamuiProgressIndicator1.BackColor = System.Drawing.Color.Transparent;
             this.yamuiProgressIndicator1.CircleCount = 6;
             this.yamuiProgressIndicator1.CircleDiameter = 15;
             this.yamuiProgressIndicator1.Location = new System.Drawing.Point(470, 213);
@@ -152,21 +138,14 @@ namespace YamuiDemoApp.Pages.control {
             // 
             // Progress
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.yamuiScrollPage1);
             this.Name = "Progress";
             this.Size = new System.Drawing.Size(715, 315);
-            this.yamuiScrollPage1.ContentPanel.ResumeLayout(false);
-            this.yamuiScrollPage1.ContentPanel.PerformLayout();
-            this.yamuiScrollPage1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
 
         #endregion
-
-        private YamuiScrollPanel yamuiScrollPage1;
+        
         private YamuiProgressIndicator yamuiProgressIndicator2;
         private YamuiProgressIndicator yamuiProgressIndicator1;
         private YamuiLabel yamuiLabel4;

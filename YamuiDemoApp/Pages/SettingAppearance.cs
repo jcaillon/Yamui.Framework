@@ -59,8 +59,8 @@ namespace YamuiDemoApp.Pages {
             }
 
             // themes comob box
-            comboTheme.DataSource = YamuiThemeManager.GetThemesList().Select(theme => theme.ThemeName).ToList();
-            comboTheme.SelectedIndex = YamuiThemeManager.GetThemesList().IndexOf(YamuiThemeManager.Current);
+            comboTheme.DataSource = YamuiThemeManager.GetThemesList.Select(theme => theme.ThemeName).ToList();
+            comboTheme.SelectedIndex = YamuiThemeManager.GetThemesList.IndexOf(YamuiThemeManager.Current);
 
             comboTheme.SelectedIndexChanged += ComboThemeOnSelectedIndexChanged;
         }
@@ -72,7 +72,7 @@ namespace YamuiDemoApp.Pages {
         /// <param name="eventArgs"></param>
         private void ComboThemeOnSelectedIndexChanged(object sender, EventArgs eventArgs) {
             try {
-                YamuiThemeManager.Current = YamuiThemeManager.GetThemesList()[comboTheme.SelectedIndex];
+                YamuiThemeManager.Current = YamuiThemeManager.GetThemesList[comboTheme.SelectedIndex];
                 YamuiThemeManager.Current.AccentColor = YamuiThemeManager.Current.ThemeAccentColor;
                 _checkButton.Checked = false;
             } catch (Exception) {
