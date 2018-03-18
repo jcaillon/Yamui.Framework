@@ -34,29 +34,22 @@ namespace YamuiDemoApp.Pages.control {
             this.yamuiTrackBar2 = new YamuiFramework.Controls.YamuiSlider();
             this.SuspendLayout();
             // 
-            // yamuiScrollPage1
-            // 
-            // 
-            // yamuiScrollPage1.ContentPanel
-            // 
-            this.Controls.Add(this.yamuiComboBox2);
-            this.Controls.Add(this.yamuiLabel11);
-            this.Controls.Add(this.yamuiComboBox1);
-            this.Controls.Add(this.yamuiLabel7);
-            this.Controls.Add(this.yamuiTrackBar1);
-            this.Controls.Add(this.yamuiTrackBar2);
-            // 
             // yamuiComboBox2
             // 
+            this.yamuiComboBox2.BackGrndImage = null;
             this.yamuiComboBox2.Enabled = false;
+            this.yamuiComboBox2.GreyScaleBackGrndImage = null;
+            this.yamuiComboBox2.IsFocused = false;
+            this.yamuiComboBox2.IsHovered = false;
+            this.yamuiComboBox2.IsPressed = false;
             this.yamuiComboBox2.Location = new System.Drawing.Point(0, 140);
             this.yamuiComboBox2.Name = "yamuiComboBox2";
+            this.yamuiComboBox2.SetImgSize = new System.Drawing.Size(0, 0);
             this.yamuiComboBox2.Size = new System.Drawing.Size(121, 21);
             this.yamuiComboBox2.TabIndex = 27;
             // 
             // yamuiLabel11
             // 
-            this.yamuiLabel11.AutoSize = true;
             this.yamuiLabel11.Function = YamuiFramework.Fonts.FontFunction.Heading;
             this.yamuiLabel11.Location = new System.Drawing.Point(0, 87);
             this.yamuiLabel11.Margin = new System.Windows.Forms.Padding(5, 18, 5, 7);
@@ -67,30 +60,21 @@ namespace YamuiDemoApp.Pages.control {
             // 
             // yamuiComboBox1
             // 
-            this.yamuiComboBox1.DataSource = new string[] {
-                "test1",
-                "test2",
-                "test1",
-                "test2",
-                "test1",
-                "test2",
-                "test1",
-                "test20",
-                "test21",
-                "test22",
-                "test1",
-                "test2",
-                "test1",
-                "test2"};
+            this.yamuiComboBox1.BackGrndImage = null;
+            this.yamuiComboBox1.GreyScaleBackGrndImage = null;
+            this.yamuiComboBox1.IsFocused = false;
+            this.yamuiComboBox1.IsHovered = false;
+            this.yamuiComboBox1.IsPressed = false;
             this.yamuiComboBox1.Location = new System.Drawing.Point(0, 109);
             this.yamuiComboBox1.Name = "yamuiComboBox1";
+            this.yamuiComboBox1.SetImgSize = new System.Drawing.Size(0, 0);
             this.yamuiComboBox1.Size = new System.Drawing.Size(121, 21);
             this.yamuiComboBox1.TabIndex = 26;
+            this.yamuiComboBox1.Text = "test1";
             this.yamuiComboBox1.WaterMark = "Water mark !";
             // 
             // yamuiLabel7
             // 
-            this.yamuiLabel7.AutoSize = true;
             this.yamuiLabel7.Function = YamuiFramework.Fonts.FontFunction.Heading;
             this.yamuiLabel7.Location = new System.Drawing.Point(0, 0);
             this.yamuiLabel7.Margin = new System.Windows.Forms.Padding(5, 18, 5, 7);
@@ -103,7 +87,7 @@ namespace YamuiDemoApp.Pages.control {
             // 
             this.yamuiTrackBar1.Location = new System.Drawing.Point(0, 22);
             this.yamuiTrackBar1.Name = "yamuiTrackBar1";
-            this.yamuiTrackBar1.Size = new System.Drawing.Size(191, 23);
+            this.yamuiTrackBar1.Size = new System.Drawing.Size(212, 23);
             this.yamuiTrackBar1.TabIndex = 23;
             this.yamuiTrackBar1.Text = "yamuiTrackBar1";
             // 
@@ -118,9 +102,17 @@ namespace YamuiDemoApp.Pages.control {
             // 
             // ItemControl
             // 
+            this.AutoScrollMinSize = new System.Drawing.Size(-503, -154);
+            this.Controls.Add(this.yamuiComboBox2);
+            this.Controls.Add(this.yamuiLabel11);
+            this.Controls.Add(this.yamuiComboBox1);
+            this.Controls.Add(this.yamuiLabel7);
+            this.Controls.Add(this.yamuiTrackBar1);
+            this.Controls.Add(this.yamuiTrackBar2);
             this.Name = "ItemControl";
             this.Size = new System.Drawing.Size(715, 315);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 

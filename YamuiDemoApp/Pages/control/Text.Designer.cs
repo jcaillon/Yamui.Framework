@@ -108,8 +108,6 @@ namespace YamuiDemoApp.Pages.control {
             // 
             // htmlPanel1
             // 
-            this.htmlPanel1.AutoScroll = true;
-            this.htmlPanel1.AutoScrollMinSize = new System.Drawing.Size(338, 46);
             this.htmlPanel1.BaseStylesheet = null;
             this.htmlPanel1.Location = new System.Drawing.Point(347, 80);
             this.htmlPanel1.Name = "htmlPanel1";

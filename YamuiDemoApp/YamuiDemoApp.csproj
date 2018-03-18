@@ -97,6 +97,9 @@
     <Compile Include="Pages\Navigation\UserControl1.Designer.cs">
       <DependentUpon>UserControl1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Pages\Navigation\ScrollPanelTest.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Pages\SettingAppearance.cs">
       <SubType>UserControl</SubType>
     </Compile>
