@@ -121,20 +121,17 @@ namespace YamuiDemoApp.Pages.Navigation {
 
         #endregion
 
-        #region Handle windows messages
-
-        //[DebuggerStepThrough]
-        [SecuritySafeCritical]
-        protected override void WndProc(ref Message message) {
-            VerticalScroll.HandleWindowsProc(message);
-            HorizontalScroll.HandleWindowsProc(message);
-            base.WndProc(ref message);
+        #region handle windows events
+        
+        /// <summary>
+        /// Handle keydown
+        /// </summary>
+        protected override void OnKeyDown(KeyEventArgs e) {
+            e.Handled = HorizontalScroll.HandleKeyDown(e) || VerticalScroll.HandleKeyDown(e);
+            if (!e.Handled)
+                base.OnKeyDown(e);
         }
-        
-        #endregion
 
-        #region core
-        
         /// <summary>
         /// redirect all input key to keydown
         /// </summary>
@@ -142,14 +139,52 @@ namespace YamuiDemoApp.Pages.Navigation {
             e.IsInputKey = true;
             base.OnPreviewKeyDown(e);
         }
-        
+
         /// <summary>
-        /// Set focus on the control for keyboard scrollbars handling
+        /// Handle mouse wheel
         /// </summary>
-        protected override void OnClick(EventArgs e) {
-            base.OnClick(e);
-            Focus();
+        protected override void OnMouseWheel(MouseEventArgs e) {
+            if (HorizontalScroll.IsActive) {
+                HorizontalScroll.HandleScroll(e);
+            } else {
+                VerticalScroll.HandleScroll(e);
+            }
+            base.OnMouseWheel(e);
         }
+
+        protected override void OnMouseDown(MouseEventArgs e) {
+            HorizontalScroll.HandleMouseDown(e);
+            VerticalScroll.HandleMouseDown(e);
+            Focus();
+            base.OnMouseDown(e);
+        }
+
+        protected override void OnMouseUp(MouseEventArgs e) {
+            HorizontalScroll.HandleMouseUp(e);
+            VerticalScroll.HandleMouseUp(e);
+            base.OnMouseUp(e);
+        }
+
+        protected override void OnMouseMove(MouseEventArgs e) {
+            HorizontalScroll.HandleMouseMove(e);
+            VerticalScroll.HandleMouseMove(e);
+            base.OnMouseMove(e);
+        }
+
+        /// <summary>
+        /// Programatically triggers the OnKeyDown event
+        /// </summary>
+        public bool PerformKeyDown(KeyEventArgs e) {
+            OnKeyDown(e);
+            return e.Handled;
+        }
+        
+        protected override void OnResize(EventArgs e) {
+            HorizontalScroll.UpdateLength(HorizontalScroll.LengthToRepresent, HorizontalScroll.LengthAvailable);
+            VerticalScroll.UpdateLength(VerticalScroll.LengthToRepresent, VerticalScroll.LengthAvailable);
+            base.OnResize(e);
+        }
+
 
         /// <summary>
         /// Correct original padding as we need extra space for the scrollbars

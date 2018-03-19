@@ -28,12 +28,13 @@ namespace YamuiDemoApp.Pages.Navigation
            scrollPanelTest1.VerticalScroll.UpdateLength(100, 10);
            scrollPanelTest1.VerticalScroll.SmallChange = 1;
            scrollPanelTest1.VerticalScroll.LargeChange = 5;
+           scrollPanelTest1.VerticalScroll.ExtraEndPadding = 15;
            scrollPanelTest1.VerticalScroll.OnValueChange += (simple, i, j) => { yamuiLabel1.Text = j.ToString(); };      
            
            scrollPanelTest1.HorizontalScroll.UpdateLength(100, 10);
            scrollPanelTest1.HorizontalScroll.SmallChange = 1;
            scrollPanelTest1.HorizontalScroll.LargeChange = 5;
-           scrollPanelTest1.HorizontalScroll.Padding = new Padding(0, 0, 15, 0);
+           scrollPanelTest1.HorizontalScroll.ExtraEndPadding = 15;
            scrollPanelTest1.HorizontalScroll.OnValueChange += (simple, i, j) => { yamuiLabel1.Text = j.ToString(); };
             
         }

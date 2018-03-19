@@ -42,21 +42,24 @@
             // 
             // scrollPanelTest1
             // 
+            this.scrollPanelTest1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.scrollPanelTest1.AutoScrollMinSize = new System.Drawing.Size(0, 0);
             this.scrollPanelTest1.AutoScrollPosition = new System.Drawing.Point(0, 0);
             this.scrollPanelTest1.Location = new System.Drawing.Point(4, 4);
             this.scrollPanelTest1.Name = "scrollPanelTest1";
-            this.scrollPanelTest1.Size = new System.Drawing.Size(374, 164);
+            this.scrollPanelTest1.Size = new System.Drawing.Size(349, 16);
             this.scrollPanelTest1.TabIndex = 3;
             this.scrollPanelTest1.Text = "scrollPanelTest1";
             // 
             // UserControl1
             // 
-            this.AutoScrollMinSize = new System.Drawing.Size(-509, -1092);
+            this.AutoScrollMinSize = new System.Drawing.Size(0, -332);
             this.Controls.Add(this.scrollPanelTest1);
             this.Controls.Add(this.yamuiLabel1);
             this.Name = "UserControl1";
-            this.Size = new System.Drawing.Size(509, 1092);
+            this.Size = new System.Drawing.Size(509, 332);
             this.ResumeLayout(false);
 
         }
