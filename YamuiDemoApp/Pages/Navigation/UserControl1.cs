@@ -22,7 +22,7 @@ namespace YamuiDemoApp.Pages.Navigation
                 sb.Append(i + "<br>");
             }
 
-            //htmlLabel1.Text = sb.ToString();
+            htmlLabel1.Text = sb.ToString();
             
 
            scrollPanelTest1.VerticalScroll.UpdateLength(100, 10);

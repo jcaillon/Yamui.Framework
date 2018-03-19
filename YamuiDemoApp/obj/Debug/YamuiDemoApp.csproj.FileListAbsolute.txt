@@ -101,7 +101,6 @@ C:\Work\3P\YamuiDemoApp\bin\Debug\ObjectListView.xml
 C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.csproj.CoreCompileInputs.cache
 C:\Work\YamuiFramework\YamuiDemoApp\bin\Debug\YamuiDemoApp.exe.config
 C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.Pages.Navigation.UserControl1.resources
-C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.Pages.Navigation.UserControl2.resources
 C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.Pages.Navigation.UserControl3.resources
 D:\Repo\YamuiFramework\YamuiDemoApp\bin\Debug\YamuiDemoApp.exe.config
 D:\Repo\YamuiFramework\YamuiDemoApp\bin\Debug\YamuiDemoApp.exe

@@ -104,7 +104,6 @@
             // 
             // yamuiLabel14
             // 
-            this.yamuiLabel14.AutoSize = true;
             this.yamuiLabel14.Location = new System.Drawing.Point(150, 385);
             this.yamuiLabel14.Name = "yamuiLabel14";
             this.yamuiLabel14.Size = new System.Drawing.Size(80, 15);
@@ -143,7 +142,6 @@
             // 
             // yamuiLabel13
             // 
-            this.yamuiLabel13.AutoSize = true;
             this.yamuiLabel13.Location = new System.Drawing.Point(150, 356);
             this.yamuiLabel13.Name = "yamuiLabel13";
             this.yamuiLabel13.Size = new System.Drawing.Size(80, 15);
@@ -182,7 +180,6 @@
             // 
             // yamuiLabel12
             // 
-            this.yamuiLabel12.AutoSize = true;
             this.yamuiLabel12.Location = new System.Drawing.Point(150, 327);
             this.yamuiLabel12.Name = "yamuiLabel12";
             this.yamuiLabel12.Size = new System.Drawing.Size(80, 15);
@@ -221,7 +218,6 @@
             // 
             // yamuiLabel11
             // 
-            this.yamuiLabel11.AutoSize = true;
             this.yamuiLabel11.Location = new System.Drawing.Point(147, 298);
             this.yamuiLabel11.Name = "yamuiLabel11";
             this.yamuiLabel11.Size = new System.Drawing.Size(80, 15);
@@ -260,7 +256,6 @@
             // 
             // yamuiLabel10
             // 
-            this.yamuiLabel10.AutoSize = true;
             this.yamuiLabel10.Location = new System.Drawing.Point(150, 269);
             this.yamuiLabel10.Name = "yamuiLabel10";
             this.yamuiLabel10.Size = new System.Drawing.Size(80, 15);
@@ -299,7 +294,6 @@
             // 
             // yamuiLabel9
             // 
-            this.yamuiLabel9.AutoSize = true;
             this.yamuiLabel9.Location = new System.Drawing.Point(150, 240);
             this.yamuiLabel9.Name = "yamuiLabel9";
             this.yamuiLabel9.Size = new System.Drawing.Size(74, 15);
@@ -338,7 +332,6 @@
             // 
             // yamuiLabel8
             // 
-            this.yamuiLabel8.AutoSize = true;
             this.yamuiLabel8.Location = new System.Drawing.Point(150, 211);
             this.yamuiLabel8.Name = "yamuiLabel8";
             this.yamuiLabel8.Size = new System.Drawing.Size(74, 15);
@@ -377,7 +370,6 @@
             // 
             // yamuiLabel7
             // 
-            this.yamuiLabel7.AutoSize = true;
             this.yamuiLabel7.Location = new System.Drawing.Point(150, 182);
             this.yamuiLabel7.Name = "yamuiLabel7";
             this.yamuiLabel7.Size = new System.Drawing.Size(74, 15);
@@ -416,7 +408,6 @@
             // 
             // yamuiLabel6
             // 
-            this.yamuiLabel6.AutoSize = true;
             this.yamuiLabel6.Location = new System.Drawing.Point(150, 153);
             this.yamuiLabel6.Name = "yamuiLabel6";
             this.yamuiLabel6.Size = new System.Drawing.Size(74, 15);
@@ -455,7 +446,6 @@
             // 
             // yamuiLabel5
             // 
-            this.yamuiLabel5.AutoSize = true;
             this.yamuiLabel5.Location = new System.Drawing.Point(150, 124);
             this.yamuiLabel5.Name = "yamuiLabel5";
             this.yamuiLabel5.Size = new System.Drawing.Size(74, 15);
@@ -494,7 +484,6 @@
             // 
             // yamuiLabel4
             // 
-            this.yamuiLabel4.AutoSize = true;
             this.yamuiLabel4.Location = new System.Drawing.Point(150, 95);
             this.yamuiLabel4.Name = "yamuiLabel4";
             this.yamuiLabel4.Size = new System.Drawing.Size(74, 15);
@@ -533,7 +522,6 @@
             // 
             // yamuiLabel3
             // 
-            this.yamuiLabel3.AutoSize = true;
             this.yamuiLabel3.Location = new System.Drawing.Point(150, 66);
             this.yamuiLabel3.Name = "yamuiLabel3";
             this.yamuiLabel3.Size = new System.Drawing.Size(74, 15);
@@ -572,7 +560,6 @@
             // 
             // yamuiLabel2
             // 
-            this.yamuiLabel2.AutoSize = true;
             this.yamuiLabel2.Location = new System.Drawing.Point(150, 37);
             this.yamuiLabel2.Name = "yamuiLabel2";
             this.yamuiLabel2.Size = new System.Drawing.Size(74, 15);
@@ -604,14 +591,13 @@
             this.yamuiTextBox1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
             this.yamuiTextBox1.Location = new System.Drawing.Point(231, 9);
             this.yamuiTextBox1.Name = "yamuiTextBox1";
-            this.yamuiTextBox1.Size = new System.Drawing.Size(351, 20);
+            this.yamuiTextBox1.Size = new System.Drawing.Size(768, 20);
             this.yamuiTextBox1.TabIndex = 87;
             this.yamuiTextBox1.Text = "yamuiTextBox1";
             this.yamuiTextBox1.WaterMark = null;
             // 
             // yamuiLabel1
             // 
-            this.yamuiLabel1.AutoSize = true;
             this.yamuiLabel1.Location = new System.Drawing.Point(150, 8);
             this.yamuiLabel1.Name = "yamuiLabel1";
             this.yamuiLabel1.Size = new System.Drawing.Size(74, 15);
@@ -678,7 +664,7 @@
             this.Controls.Add(this.yamuiLabel1);
             this.Controls.Add(this.yamuiButton1);
             this.Name = "UserControl3";
-            this.Size = new System.Drawing.Size(631, 1128);
+            this.Size = new System.Drawing.Size(1017, 1128);
             this.ResumeLayout(false);
             this.PerformLayout();
 

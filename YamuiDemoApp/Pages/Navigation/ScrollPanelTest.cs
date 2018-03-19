@@ -23,9 +23,9 @@
 using System;
 using System.ComponentModel;
 using System.Drawing;
-using System.Security;
 using System.Windows.Forms;
 using YamuiFramework.Controls;
+using YamuiFramework.Helper;
 
 namespace YamuiDemoApp.Pages.Navigation {
     
@@ -122,7 +122,23 @@ namespace YamuiDemoApp.Pages.Navigation {
         #endregion
 
         #region handle windows events
-        
+
+        protected override void WndProc(ref Message m) {
+            switch (m.Msg) {
+                case (int) WinApi.Messages.WM_MOUSEWHEEL:
+                    // delta negative when scrolling up
+                    // delta negative when scrolling up
+                    var delta = (short) (m.WParam.ToInt64() >> 16);
+                    if (HorizontalScroll.IsHovered) {
+                        HorizontalScroll.HandleScroll(new MouseEventArgs(MouseButtons.Left, 0, 0, 0, delta));
+                    } else {
+                        VerticalScroll.HandleScroll(new MouseEventArgs(MouseButtons.Left, 0, 0, 0, delta));
+                    }
+                    return;
+            }
+            base.WndProc(ref m);
+        }
+
         /// <summary>
         /// Handle keydown
         /// </summary>
@@ -144,7 +160,7 @@ namespace YamuiDemoApp.Pages.Navigation {
         /// Handle mouse wheel
         /// </summary>
         protected override void OnMouseWheel(MouseEventArgs e) {
-            if (HorizontalScroll.IsActive) {
+            if (HorizontalScroll.IsHovered) {
                 HorizontalScroll.HandleScroll(e);
             } else {
                 VerticalScroll.HandleScroll(e);
@@ -171,6 +187,12 @@ namespace YamuiDemoApp.Pages.Navigation {
             base.OnMouseMove(e);
         }
 
+        protected override void OnMouseLeave(EventArgs e) {
+            HorizontalScroll.HandleMouseLeave(e);
+            VerticalScroll.HandleMouseLeave(e);
+            base.OnMouseLeave(e);
+        }
+
         /// <summary>
         /// Programatically triggers the OnKeyDown event
         /// </summary>
@@ -185,6 +207,9 @@ namespace YamuiDemoApp.Pages.Navigation {
             base.OnResize(e);
         }
 
+        #endregion
+
+        #region misc
 
         /// <summary>
         /// Correct original padding as we need extra space for the scrollbars

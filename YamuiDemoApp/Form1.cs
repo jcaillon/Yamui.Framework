@@ -23,7 +23,6 @@ namespace YamuiDemoApp {
                 }),
                 new YamuiMainMenu("Navigation", null, false, new List<YamuiSecMenu> {
                     new YamuiSecMenu("Other", null, new UserControl1()),
-                    new YamuiSecMenu("Other", null, new UserControl2()),
                     new YamuiSecMenu("Other", null, new UserControl3()),
                 }),
             });

@@ -85,12 +85,6 @@
     <Compile Include="Pages\Navigation\UserControl3.Designer.cs">
       <DependentUpon>UserControl3.cs</DependentUpon>
     </Compile>
-    <Compile Include="Pages\Navigation\UserControl2.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Pages\Navigation\UserControl2.Designer.cs">
-      <DependentUpon>UserControl2.cs</DependentUpon>
-    </Compile>
     <Compile Include="Pages\Navigation\UserControl1.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -131,9 +125,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Pages\Navigation\UserControl3.resx">
       <DependentUpon>UserControl3.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Pages\Navigation\UserControl2.resx">
-      <DependentUpon>UserControl2.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Pages\Navigation\UserControl1.resx">
       <DependentUpon>UserControl1.cs</DependentUpon>

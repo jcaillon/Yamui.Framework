@@ -30,11 +30,12 @@
         {
             this.yamuiLabel1 = new YamuiFramework.Controls.YamuiLabel();
             this.scrollPanelTest1 = new YamuiDemoApp.Pages.Navigation.ScrollPanelTest();
+            this.htmlLabel1 = new YamuiFramework.HtmlRenderer.WinForms.HtmlLabel();
             this.SuspendLayout();
             // 
             // yamuiLabel1
             // 
-            this.yamuiLabel1.Location = new System.Drawing.Point(408, 74);
+            this.yamuiLabel1.Location = new System.Drawing.Point(394, 24);
             this.yamuiLabel1.Name = "yamuiLabel1";
             this.yamuiLabel1.Size = new System.Drawing.Size(75, 23);
             this.yamuiLabel1.TabIndex = 2;
@@ -42,30 +43,43 @@
             // 
             // scrollPanelTest1
             // 
-            this.scrollPanelTest1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.scrollPanelTest1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.scrollPanelTest1.AutoScrollMinSize = new System.Drawing.Size(0, 0);
             this.scrollPanelTest1.AutoScrollPosition = new System.Drawing.Point(0, 0);
             this.scrollPanelTest1.Location = new System.Drawing.Point(4, 4);
             this.scrollPanelTest1.Name = "scrollPanelTest1";
-            this.scrollPanelTest1.Size = new System.Drawing.Size(349, 16);
+            this.scrollPanelTest1.Size = new System.Drawing.Size(349, 102);
             this.scrollPanelTest1.TabIndex = 3;
             this.scrollPanelTest1.Text = "scrollPanelTest1";
             // 
+            // htmlLabel1
+            // 
+            this.htmlLabel1.BackColor = System.Drawing.SystemColors.Window;
+            this.htmlLabel1.BaseStylesheet = null;
+            this.htmlLabel1.Location = new System.Drawing.Point(14, 299);
+            this.htmlLabel1.Name = "htmlLabel1";
+            this.htmlLabel1.Size = new System.Drawing.Size(59, 15);
+            this.htmlLabel1.TabIndex = 4;
+            this.htmlLabel1.TabStop = false;
+            this.htmlLabel1.Text = "htmlLabel1";
+            // 
             // UserControl1
             // 
-            this.AutoScrollMinSize = new System.Drawing.Size(0, -332);
+            this.AutoScrollMinSize = new System.Drawing.Size(0, -18);
+            this.Controls.Add(this.htmlLabel1);
             this.Controls.Add(this.scrollPanelTest1);
             this.Controls.Add(this.yamuiLabel1);
             this.Name = "UserControl1";
             this.Size = new System.Drawing.Size(509, 332);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
         private YamuiFramework.Controls.YamuiLabel yamuiLabel1;
         private ScrollPanelTest scrollPanelTest1;
+        private YamuiFramework.HtmlRenderer.WinForms.HtmlLabel htmlLabel1;
     }
 }
