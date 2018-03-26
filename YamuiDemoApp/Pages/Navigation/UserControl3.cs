@@ -13,10 +13,8 @@ namespace YamuiDemoApp.Pages.Navigation
 {
     public partial class UserControl3 : YamuiPage
     {
-        public UserControl3()
-        {
+        public UserControl3() {
             InitializeComponent();
-            htmlLabel1.Text = "zefze<br>zefze<br>zefze<br>zefze<br>zefze<br>zefze<br>zefze<br>zefze<br>zefze<br>zefze<br>end";
         }
 
         private void yamuiScrollPanel1_Click(object sender, EventArgs e)

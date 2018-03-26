@@ -123,3 +123,4 @@ D:\Repo\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.csproj.GenerateResour
 D:\Repo\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.csproj.CoreCompileInputs.cache
 D:\Repo\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.exe
 D:\Repo\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.pdb
+C:\Work\YamuiFramework\YamuiDemoApp\obj\Debug\YamuiDemoApp.csproj.CopyComplete

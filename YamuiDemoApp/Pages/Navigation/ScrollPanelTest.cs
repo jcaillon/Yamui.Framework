@@ -33,20 +33,6 @@ namespace YamuiDemoApp.Pages.Navigation {
 
         #region fields
 
-        [DefaultValue(false)]
-        [Category("Yamui")]
-        public bool NoBackgroundImage { get; set; }
-
-        /*
-        [DefaultValue(2)]
-        [Category("Yamui")]
-        public int ThumbPadding { get; set; }
-
-        [DefaultValue(10)]
-        [Category("Yamui")]
-        public int ScrollBarWidth { get; set; }
-        */
-
         [Browsable(false)]
         public YamuiScrollHandler VerticalScroll { get; }
         
@@ -188,8 +174,8 @@ namespace YamuiDemoApp.Pages.Navigation {
         }
 
         protected override void OnMouseLeave(EventArgs e) {
-            HorizontalScroll.HandleMouseLeave(e);
-            VerticalScroll.HandleMouseLeave(e);
+            HorizontalScroll.HandleMouseLeave();
+            VerticalScroll.HandleMouseLeave();
             base.OnMouseLeave(e);
         }
 
@@ -202,78 +188,9 @@ namespace YamuiDemoApp.Pages.Navigation {
         }
         
         protected override void OnResize(EventArgs e) {
-            HorizontalScroll.UpdateLength(HorizontalScroll.LengthToRepresent, HorizontalScroll.LengthAvailable);
-            VerticalScroll.UpdateLength(VerticalScroll.LengthToRepresent, VerticalScroll.LengthAvailable);
+            VerticalScroll.UpdateLength(VerticalScroll.LengthToRepresent, VerticalScroll.LengthAvailable, Height, Width);
+            HorizontalScroll.UpdateLength(HorizontalScroll.LengthToRepresent, HorizontalScroll.LengthAvailable, Width, Height);
             base.OnResize(e);
-        }
-
-        #endregion
-
-        #region misc
-
-        /// <summary>
-        /// Correct original padding as we need extra space for the scrollbars
-        /// </summary>
-        public new Padding Padding {
-            get {
-                var basePadding = base.Padding;
-                if (!DesignMode) {
-                    if (HorizontalScroll.HasScroll) {
-                        basePadding.Bottom = basePadding.Bottom + HorizontalScroll.BarThickness;
-                    }
-
-                    if (VerticalScroll.HasScroll) {
-                        basePadding.Right = basePadding.Right + VerticalScroll.BarThickness;
-                    }
-                }
-                return basePadding;
-            }
-            set {
-                base.Padding = value;
-            }
-        }
-
-        /// <summary>
-        /// Very important to display the correct scroll value when coming back to a scrolled panel.
-        /// Try without it and watch for yourself
-        /// </summary>
-        public override Rectangle DisplayRectangle {
-            get {
-                Rectangle rect = ClientRectangle;
-                if (VerticalScroll.HasScroll)
-                    rect.Y = -VerticalScroll.Value;
-                    rect.Width -= HorizontalScroll.BarThickness;
-                if (HorizontalScroll.HasScroll) {
-                    rect.X = -HorizontalScroll.Value;
-                    rect.Height -= VerticalScroll.BarThickness;
-                }
-                return rect;
-            }
-        }
-
-        [Browsable(false)]
-        public Point AutoScrollPosition {
-            get { return new Point(HorizontalScroll.HasScroll ? HorizontalScroll.Value : 0, VerticalScroll.HasScroll ? VerticalScroll.Value : 0); }
-            set {
-                if (HorizontalScroll.HasScroll)
-                    HorizontalScroll.Value = value.X;
-                if (VerticalScroll.HasScroll)
-                    VerticalScroll.Value = value.Y;
-            }
-        }
-
-        [Browsable(false)]
-        public Size AutoScrollMinSize {
-            get {
-                return new Size(HorizontalScroll.MaximumValue, VerticalScroll.MaximumValue);
-            }
-            set {
-                // TODO : 
-            }
-        }
-
-        public void ScrollControlIntoView(Control control) {
-            
         }
 
         #endregion

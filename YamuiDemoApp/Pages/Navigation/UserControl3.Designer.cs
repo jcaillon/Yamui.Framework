@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.htmlLabel1 = new YamuiFramework.HtmlRenderer.WinForms.HtmlLabel();
             this.yamuiTextBox14 = new YamuiFramework.Controls.YamuiTextBox();
             this.yamuiLabel14 = new YamuiFramework.Controls.YamuiLabel();
             this.yamuiButton14 = new YamuiFramework.Controls.YamuiButton();
@@ -73,19 +72,6 @@
             this.yamuiButton1 = new YamuiFramework.Controls.YamuiButton();
             this.SuspendLayout();
             // 
-            // htmlLabel1
-            // 
-            this.htmlLabel1.AutoSize = false;
-            this.htmlLabel1.AutoSizeHeightOnly = true;
-            this.htmlLabel1.BackColor = System.Drawing.SystemColors.Window;
-            this.htmlLabel1.BaseStylesheet = null;
-            this.htmlLabel1.Location = new System.Drawing.Point(62, 1100);
-            this.htmlLabel1.Name = "htmlLabel1";
-            this.htmlLabel1.Size = new System.Drawing.Size(139, 15);
-            this.htmlLabel1.TabIndex = 88;
-            this.htmlLabel1.TabStop = false;
-            this.htmlLabel1.Text = "htmlLabel1";
-            // 
             // yamuiTextBox14
             // 
             this.yamuiTextBox14.AllowDrop = true;
@@ -95,7 +81,7 @@
             this.yamuiTextBox14.CustomForeColor = System.Drawing.Color.Empty;
             this.yamuiTextBox14.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.yamuiTextBox14.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-            this.yamuiTextBox14.Location = new System.Drawing.Point(231, 386);
+            this.yamuiTextBox14.Location = new System.Drawing.Point(214, 410);
             this.yamuiTextBox14.Name = "yamuiTextBox14";
             this.yamuiTextBox14.Size = new System.Drawing.Size(351, 20);
             this.yamuiTextBox14.TabIndex = 127;
@@ -104,7 +90,7 @@
             // 
             // yamuiLabel14
             // 
-            this.yamuiLabel14.Location = new System.Drawing.Point(150, 385);
+            this.yamuiLabel14.Location = new System.Drawing.Point(133, 409);
             this.yamuiLabel14.Name = "yamuiLabel14";
             this.yamuiLabel14.Size = new System.Drawing.Size(80, 15);
             this.yamuiLabel14.TabIndex = 126;
@@ -117,7 +103,7 @@
             this.yamuiButton14.IsFocused = false;
             this.yamuiButton14.IsHovered = false;
             this.yamuiButton14.IsPressed = false;
-            this.yamuiButton14.Location = new System.Drawing.Point(52, 385);
+            this.yamuiButton14.Location = new System.Drawing.Point(35, 409);
             this.yamuiButton14.Name = "yamuiButton14";
             this.yamuiButton14.SetImgSize = new System.Drawing.Size(0, 0);
             this.yamuiButton14.Size = new System.Drawing.Size(92, 23);
@@ -133,7 +119,7 @@
             this.yamuiTextBox13.CustomForeColor = System.Drawing.Color.Empty;
             this.yamuiTextBox13.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.yamuiTextBox13.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-            this.yamuiTextBox13.Location = new System.Drawing.Point(231, 357);
+            this.yamuiTextBox13.Location = new System.Drawing.Point(214, 381);
             this.yamuiTextBox13.Name = "yamuiTextBox13";
             this.yamuiTextBox13.Size = new System.Drawing.Size(351, 20);
             this.yamuiTextBox13.TabIndex = 124;
@@ -142,7 +128,7 @@
             // 
             // yamuiLabel13
             // 
-            this.yamuiLabel13.Location = new System.Drawing.Point(150, 356);
+            this.yamuiLabel13.Location = new System.Drawing.Point(133, 380);
             this.yamuiLabel13.Name = "yamuiLabel13";
             this.yamuiLabel13.Size = new System.Drawing.Size(80, 15);
             this.yamuiLabel13.TabIndex = 123;
@@ -155,7 +141,7 @@
             this.yamuiButton13.IsFocused = false;
             this.yamuiButton13.IsHovered = false;
             this.yamuiButton13.IsPressed = false;
-            this.yamuiButton13.Location = new System.Drawing.Point(52, 356);
+            this.yamuiButton13.Location = new System.Drawing.Point(35, 380);
             this.yamuiButton13.Name = "yamuiButton13";
             this.yamuiButton13.SetImgSize = new System.Drawing.Size(0, 0);
             this.yamuiButton13.Size = new System.Drawing.Size(92, 23);
@@ -171,7 +157,7 @@
             this.yamuiTextBox12.CustomForeColor = System.Drawing.Color.Empty;
             this.yamuiTextBox12.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.yamuiTextBox12.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-            this.yamuiTextBox12.Location = new System.Drawing.Point(231, 328);
+            this.yamuiTextBox12.Location = new System.Drawing.Point(214, 352);
             this.yamuiTextBox12.Name = "yamuiTextBox12";
             this.yamuiTextBox12.Size = new System.Drawing.Size(351, 20);
             this.yamuiTextBox12.TabIndex = 121;
@@ -180,7 +166,7 @@
             // 
             // yamuiLabel12
             // 
-            this.yamuiLabel12.Location = new System.Drawing.Point(150, 327);
+            this.yamuiLabel12.Location = new System.Drawing.Point(133, 351);
             this.yamuiLabel12.Name = "yamuiLabel12";
             this.yamuiLabel12.Size = new System.Drawing.Size(80, 15);
             this.yamuiLabel12.TabIndex = 120;
@@ -193,7 +179,7 @@
             this.yamuiButton12.IsFocused = false;
             this.yamuiButton12.IsHovered = false;
             this.yamuiButton12.IsPressed = false;
-            this.yamuiButton12.Location = new System.Drawing.Point(52, 327);
+            this.yamuiButton12.Location = new System.Drawing.Point(35, 351);
             this.yamuiButton12.Name = "yamuiButton12";
             this.yamuiButton12.SetImgSize = new System.Drawing.Size(0, 0);
             this.yamuiButton12.Size = new System.Drawing.Size(92, 23);
@@ -209,7 +195,7 @@
             this.yamuiTextBox11.CustomForeColor = System.Drawing.Color.Empty;
             this.yamuiTextBox11.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.yamuiTextBox11.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-            this.yamuiTextBox11.Location = new System.Drawing.Point(228, 299);
+            this.yamuiTextBox11.Location = new System.Drawing.Point(211, 323);
             this.yamuiTextBox11.Name = "yamuiTextBox11";
             this.yamuiTextBox11.Size = new System.Drawing.Size(351, 20);
             this.yamuiTextBox11.TabIndex = 118;
@@ -218,7 +204,7 @@
             // 
             // yamuiLabel11
             // 
-            this.yamuiLabel11.Location = new System.Drawing.Point(147, 298);
+            this.yamuiLabel11.Location = new System.Drawing.Point(130, 322);
             this.yamuiLabel11.Name = "yamuiLabel11";
             this.yamuiLabel11.Size = new System.Drawing.Size(80, 15);
             this.yamuiLabel11.TabIndex = 117;
@@ -231,7 +217,7 @@
             this.yamuiButton11.IsFocused = false;
             this.yamuiButton11.IsHovered = false;
             this.yamuiButton11.IsPressed = false;
-            this.yamuiButton11.Location = new System.Drawing.Point(49, 298);
+            this.yamuiButton11.Location = new System.Drawing.Point(32, 322);
             this.yamuiButton11.Name = "yamuiButton11";
             this.yamuiButton11.SetImgSize = new System.Drawing.Size(0, 0);
             this.yamuiButton11.Size = new System.Drawing.Size(92, 23);
@@ -247,7 +233,7 @@
             this.yamuiTextBox10.CustomForeColor = System.Drawing.Color.Empty;
             this.yamuiTextBox10.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.yamuiTextBox10.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-            this.yamuiTextBox10.Location = new System.Drawing.Point(231, 270);
+            this.yamuiTextBox10.Location = new System.Drawing.Point(214, 294);
             this.yamuiTextBox10.Name = "yamuiTextBox10";
             this.yamuiTextBox10.Size = new System.Drawing.Size(351, 20);
             this.yamuiTextBox10.TabIndex = 115;
@@ -256,7 +242,7 @@
             // 
             // yamuiLabel10
             // 
-            this.yamuiLabel10.Location = new System.Drawing.Point(150, 269);
+            this.yamuiLabel10.Location = new System.Drawing.Point(133, 293);
             this.yamuiLabel10.Name = "yamuiLabel10";
             this.yamuiLabel10.Size = new System.Drawing.Size(80, 15);
             this.yamuiLabel10.TabIndex = 114;
@@ -269,7 +255,7 @@
             this.yamuiButton10.IsFocused = false;
             this.yamuiButton10.IsHovered = false;
             this.yamuiButton10.IsPressed = false;
-            this.yamuiButton10.Location = new System.Drawing.Point(52, 269);
+            this.yamuiButton10.Location = new System.Drawing.Point(35, 293);
             this.yamuiButton10.Name = "yamuiButton10";
             this.yamuiButton10.SetImgSize = new System.Drawing.Size(0, 0);
             this.yamuiButton10.Size = new System.Drawing.Size(92, 23);
@@ -285,7 +271,7 @@
             this.yamuiTextBox9.CustomForeColor = System.Drawing.Color.Empty;
             this.yamuiTextBox9.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.yamuiTextBox9.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-            this.yamuiTextBox9.Location = new System.Drawing.Point(231, 241);
+            this.yamuiTextBox9.Location = new System.Drawing.Point(214, 265);
             this.yamuiTextBox9.Name = "yamuiTextBox9";
             this.yamuiTextBox9.Size = new System.Drawing.Size(351, 20);
             this.yamuiTextBox9.TabIndex = 112;
@@ -294,7 +280,7 @@
             // 
             // yamuiLabel9
             // 
-            this.yamuiLabel9.Location = new System.Drawing.Point(150, 240);
+            this.yamuiLabel9.Location = new System.Drawing.Point(133, 264);
             this.yamuiLabel9.Name = "yamuiLabel9";
             this.yamuiLabel9.Size = new System.Drawing.Size(74, 15);
             this.yamuiLabel9.TabIndex = 111;
@@ -307,7 +293,7 @@
             this.yamuiButton9.IsFocused = false;
             this.yamuiButton9.IsHovered = false;
             this.yamuiButton9.IsPressed = false;
-            this.yamuiButton9.Location = new System.Drawing.Point(52, 240);
+            this.yamuiButton9.Location = new System.Drawing.Point(35, 264);
             this.yamuiButton9.Name = "yamuiButton9";
             this.yamuiButton9.SetImgSize = new System.Drawing.Size(0, 0);
             this.yamuiButton9.Size = new System.Drawing.Size(92, 23);
@@ -323,7 +309,7 @@
             this.yamuiTextBox8.CustomForeColor = System.Drawing.Color.Empty;
             this.yamuiTextBox8.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.yamuiTextBox8.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-            this.yamuiTextBox8.Location = new System.Drawing.Point(231, 212);
+            this.yamuiTextBox8.Location = new System.Drawing.Point(214, 236);
             this.yamuiTextBox8.Name = "yamuiTextBox8";
             this.yamuiTextBox8.Size = new System.Drawing.Size(351, 20);
             this.yamuiTextBox8.TabIndex = 109;
@@ -332,7 +318,7 @@
             // 
             // yamuiLabel8
             // 
-            this.yamuiLabel8.Location = new System.Drawing.Point(150, 211);
+            this.yamuiLabel8.Location = new System.Drawing.Point(133, 235);
             this.yamuiLabel8.Name = "yamuiLabel8";
             this.yamuiLabel8.Size = new System.Drawing.Size(74, 15);
             this.yamuiLabel8.TabIndex = 108;
@@ -345,7 +331,7 @@
             this.yamuiButton8.IsFocused = false;
             this.yamuiButton8.IsHovered = false;
             this.yamuiButton8.IsPressed = false;
-            this.yamuiButton8.Location = new System.Drawing.Point(52, 211);
+            this.yamuiButton8.Location = new System.Drawing.Point(35, 235);
             this.yamuiButton8.Name = "yamuiButton8";
             this.yamuiButton8.SetImgSize = new System.Drawing.Size(0, 0);
             this.yamuiButton8.Size = new System.Drawing.Size(92, 23);
@@ -361,7 +347,7 @@
             this.yamuiTextBox7.CustomForeColor = System.Drawing.Color.Empty;
             this.yamuiTextBox7.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.yamuiTextBox7.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-            this.yamuiTextBox7.Location = new System.Drawing.Point(231, 183);
+            this.yamuiTextBox7.Location = new System.Drawing.Point(214, 207);
             this.yamuiTextBox7.Name = "yamuiTextBox7";
             this.yamuiTextBox7.Size = new System.Drawing.Size(351, 20);
             this.yamuiTextBox7.TabIndex = 106;
@@ -370,7 +356,7 @@
             // 
             // yamuiLabel7
             // 
-            this.yamuiLabel7.Location = new System.Drawing.Point(150, 182);
+            this.yamuiLabel7.Location = new System.Drawing.Point(133, 206);
             this.yamuiLabel7.Name = "yamuiLabel7";
             this.yamuiLabel7.Size = new System.Drawing.Size(74, 15);
             this.yamuiLabel7.TabIndex = 105;
@@ -383,7 +369,7 @@
             this.yamuiButton7.IsFocused = false;
             this.yamuiButton7.IsHovered = false;
             this.yamuiButton7.IsPressed = false;
-            this.yamuiButton7.Location = new System.Drawing.Point(52, 182);
+            this.yamuiButton7.Location = new System.Drawing.Point(35, 206);
             this.yamuiButton7.Name = "yamuiButton7";
             this.yamuiButton7.SetImgSize = new System.Drawing.Size(0, 0);
             this.yamuiButton7.Size = new System.Drawing.Size(92, 23);
@@ -399,7 +385,7 @@
             this.yamuiTextBox6.CustomForeColor = System.Drawing.Color.Empty;
             this.yamuiTextBox6.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.yamuiTextBox6.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-            this.yamuiTextBox6.Location = new System.Drawing.Point(231, 154);
+            this.yamuiTextBox6.Location = new System.Drawing.Point(214, 178);
             this.yamuiTextBox6.Name = "yamuiTextBox6";
             this.yamuiTextBox6.Size = new System.Drawing.Size(351, 20);
             this.yamuiTextBox6.TabIndex = 103;
@@ -408,7 +394,7 @@
             // 
             // yamuiLabel6
             // 
-            this.yamuiLabel6.Location = new System.Drawing.Point(150, 153);
+            this.yamuiLabel6.Location = new System.Drawing.Point(133, 177);
             this.yamuiLabel6.Name = "yamuiLabel6";
             this.yamuiLabel6.Size = new System.Drawing.Size(74, 15);
             this.yamuiLabel6.TabIndex = 102;
@@ -421,7 +407,7 @@
             this.yamuiButton6.IsFocused = false;
             this.yamuiButton6.IsHovered = false;
             this.yamuiButton6.IsPressed = false;
-            this.yamuiButton6.Location = new System.Drawing.Point(52, 153);
+            this.yamuiButton6.Location = new System.Drawing.Point(35, 177);
             this.yamuiButton6.Name = "yamuiButton6";
             this.yamuiButton6.SetImgSize = new System.Drawing.Size(0, 0);
             this.yamuiButton6.Size = new System.Drawing.Size(92, 23);
@@ -437,7 +423,7 @@
             this.yamuiTextBox5.CustomForeColor = System.Drawing.Color.Empty;
             this.yamuiTextBox5.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.yamuiTextBox5.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-            this.yamuiTextBox5.Location = new System.Drawing.Point(231, 125);
+            this.yamuiTextBox5.Location = new System.Drawing.Point(214, 149);
             this.yamuiTextBox5.Name = "yamuiTextBox5";
             this.yamuiTextBox5.Size = new System.Drawing.Size(351, 20);
             this.yamuiTextBox5.TabIndex = 100;
@@ -446,7 +432,7 @@
             // 
             // yamuiLabel5
             // 
-            this.yamuiLabel5.Location = new System.Drawing.Point(150, 124);
+            this.yamuiLabel5.Location = new System.Drawing.Point(133, 148);
             this.yamuiLabel5.Name = "yamuiLabel5";
             this.yamuiLabel5.Size = new System.Drawing.Size(74, 15);
             this.yamuiLabel5.TabIndex = 99;
@@ -459,7 +445,7 @@
             this.yamuiButton5.IsFocused = false;
             this.yamuiButton5.IsHovered = false;
             this.yamuiButton5.IsPressed = false;
-            this.yamuiButton5.Location = new System.Drawing.Point(52, 124);
+            this.yamuiButton5.Location = new System.Drawing.Point(35, 148);
             this.yamuiButton5.Name = "yamuiButton5";
             this.yamuiButton5.SetImgSize = new System.Drawing.Size(0, 0);
             this.yamuiButton5.Size = new System.Drawing.Size(92, 23);
@@ -475,7 +461,7 @@
             this.yamuiTextBox4.CustomForeColor = System.Drawing.Color.Empty;
             this.yamuiTextBox4.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.yamuiTextBox4.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-            this.yamuiTextBox4.Location = new System.Drawing.Point(231, 96);
+            this.yamuiTextBox4.Location = new System.Drawing.Point(214, 120);
             this.yamuiTextBox4.Name = "yamuiTextBox4";
             this.yamuiTextBox4.Size = new System.Drawing.Size(351, 20);
             this.yamuiTextBox4.TabIndex = 97;
@@ -484,7 +470,7 @@
             // 
             // yamuiLabel4
             // 
-            this.yamuiLabel4.Location = new System.Drawing.Point(150, 95);
+            this.yamuiLabel4.Location = new System.Drawing.Point(133, 119);
             this.yamuiLabel4.Name = "yamuiLabel4";
             this.yamuiLabel4.Size = new System.Drawing.Size(74, 15);
             this.yamuiLabel4.TabIndex = 96;
@@ -497,7 +483,7 @@
             this.yamuiButton4.IsFocused = false;
             this.yamuiButton4.IsHovered = false;
             this.yamuiButton4.IsPressed = false;
-            this.yamuiButton4.Location = new System.Drawing.Point(52, 95);
+            this.yamuiButton4.Location = new System.Drawing.Point(35, 119);
             this.yamuiButton4.Name = "yamuiButton4";
             this.yamuiButton4.SetImgSize = new System.Drawing.Size(0, 0);
             this.yamuiButton4.Size = new System.Drawing.Size(92, 23);
@@ -513,7 +499,7 @@
             this.yamuiTextBox3.CustomForeColor = System.Drawing.Color.Empty;
             this.yamuiTextBox3.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.yamuiTextBox3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-            this.yamuiTextBox3.Location = new System.Drawing.Point(231, 67);
+            this.yamuiTextBox3.Location = new System.Drawing.Point(214, 91);
             this.yamuiTextBox3.Name = "yamuiTextBox3";
             this.yamuiTextBox3.Size = new System.Drawing.Size(351, 20);
             this.yamuiTextBox3.TabIndex = 94;
@@ -522,7 +508,7 @@
             // 
             // yamuiLabel3
             // 
-            this.yamuiLabel3.Location = new System.Drawing.Point(150, 66);
+            this.yamuiLabel3.Location = new System.Drawing.Point(133, 90);
             this.yamuiLabel3.Name = "yamuiLabel3";
             this.yamuiLabel3.Size = new System.Drawing.Size(74, 15);
             this.yamuiLabel3.TabIndex = 93;
@@ -535,7 +521,7 @@
             this.yamuiButton3.IsFocused = false;
             this.yamuiButton3.IsHovered = false;
             this.yamuiButton3.IsPressed = false;
-            this.yamuiButton3.Location = new System.Drawing.Point(52, 66);
+            this.yamuiButton3.Location = new System.Drawing.Point(35, 90);
             this.yamuiButton3.Name = "yamuiButton3";
             this.yamuiButton3.SetImgSize = new System.Drawing.Size(0, 0);
             this.yamuiButton3.Size = new System.Drawing.Size(92, 23);
@@ -551,7 +537,7 @@
             this.yamuiTextBox2.CustomForeColor = System.Drawing.Color.Empty;
             this.yamuiTextBox2.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.yamuiTextBox2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-            this.yamuiTextBox2.Location = new System.Drawing.Point(231, 38);
+            this.yamuiTextBox2.Location = new System.Drawing.Point(214, 62);
             this.yamuiTextBox2.Name = "yamuiTextBox2";
             this.yamuiTextBox2.Size = new System.Drawing.Size(351, 20);
             this.yamuiTextBox2.TabIndex = 91;
@@ -560,7 +546,7 @@
             // 
             // yamuiLabel2
             // 
-            this.yamuiLabel2.Location = new System.Drawing.Point(150, 37);
+            this.yamuiLabel2.Location = new System.Drawing.Point(133, 61);
             this.yamuiLabel2.Name = "yamuiLabel2";
             this.yamuiLabel2.Size = new System.Drawing.Size(74, 15);
             this.yamuiLabel2.TabIndex = 90;
@@ -573,7 +559,7 @@
             this.yamuiButton2.IsFocused = false;
             this.yamuiButton2.IsHovered = false;
             this.yamuiButton2.IsPressed = false;
-            this.yamuiButton2.Location = new System.Drawing.Point(52, 37);
+            this.yamuiButton2.Location = new System.Drawing.Point(35, 61);
             this.yamuiButton2.Name = "yamuiButton2";
             this.yamuiButton2.SetImgSize = new System.Drawing.Size(0, 0);
             this.yamuiButton2.Size = new System.Drawing.Size(92, 23);
@@ -589,7 +575,7 @@
             this.yamuiTextBox1.CustomForeColor = System.Drawing.Color.Empty;
             this.yamuiTextBox1.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.yamuiTextBox1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-            this.yamuiTextBox1.Location = new System.Drawing.Point(231, 9);
+            this.yamuiTextBox1.Location = new System.Drawing.Point(214, 33);
             this.yamuiTextBox1.Name = "yamuiTextBox1";
             this.yamuiTextBox1.Size = new System.Drawing.Size(768, 20);
             this.yamuiTextBox1.TabIndex = 87;
@@ -598,7 +584,7 @@
             // 
             // yamuiLabel1
             // 
-            this.yamuiLabel1.Location = new System.Drawing.Point(150, 8);
+            this.yamuiLabel1.Location = new System.Drawing.Point(133, 32);
             this.yamuiLabel1.Name = "yamuiLabel1";
             this.yamuiLabel1.Size = new System.Drawing.Size(74, 15);
             this.yamuiLabel1.TabIndex = 86;
@@ -611,7 +597,7 @@
             this.yamuiButton1.IsFocused = false;
             this.yamuiButton1.IsHovered = false;
             this.yamuiButton1.IsPressed = false;
-            this.yamuiButton1.Location = new System.Drawing.Point(52, 8);
+            this.yamuiButton1.Location = new System.Drawing.Point(35, 32);
             this.yamuiButton1.Name = "yamuiButton1";
             this.yamuiButton1.SetImgSize = new System.Drawing.Size(0, 0);
             this.yamuiButton1.Size = new System.Drawing.Size(92, 23);
@@ -620,7 +606,6 @@
             // 
             // UserControl3
             // 
-            this.Controls.Add(this.htmlLabel1);
             this.Controls.Add(this.yamuiTextBox14);
             this.Controls.Add(this.yamuiLabel14);
             this.Controls.Add(this.yamuiButton14);
@@ -664,6 +649,7 @@
             this.Controls.Add(this.yamuiLabel1);
             this.Controls.Add(this.yamuiButton1);
             this.Name = "UserControl3";
+            this.Padding = new System.Windows.Forms.Padding(0, 0, 20, 20);
             this.Size = new System.Drawing.Size(1017, 1128);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -671,8 +657,6 @@
         }
 
         #endregion
-
-        private YamuiFramework.HtmlRenderer.WinForms.HtmlLabel htmlLabel1;
         private YamuiFramework.Controls.YamuiTextBox yamuiTextBox14;
         private YamuiFramework.Controls.YamuiLabel yamuiLabel14;
         private YamuiFramework.Controls.YamuiButton yamuiButton14;

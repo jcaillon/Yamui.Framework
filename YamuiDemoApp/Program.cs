@@ -21,6 +21,8 @@ namespace YamuiDemoApp {
         static void Main() {
 
             Application.EnableVisualStyles();
+
+            // https://stackoverflow.com/questions/8283631/graphics-drawstring-vs-textrenderer-drawtextwhich-can-deliver-better-quality
             Application.SetCompatibleTextRenderingDefault(false);
 
             YamuiThemeManager.TabAnimationAllowed = true;
