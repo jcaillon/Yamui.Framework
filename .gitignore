@@ -342,7 +342,7 @@ $RECYCLE.BIN/
 # SASS Compiler cache
 .sass-cache
 .DS_Store*
-Icon?
+#Icon?
 
 # Resharper #
 #############
