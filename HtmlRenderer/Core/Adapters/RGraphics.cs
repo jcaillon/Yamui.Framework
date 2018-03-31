@@ -17,12 +17,13 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
-using YamuiFramework.HtmlRenderer.Core.Adapters.Entities;
-using YamuiFramework.HtmlRenderer.Core.Core.Utils;
+using Yamui.Framework.HtmlRenderer.Core.Adapters.Entities;
+using Yamui.Framework.HtmlRenderer.Core.Core.Utils;
 
-namespace YamuiFramework.HtmlRenderer.Core.Adapters {
+namespace Yamui.Framework.HtmlRenderer.Core.Adapters {
     /// <summary>
     /// Adapter for platform specific graphics rendering object - used to render graphics and text in platform specific context.<br/>
     /// The core HTML Renderer components use this class for rendering logic, extending this

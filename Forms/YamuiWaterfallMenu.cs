@@ -17,6 +17,7 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -24,13 +25,13 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
-using YamuiFramework.Controls;
-using YamuiFramework.Fonts;
-using YamuiFramework.Helper;
-using YamuiFramework.HtmlRenderer.WinForms;
-using YamuiFramework.Themes;
+using Yamui.Framework.Controls;
+using Yamui.Framework.Fonts;
+using Yamui.Framework.Helper;
+using Yamui.Framework.HtmlRenderer.WinForms;
+using Yamui.Framework.Themes;
 
-namespace YamuiFramework.Forms {
+namespace Yamui.Framework.Forms {
     /// <summary>
     /// A class to display a cool custom context menu
     /// </summary>

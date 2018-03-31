@@ -17,10 +17,11 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
-using System.Collections.Generic;
-using YamuiFramework.HtmlRenderer.Core.Core.Utils;
 
-namespace YamuiFramework.HtmlRenderer.Core.Core.Entities {
+using System.Collections.Generic;
+using Yamui.Framework.HtmlRenderer.Core.Core.Utils;
+
+namespace Yamui.Framework.HtmlRenderer.Core.Core.Entities {
     /// <summary>
     /// Represents a block of CSS property values.<br/>
     /// Contains collection of key-value pairs that are CSS properties for specific css class.<br/>

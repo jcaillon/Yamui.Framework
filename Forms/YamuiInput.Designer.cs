@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel;
 using System.Windows.Forms;
-using YamuiFramework.Controls;
-using YamuiFramework.HtmlRenderer.WinForms;
+using Yamui.Framework.Controls;
+using Yamui.Framework.HtmlRenderer.WinForms;
 
-namespace YamuiFramework.Forms {
+namespace Yamui.Framework.Forms {
     partial class YamuiInput {
         /// <summary>
         /// Required designer variable.
@@ -29,10 +29,10 @@ namespace YamuiFramework.Forms {
         /// </summary>
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
-            this.contentPanel = new YamuiFramework.Controls.YamuiScrollPanel();
-            this.contentLabel = new YamuiFramework.HtmlRenderer.WinForms.HtmlLabel();
+            this.contentPanel = new YamuiScrollPanel();
+            this.contentLabel = new HtmlLabel();
             this._errorProvider = new System.Windows.Forms.ErrorProvider(this.components);
-            this.titleLabel = new YamuiFramework.HtmlRenderer.WinForms.HtmlLabel();
+            this.titleLabel = new HtmlLabel();
             this.contentPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._errorProvider)).BeginInit();
             this.SuspendLayout();

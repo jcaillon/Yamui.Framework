@@ -27,10 +27,10 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
-using YamuiFramework.Helper;
-using YamuiFramework.Themes;
+using Yamui.Framework.Helper;
+using Yamui.Framework.Themes;
 
-namespace YamuiFramework.Controls {
+namespace Yamui.Framework.Controls {
     [Designer(typeof(YamuiScrollPanelDesigner))]
     public class YamuiScrollPanel : YamuiControl {
         #region fields

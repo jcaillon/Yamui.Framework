@@ -17,12 +17,13 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Drawing.Drawing2D;
-using YamuiFramework.HtmlRenderer.Core.Adapters;
-using YamuiFramework.HtmlRenderer.Core.Adapters.Entities;
+using Yamui.Framework.HtmlRenderer.Core.Adapters;
+using Yamui.Framework.HtmlRenderer.Core.Adapters.Entities;
 
-namespace YamuiFramework.HtmlRenderer.WinForms.Adapters {
+namespace Yamui.Framework.HtmlRenderer.WinForms.Adapters {
     /// <summary>
     /// Adapter for WinForms graphics path object for core.
     /// </summary>

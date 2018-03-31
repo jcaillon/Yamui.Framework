@@ -17,15 +17,16 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.Text;
-using YamuiFramework.HtmlRenderer.Core.Adapters.Entities;
-using YamuiFramework.HtmlRenderer.Core.Core.Dom;
-using YamuiFramework.HtmlRenderer.Core.Core.Entities;
-using YamuiFramework.HtmlRenderer.Core.Core.Parse;
+using Yamui.Framework.HtmlRenderer.Core.Adapters.Entities;
+using Yamui.Framework.HtmlRenderer.Core.Core.Dom;
+using Yamui.Framework.HtmlRenderer.Core.Core.Entities;
+using Yamui.Framework.HtmlRenderer.Core.Core.Parse;
 
-namespace YamuiFramework.HtmlRenderer.Core.Core.Utils {
+namespace Yamui.Framework.HtmlRenderer.Core.Core.Utils {
     /// <summary>
     /// Utility class for traversing DOM structure and execution stuff on it.
     /// </summary>

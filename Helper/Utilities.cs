@@ -17,6 +17,7 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -27,10 +28,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using YamuiFramework.HtmlRenderer.WinForms;
-using YamuiFramework.Themes;
+using Yamui.Framework.HtmlRenderer.WinForms;
+using Yamui.Framework.Themes;
 
-namespace YamuiFramework.Helper {
+namespace Yamui.Framework.Helper {
     /// <summary>
     /// This class provides various utilies to use in YamuiFramework and outside
     /// </summary>

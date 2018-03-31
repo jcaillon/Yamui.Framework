@@ -17,9 +17,10 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 
-namespace YamuiFramework.HtmlRenderer.Core.Adapters.Entities {
+namespace Yamui.Framework.HtmlRenderer.Core.Adapters.Entities {
     /// <summary>
     /// Stores a set of four floating-point numbers that represent the location and size of a rectangle. 
     /// </summary>

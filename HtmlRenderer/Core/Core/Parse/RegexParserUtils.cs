@@ -17,10 +17,11 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace YamuiFramework.HtmlRenderer.Core.Core.Parse {
+namespace Yamui.Framework.HtmlRenderer.Core.Core.Parse {
     /// <summary>
     /// Collection of regular expressions used when parsing
     /// </summary>

@@ -17,14 +17,15 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System.Collections;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
-using YamuiFramework.Themes;
+using Yamui.Framework.Themes;
 
-namespace YamuiFramework.Controls {
+namespace Yamui.Framework.Controls {
     [Designer("YamuiFramework.Controls.YamuiImageDesigner")]
     public class YamuiPictureBox : PictureBox, IScrollableControl {
         private Image _backGrndImage;

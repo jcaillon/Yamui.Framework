@@ -17,7 +17,7 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
-namespace YamuiFramework.HtmlRenderer.Core.Core.Entities {
+namespace Yamui.Framework.HtmlRenderer.Core.Core.Entities {
     /// <summary>
     /// Holds data on link element in HTML.<br/>
     /// Used to expose data outside of HTML Renderer internal structure.

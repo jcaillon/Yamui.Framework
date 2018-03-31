@@ -17,15 +17,16 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-using YamuiFramework.Helper;
-using YamuiFramework.Themes;
+using Yamui.Framework.Helper;
+using Yamui.Framework.Themes;
 
-namespace YamuiFramework.Forms {
+namespace Yamui.Framework.Forms {
 
     /// <summary>
     /// Form class that implements interesting utilities + shadow + onpaint + movable/resizable borderless

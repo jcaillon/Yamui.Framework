@@ -17,11 +17,12 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
-using YamuiFramework.HtmlRenderer.Core.Core.Utils;
+using Yamui.Framework.HtmlRenderer.Core.Core.Utils;
 
-namespace YamuiFramework.HtmlRenderer.Core.Core.Dom {
+namespace Yamui.Framework.HtmlRenderer.Core.Core.Dom {
     /// <summary>
     /// Used to make space on vertical cell combination
     /// </summary>

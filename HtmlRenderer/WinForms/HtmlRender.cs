@@ -17,18 +17,19 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
-using YamuiFramework.HtmlRenderer.Core.Core;
-using YamuiFramework.HtmlRenderer.Core.Core.Entities;
-using YamuiFramework.HtmlRenderer.Core.Core.Utils;
-using YamuiFramework.HtmlRenderer.WinForms.Adapters;
-using YamuiFramework.HtmlRenderer.WinForms.Utilities;
+using Yamui.Framework.HtmlRenderer.Core.Core;
+using Yamui.Framework.HtmlRenderer.Core.Core.Entities;
+using Yamui.Framework.HtmlRenderer.Core.Core.Utils;
+using Yamui.Framework.HtmlRenderer.WinForms.Adapters;
+using Yamui.Framework.HtmlRenderer.WinForms.Utilities;
 
-namespace YamuiFramework.HtmlRenderer.WinForms {
+namespace Yamui.Framework.HtmlRenderer.WinForms {
     /// <summary>
     /// Standalone static class for simple and direct HTML rendering.<br/>
     /// For WinForms UI prefer using HTML controls: <see cref="HtmlPanel"/> or <see cref="HtmlLabel"/>.<br/>

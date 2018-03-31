@@ -17,12 +17,13 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.ComponentModel;
 using System.Windows.Forms;
-using YamuiFramework.Animations.Transitions;
+using Yamui.Framework.Animations.Transitions;
 
-namespace YamuiFramework.Forms {
+namespace Yamui.Framework.Forms {
     /// <summary>
     /// Form class that adds a fade in/out animation on form show/close
     /// </summary>

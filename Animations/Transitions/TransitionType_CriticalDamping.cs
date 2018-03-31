@@ -17,9 +17,10 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 
-namespace YamuiFramework.Animations.Transitions {
+namespace Yamui.Framework.Animations.Transitions {
     /// <summary>
     /// This transition animates with an exponential decay. This has a damping effect
     /// similar to the motion of a needle on an electomagnetically controlled dial.

@@ -17,7 +17,7 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
-namespace YamuiFramework.HtmlRenderer.Core.Core.Entities {
+namespace Yamui.Framework.HtmlRenderer.Core.Core.Entities {
     /// <summary>
     /// Controls the way styles are generated when html is generated.
     /// </summary>

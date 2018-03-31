@@ -17,9 +17,10 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
-using YamuiFramework.HtmlRenderer.Core.Adapters.Entities;
 
-namespace YamuiFramework.HtmlRenderer.Core.Adapters {
+using Yamui.Framework.HtmlRenderer.Core.Adapters.Entities;
+
+namespace Yamui.Framework.HtmlRenderer.Core.Adapters {
     /// <summary>
     /// Adapter for platform specific pen objects - used to draw graphics (lines, rectangles and paths) 
     /// </summary>

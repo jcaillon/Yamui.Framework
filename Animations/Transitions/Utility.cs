@@ -17,11 +17,12 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.ComponentModel;
 using System.Reflection;
 
-namespace YamuiFramework.Animations.Transitions {
+namespace Yamui.Framework.Animations.Transitions {
     /// <summary>
     /// A class holding static utility functions.
     /// </summary>

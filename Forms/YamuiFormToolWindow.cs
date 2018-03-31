@@ -17,10 +17,11 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
-using System.Windows.Forms;
-using YamuiFramework.Helper;
 
-namespace YamuiFramework.Forms {
+using System.Windows.Forms;
+using Yamui.Framework.Helper;
+
+namespace Yamui.Framework.Forms {
     /// <summary>
     /// Form class that does not take focus on show
     /// </summary>

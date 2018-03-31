@@ -17,9 +17,10 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System.Collections.Generic;
 
-namespace YamuiFramework.Animations.Transitions {
+namespace Yamui.Framework.Animations.Transitions {
     internal class TransitionChain {
         #region Public methods
 

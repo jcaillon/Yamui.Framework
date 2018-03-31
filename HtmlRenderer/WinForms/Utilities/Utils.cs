@@ -17,11 +17,12 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Drawing;
-using YamuiFramework.HtmlRenderer.Core.Adapters.Entities;
+using Yamui.Framework.HtmlRenderer.Core.Adapters.Entities;
 
-namespace YamuiFramework.HtmlRenderer.WinForms.Utilities {
+namespace Yamui.Framework.HtmlRenderer.WinForms.Utilities {
     /// <summary>
     /// Utilities for converting WinForms entities to HtmlRenderer core entities.
     /// </summary>

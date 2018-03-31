@@ -17,14 +17,15 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
-using YamuiFramework.HtmlRenderer.Core.Adapters;
-using YamuiFramework.HtmlRenderer.Core.Core.Entities;
-using YamuiFramework.HtmlRenderer.Core.Core.Parse;
-using YamuiFramework.HtmlRenderer.Core.Core.Utils;
+using Yamui.Framework.HtmlRenderer.Core.Adapters;
+using Yamui.Framework.HtmlRenderer.Core.Core.Entities;
+using Yamui.Framework.HtmlRenderer.Core.Core.Parse;
+using Yamui.Framework.HtmlRenderer.Core.Core.Utils;
 
-namespace YamuiFramework.HtmlRenderer.Core.Core {
+namespace Yamui.Framework.HtmlRenderer.Core.Core {
     /// <summary>
     /// Holds parsed stylesheet css blocks arranged by media and classes.<br/>
     /// <seealso cref="CssBlock"/>

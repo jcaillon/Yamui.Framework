@@ -17,10 +17,11 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
 
-namespace YamuiFramework.HtmlRenderer.Core.Core.Entities {
+namespace Yamui.Framework.HtmlRenderer.Core.Core.Entities {
     /// <summary>
     /// Invoked when a stylesheet is about to be loaded by file path or URL in 'link' element.<br/>
     /// Allows to overwrite the loaded stylesheet by providing the stylesheet data manually, or different source (file or URL) to load from.<br/>

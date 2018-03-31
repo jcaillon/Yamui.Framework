@@ -17,7 +17,7 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
-namespace YamuiFramework.HtmlRenderer.Core.Core.Utils {
+namespace Yamui.Framework.HtmlRenderer.Core.Core.Utils {
     /// <summary>
     /// Defines HTML strings
     /// </summary>

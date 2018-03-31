@@ -17,16 +17,17 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using YamuiFramework.HtmlRenderer.WinForms;
-using YamuiFramework.Themes;
+using Yamui.Framework.HtmlRenderer.WinForms;
+using Yamui.Framework.Themes;
 
-namespace YamuiFramework.Controls.YamuiList {
+namespace Yamui.Framework.Controls.YamuiList {
     /// <summary>
     /// This usercontrol displays a filter box (textbox + buttons) that should be associated
     /// to a yamuiFilteredTypeList or treeList

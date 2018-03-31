@@ -17,6 +17,7 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -24,7 +25,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace YamuiFramework.Helper {
+namespace Yamui.Framework.Helper {
     /// <summary>
     /// A class that can be inherited to hold themes,
     /// instead of directly carrying Color fields, it only has a dictionary of property -> value

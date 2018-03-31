@@ -17,9 +17,10 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 
-namespace YamuiFramework.Animations.Transitions {
+namespace Yamui.Framework.Animations.Transitions {
     /// <summary>
     /// This class manages a linear transition. The percentage complete for the transition
     /// increases linearly with time.

@@ -17,18 +17,19 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using YamuiFramework.Animations.Transitions;
-using YamuiFramework.Fonts;
-using YamuiFramework.Forms;
-using YamuiFramework.Helper;
-using YamuiFramework.Themes;
+using Yamui.Framework.Animations.Transitions;
+using Yamui.Framework.Fonts;
+using Yamui.Framework.Forms;
+using Yamui.Framework.Helper;
+using Yamui.Framework.Themes;
 
-namespace YamuiFramework.Controls {
+namespace Yamui.Framework.Controls {
     /// <summary>
     /// Basically, this class is a better tabControl, documentation to be done later 
     /// </summary>

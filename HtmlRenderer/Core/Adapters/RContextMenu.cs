@@ -17,10 +17,11 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
-using System;
-using YamuiFramework.HtmlRenderer.Core.Adapters.Entities;
 
-namespace YamuiFramework.HtmlRenderer.Core.Adapters {
+using System;
+using Yamui.Framework.HtmlRenderer.Core.Adapters.Entities;
+
+namespace Yamui.Framework.HtmlRenderer.Core.Adapters {
     /// <summary>
     /// Adapter for platform specific context menu - used to create and show context menu at specific location.<br/>
     /// Not relevant for platforms that don't render HTML on UI element.

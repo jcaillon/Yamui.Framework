@@ -17,12 +17,13 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
 
-namespace YamuiFramework.Controls {
+namespace Yamui.Framework.Controls {
     public class YamuiArea : YamuiControl {
         #region constructor
 

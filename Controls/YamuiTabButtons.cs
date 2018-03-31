@@ -17,14 +17,15 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using YamuiFramework.Themes;
+using Yamui.Framework.Themes;
 
-namespace YamuiFramework.Controls {
+namespace Yamui.Framework.Controls {
     /// <summary>
     /// This class displays items on a list o strings, next to each other
     /// each item is clickable and triggers the TabPressed event that provides

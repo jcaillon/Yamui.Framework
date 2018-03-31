@@ -17,13 +17,14 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using YamuiFramework.Helper;
+using Yamui.Framework.Helper;
 
-namespace YamuiFramework.Themes {
+namespace Yamui.Framework.Themes {
     /// <summary>
     /// Holds a theme configuration for the YamuiFramework
     /// </summary>

@@ -17,10 +17,11 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System.Collections.Generic;
 using System.Timers;
 
-namespace YamuiFramework.Animations.Transitions {
+namespace Yamui.Framework.Animations.Transitions {
     /// <summary>
     /// This class is responsible for running transitions. It holds the timer that
     /// triggers transaction animation. 

@@ -17,10 +17,11 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
 
-namespace YamuiFramework.HtmlRenderer.Core.Core.Utils {
+namespace Yamui.Framework.HtmlRenderer.Core.Core.Utils {
     internal static class HtmlUtils {
         #region Fields and Consts
 

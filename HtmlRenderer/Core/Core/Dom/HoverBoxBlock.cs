@@ -17,9 +17,10 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
-using YamuiFramework.HtmlRenderer.Core.Core.Entities;
 
-namespace YamuiFramework.HtmlRenderer.Core.Core.Dom {
+using Yamui.Framework.HtmlRenderer.Core.Core.Entities;
+
+namespace Yamui.Framework.HtmlRenderer.Core.Core.Dom {
     /// <summary>
     /// CSS boxes that have ":hover" selector on them.
     /// </summary>

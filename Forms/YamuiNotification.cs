@@ -17,18 +17,19 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using YamuiFramework.Animations.Transitions;
-using YamuiFramework.Controls;
-using YamuiFramework.Helper;
-using YamuiFramework.HtmlRenderer.Core.Core.Entities;
-using YamuiFramework.Themes;
+using Yamui.Framework.Animations.Transitions;
+using Yamui.Framework.Controls;
+using Yamui.Framework.Helper;
+using Yamui.Framework.HtmlRenderer.Core.Core.Entities;
+using Yamui.Framework.Themes;
 
-namespace YamuiFramework.Forms {
+namespace Yamui.Framework.Forms {
 
     public sealed partial class YamuiNotification : YamuiFormToolWindow {
 

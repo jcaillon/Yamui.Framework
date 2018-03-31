@@ -17,11 +17,12 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
-using System;
-using YamuiFramework.HtmlRenderer.Core.Adapters;
-using YamuiFramework.HtmlRenderer.Core.Adapters.Entities;
 
-namespace YamuiFramework.HtmlRenderer.Core.Core {
+using System;
+using Yamui.Framework.HtmlRenderer.Core.Adapters;
+using Yamui.Framework.HtmlRenderer.Core.Adapters.Entities;
+
+namespace Yamui.Framework.HtmlRenderer.Core.Core {
     /// <summary>
     /// General utilities.
     /// </summary>

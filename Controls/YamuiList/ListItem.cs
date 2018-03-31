@@ -17,10 +17,11 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace YamuiFramework.Controls.YamuiList {
+namespace Yamui.Framework.Controls.YamuiList {
 
     #region ListItem
 

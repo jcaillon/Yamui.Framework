@@ -17,9 +17,10 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
-using YamuiFramework.HtmlRenderer.Core.Core.Utils;
 
-namespace YamuiFramework.HtmlRenderer.Core.Core.Entities {
+using Yamui.Framework.HtmlRenderer.Core.Core.Utils;
+
+namespace Yamui.Framework.HtmlRenderer.Core.Core.Entities {
     /// <summary>
     /// Holds single class selector in css block hierarchical selection (p class1 > div.class2)
     /// </summary>

@@ -17,6 +17,7 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -24,11 +25,11 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Threading;
 using System.Windows.Forms;
-using YamuiFramework.Fonts;
-using YamuiFramework.Helper;
-using YamuiFramework.Themes;
+using Yamui.Framework.Fonts;
+using Yamui.Framework.Helper;
+using Yamui.Framework.Themes;
 
-namespace YamuiFramework.Controls.YamuiList {
+namespace Yamui.Framework.Controls.YamuiList {
     /// <summary>
     /// A control that allows you to display a list of items super efficiently,
     /// use SetItems to start

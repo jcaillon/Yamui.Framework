@@ -17,10 +17,11 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
-using YamuiFramework.HtmlRenderer.Core.Adapters;
-using YamuiFramework.HtmlRenderer.Core.Adapters.Entities;
 
-namespace YamuiFramework.HtmlRenderer.Core.Core.Dom {
+using Yamui.Framework.HtmlRenderer.Core.Adapters;
+using Yamui.Framework.HtmlRenderer.Core.Adapters.Entities;
+
+namespace Yamui.Framework.HtmlRenderer.Core.Core.Dom {
     /// <summary>
     /// Represents a word inside an inline box
     /// </summary>

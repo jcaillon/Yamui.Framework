@@ -17,10 +17,11 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
-using YamuiFramework.HtmlRenderer.Core.Adapters.Entities;
-using YamuiFramework.HtmlRenderer.Core.Core.Utils;
 
-namespace YamuiFramework.HtmlRenderer.Core.Adapters {
+using Yamui.Framework.HtmlRenderer.Core.Adapters.Entities;
+using Yamui.Framework.HtmlRenderer.Core.Core.Utils;
+
+namespace Yamui.Framework.HtmlRenderer.Core.Adapters {
     /// <summary>
     /// Adapter for platform specific control object - used to handle updating the control that the html is rendered on.<br/>
     /// Not relevant for platforms that don't render HTML on UI element.

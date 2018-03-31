@@ -17,20 +17,21 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Text;
 using System.Windows.Forms;
-using YamuiFramework.HtmlRenderer.Core.Adapters.Entities;
-using YamuiFramework.HtmlRenderer.Core.Core;
-using YamuiFramework.HtmlRenderer.Core.Core.Entities;
-using YamuiFramework.HtmlRenderer.Core.Core.Parse;
-using YamuiFramework.HtmlRenderer.Core.Core.Utils;
-using YamuiFramework.HtmlRenderer.WinForms.Adapters;
-using YamuiFramework.HtmlRenderer.WinForms.Utilities;
+using Yamui.Framework.HtmlRenderer.Core.Adapters.Entities;
+using Yamui.Framework.HtmlRenderer.Core.Core;
+using Yamui.Framework.HtmlRenderer.Core.Core.Entities;
+using Yamui.Framework.HtmlRenderer.Core.Core.Parse;
+using Yamui.Framework.HtmlRenderer.Core.Core.Utils;
+using Yamui.Framework.HtmlRenderer.WinForms.Adapters;
+using Yamui.Framework.HtmlRenderer.WinForms.Utilities;
 
-namespace YamuiFramework.HtmlRenderer.WinForms {
+namespace Yamui.Framework.HtmlRenderer.WinForms {
     /// <summary>
     /// Low level handling of Html Renderer logic, this class is used by <see cref="HtmlParser"/>, 
     /// <see cref="HtmlLabel"/>, <see cref="HtmlToolTip"/> and <see cref="HtmlRender"/>.<br/>

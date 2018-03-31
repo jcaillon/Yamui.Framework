@@ -17,15 +17,16 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Globalization;
 using System.IO;
-using YamuiFramework.HtmlRenderer.Core.Adapters;
-using YamuiFramework.HtmlRenderer.Core.Core.Dom;
-using YamuiFramework.HtmlRenderer.Core.Core.Entities;
-using YamuiFramework.HtmlRenderer.Core.Core.Utils;
+using Yamui.Framework.HtmlRenderer.Core.Adapters;
+using Yamui.Framework.HtmlRenderer.Core.Core.Dom;
+using Yamui.Framework.HtmlRenderer.Core.Core.Entities;
+using Yamui.Framework.HtmlRenderer.Core.Core.Utils;
 
-namespace YamuiFramework.HtmlRenderer.Core.Core.Handlers {
+namespace Yamui.Framework.HtmlRenderer.Core.Core.Handlers {
     /// <summary>
     /// Handle context menu.
     /// </summary>

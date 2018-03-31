@@ -17,7 +17,7 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
-namespace YamuiFramework.HtmlRenderer.Core.Adapters {
+namespace Yamui.Framework.HtmlRenderer.Core.Adapters {
     /// <summary>
     /// Adapter for platform specific font object - used to render text using specific font.
     /// </summary>

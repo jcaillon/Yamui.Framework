@@ -17,12 +17,13 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using YamuiFramework.Themes;
+using Yamui.Framework.Themes;
 
-namespace YamuiFramework.Helper {
+namespace Yamui.Framework.Helper {
     public class YamuiVirtualScrollBar {
         #region Private
 

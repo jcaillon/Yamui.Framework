@@ -17,9 +17,10 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 
-namespace YamuiFramework.HtmlRenderer.Core.Adapters {
+namespace Yamui.Framework.HtmlRenderer.Core.Adapters {
     /// <summary>
     /// Adapter for platform specific graphics path object - used to render (draw/fill) path shape.
     /// </summary>

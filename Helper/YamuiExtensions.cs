@@ -17,6 +17,7 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -26,7 +27,7 @@ using System.Drawing.Imaging;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
-namespace YamuiFramework.Helper {
+namespace Yamui.Framework.Helper {
     public static class YamuiExtensions {
         #region ui thread safe invoke
 

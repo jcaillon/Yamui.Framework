@@ -17,6 +17,7 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -25,12 +26,12 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
-using YamuiFramework.Fonts;
-using YamuiFramework.Forms;
-using YamuiFramework.Helper;
-using YamuiFramework.Themes;
+using Yamui.Framework.Fonts;
+using Yamui.Framework.Forms;
+using Yamui.Framework.Helper;
+using Yamui.Framework.Themes;
 
-namespace YamuiFramework.Controls {
+namespace Yamui.Framework.Controls {
     /// <summary>
     /// Implements some of the methods/fields of a combo box
     /// </summary>

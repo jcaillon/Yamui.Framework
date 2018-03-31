@@ -17,10 +17,11 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Windows.Forms;
 
-namespace YamuiFramework.Helper {
+namespace Yamui.Framework.Helper {
     internal class WindowWrapper : IWin32Window {
         public WindowWrapper(IntPtr handle) {
             _hwnd = handle;

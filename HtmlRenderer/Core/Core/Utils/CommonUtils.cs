@@ -17,15 +17,16 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Text;
-using YamuiFramework.HtmlRenderer.Core.Adapters.Entities;
+using Yamui.Framework.HtmlRenderer.Core.Adapters.Entities;
 
-namespace YamuiFramework.HtmlRenderer.Core.Core.Utils {
+namespace Yamui.Framework.HtmlRenderer.Core.Core.Utils {
     internal delegate void ActionInt<in T>(T obj);
 
     internal delegate void ActionInt<in T1, in T2>(T1 arg1, T2 arg2);

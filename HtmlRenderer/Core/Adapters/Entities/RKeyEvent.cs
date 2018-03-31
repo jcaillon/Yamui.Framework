@@ -17,9 +17,10 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
-using YamuiFramework.HtmlRenderer.Core.Core;
 
-namespace YamuiFramework.HtmlRenderer.Core.Adapters.Entities {
+using Yamui.Framework.HtmlRenderer.Core.Core;
+
+namespace Yamui.Framework.HtmlRenderer.Core.Adapters.Entities {
     /// <summary>
     /// Even class for handling keyboard events in <see cref="HtmlContainerInt"/>.
     /// </summary>

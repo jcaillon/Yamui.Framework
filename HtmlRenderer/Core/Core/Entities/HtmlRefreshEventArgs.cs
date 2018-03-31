@@ -17,9 +17,10 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 
-namespace YamuiFramework.HtmlRenderer.Core.Core.Entities {
+namespace Yamui.Framework.HtmlRenderer.Core.Core.Entities {
     /// <summary>
     /// Raised when html renderer requires refresh of the control hosting (invalidation and re-layout).<br/>
     /// It can happen if some async event has occurred that requires re-paint and re-layout of the html.<br/>

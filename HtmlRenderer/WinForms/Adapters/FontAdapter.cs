@@ -17,11 +17,12 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Drawing;
-using YamuiFramework.HtmlRenderer.Core.Adapters;
+using Yamui.Framework.HtmlRenderer.Core.Adapters;
 
-namespace YamuiFramework.HtmlRenderer.WinForms.Adapters {
+namespace Yamui.Framework.HtmlRenderer.WinForms.Adapters {
     /// <summary>
     /// Adapter for WinForms Font object for core.
     /// </summary>

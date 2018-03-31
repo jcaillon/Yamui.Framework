@@ -17,12 +17,13 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Windows.Forms;
 
-namespace YamuiFramework.Helper {
+namespace Yamui.Framework.Helper {
     /// <summary>
     /// Dynamically determine and set a tab order for a container and children according to a given strategy.
     /// http://www.codeproject.com/Articles/8406/Automatic-Runtime-Tab-Order-Management-for-Windows

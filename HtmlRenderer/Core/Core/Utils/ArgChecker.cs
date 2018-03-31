@@ -17,10 +17,11 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.IO;
 
-namespace YamuiFramework.HtmlRenderer.Core.Core.Utils {
+namespace Yamui.Framework.HtmlRenderer.Core.Core.Utils {
     /// <summary>
     /// Static class that contains argument-checking methods
     /// </summary>

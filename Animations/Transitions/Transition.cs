@@ -17,6 +17,7 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -25,7 +26,7 @@ using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace YamuiFramework.Animations.Transitions {
+namespace Yamui.Framework.Animations.Transitions {
     /// <summary>
     /// Lets you perform animated transitions of properties on arbitrary objects. These 
     /// will often be transitions of UI properties, for example an animated fade-in of 

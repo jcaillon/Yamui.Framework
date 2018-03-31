@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace YamuiFramework.Helper {
+namespace Yamui.Framework.Helper {
     public class DrawHelper {
 
         public static void HandleWmPaint(ref Message m, Control control, Action<PaintEventArgs> paint) {

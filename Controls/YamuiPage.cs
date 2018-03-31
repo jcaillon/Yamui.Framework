@@ -18,11 +18,10 @@
 // ========================================================================
 #endregion
 
-using System;
 using System.ComponentModel;
 using System.ComponentModel.Design;
 
-namespace YamuiFramework.Controls {
+namespace Yamui.Framework.Controls {
 
     [
         Designer("System.Windows.Forms.Design.UserControlDocumentDesigner", typeof(IRootDesigner)),

@@ -17,9 +17,10 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 
-namespace YamuiFramework.HtmlRenderer.Core.Adapters.Entities {
+namespace Yamui.Framework.HtmlRenderer.Core.Adapters.Entities {
     /// <summary>
     ///     Represents an ordered pair of floating-point x- and y-coordinates that defines a point in a two-dimensional plane.
     /// </summary>

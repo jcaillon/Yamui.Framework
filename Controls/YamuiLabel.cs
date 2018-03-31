@@ -25,10 +25,10 @@ using System.Drawing;
 using System.Drawing.Design;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
-using YamuiFramework.Fonts;
-using YamuiFramework.Themes;
+using Yamui.Framework.Fonts;
+using Yamui.Framework.Themes;
 
-namespace YamuiFramework.Controls {
+namespace Yamui.Framework.Controls {
 
     [Designer("YamuiFramework.Controls.YamuiLabelDesigner")]
     [ToolboxBitmap(typeof(Label))]

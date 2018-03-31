@@ -29,7 +29,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Windows.Input;
 
-namespace YamuiFramework.Helper {
+namespace Yamui.Framework.Helper {
     [SuppressUnmanagedCodeSecurity]
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public static class WinApi {

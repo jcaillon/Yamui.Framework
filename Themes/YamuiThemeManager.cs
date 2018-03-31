@@ -17,16 +17,17 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
-using YamuiFramework.Helper;
-using YamuiFramework.HtmlRenderer.Core.Core;
-using YamuiFramework.HtmlRenderer.Core.Core.Entities;
-using YamuiFramework.HtmlRenderer.WinForms;
+using Yamui.Framework.Helper;
+using Yamui.Framework.HtmlRenderer.Core.Core;
+using Yamui.Framework.HtmlRenderer.Core.Core.Entities;
+using Yamui.Framework.HtmlRenderer.WinForms;
 
-namespace YamuiFramework.Themes {
+namespace Yamui.Framework.Themes {
     public static class YamuiThemeManager {
         #region public fields/events
 

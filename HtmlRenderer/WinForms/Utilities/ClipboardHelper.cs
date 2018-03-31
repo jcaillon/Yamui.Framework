@@ -17,11 +17,12 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Text;
 using System.Windows.Forms;
 
-namespace YamuiFramework.HtmlRenderer.WinForms.Utilities {
+namespace Yamui.Framework.HtmlRenderer.WinForms.Utilities {
     /// <summary>
     /// Helper to encode and set HTML fragment to clipboard.<br/>
     /// See http://theartofdev.wordpress.com/2012/11/11/setting-html-and-plain-text-formatting-to-clipboard/.<br/>

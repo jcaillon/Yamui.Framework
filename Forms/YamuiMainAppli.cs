@@ -17,6 +17,7 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -26,14 +27,14 @@ using System.Security;
 using System.Timers;
 using System.Web.UI.Design.WebControls;
 using System.Windows.Forms;
-using YamuiFramework.Animations.Transitions;
-using YamuiFramework.Controls;
-using YamuiFramework.Fonts;
-using YamuiFramework.Helper;
-using YamuiFramework.Themes;
+using Yamui.Framework.Animations.Transitions;
+using Yamui.Framework.Controls;
+using Yamui.Framework.Fonts;
+using Yamui.Framework.Helper;
+using Yamui.Framework.Themes;
 using Timer = System.Timers.Timer;
 
-namespace YamuiFramework.Forms {
+namespace Yamui.Framework.Forms {
     public class YamuiMainAppli : YamuiFormButtons {
         #region Fields
 

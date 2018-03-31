@@ -17,13 +17,14 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using YamuiFramework.Helper;
-using YamuiFramework.Themes;
+using Yamui.Framework.Helper;
+using Yamui.Framework.Themes;
 
-namespace YamuiFramework.Forms {
+namespace Yamui.Framework.Forms {
     public class YamuiSmokeScreen : Form {
         #region fields
 

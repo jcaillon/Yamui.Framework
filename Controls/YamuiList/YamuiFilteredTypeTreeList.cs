@@ -17,6 +17,7 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -24,9 +25,9 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
-using YamuiFramework.Themes;
+using Yamui.Framework.Themes;
 
-namespace YamuiFramework.Controls.YamuiList {
+namespace Yamui.Framework.Controls.YamuiList {
     /// <summary>
     /// This class is the most complicated, obviously
     /// The difficulty being handling the filter string correctly;

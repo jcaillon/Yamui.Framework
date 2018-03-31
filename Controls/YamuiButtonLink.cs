@@ -17,15 +17,16 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System.Collections;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
-using YamuiFramework.Fonts;
-using YamuiFramework.Themes;
+using Yamui.Framework.Fonts;
+using Yamui.Framework.Themes;
 
-namespace YamuiFramework.Controls {
+namespace Yamui.Framework.Controls {
     [Designer("YamuiFramework.Controls.YamuiLinkDesigner")]
     [ToolboxBitmap(typeof(LinkLabel))]
     [DefaultEvent("ButtonPressed")]

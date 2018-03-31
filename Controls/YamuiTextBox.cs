@@ -24,14 +24,13 @@ using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Drawing;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
-using YamuiFramework.Fonts;
-using YamuiFramework.Helper;
-using YamuiFramework.Themes;
+using Yamui.Framework.Fonts;
+using Yamui.Framework.Helper;
+using Yamui.Framework.Themes;
 
-namespace YamuiFramework.Controls {
+namespace Yamui.Framework.Controls {
     // https://gist.github.com/Ciantic/471698 : keyboard event listener
 
     [Designer("YamuiFramework.Controls.YamuiRegularTextBox2Designer")]

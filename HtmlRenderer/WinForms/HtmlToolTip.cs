@@ -17,17 +17,18 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Text;
 using System.Windows.Forms;
-using YamuiFramework.HtmlRenderer.Core.Core;
-using YamuiFramework.HtmlRenderer.Core.Core.Entities;
-using YamuiFramework.HtmlRenderer.WinForms.Utilities;
-using YamuiFramework.Themes;
+using Yamui.Framework.HtmlRenderer.Core.Core;
+using Yamui.Framework.HtmlRenderer.Core.Core.Entities;
+using Yamui.Framework.HtmlRenderer.WinForms.Utilities;
+using Yamui.Framework.Themes;
 
-namespace YamuiFramework.HtmlRenderer.WinForms {
+namespace Yamui.Framework.HtmlRenderer.WinForms {
     /// <summary>
     /// Provides HTML rendering on the tooltips
     /// </summary>

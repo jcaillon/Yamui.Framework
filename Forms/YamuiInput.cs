@@ -17,6 +17,7 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -24,13 +25,13 @@ using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
-using YamuiFramework.Controls;
-using YamuiFramework.Fonts;
-using YamuiFramework.Helper;
-using YamuiFramework.HtmlRenderer.Core.Core.Entities;
-using YamuiFramework.HtmlRenderer.WinForms;
+using Yamui.Framework.Controls;
+using Yamui.Framework.Fonts;
+using Yamui.Framework.Helper;
+using Yamui.Framework.HtmlRenderer.Core.Core.Entities;
+using Yamui.Framework.HtmlRenderer.WinForms;
 
-namespace YamuiFramework.Forms {
+namespace Yamui.Framework.Forms {
     public sealed partial class YamuiInput : YamuiFormButtons {
 
         #region Fields

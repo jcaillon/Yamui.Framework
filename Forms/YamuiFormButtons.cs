@@ -17,6 +17,7 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -24,11 +25,11 @@ using System.Drawing;
 using System.Linq;
 using System.Security;
 using System.Windows.Forms;
-using YamuiFramework.Helper;
-using YamuiFramework.HtmlRenderer.WinForms;
-using YamuiFramework.Themes;
+using Yamui.Framework.Helper;
+using Yamui.Framework.HtmlRenderer.WinForms;
+using Yamui.Framework.Themes;
 
-namespace YamuiFramework.Forms {
+namespace Yamui.Framework.Forms {
     /// <summary>
     /// Form class that adds the top right buttons + resize
     /// </summary>

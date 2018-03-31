@@ -17,15 +17,16 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
-using YamuiFramework.HtmlRenderer.Core.Adapters;
-using YamuiFramework.HtmlRenderer.Core.Adapters.Entities;
-using YamuiFramework.HtmlRenderer.Core.Core.Parse;
-using YamuiFramework.HtmlRenderer.Core.Core.Utils;
+using Yamui.Framework.HtmlRenderer.Core.Adapters;
+using Yamui.Framework.HtmlRenderer.Core.Adapters.Entities;
+using Yamui.Framework.HtmlRenderer.Core.Core.Parse;
+using Yamui.Framework.HtmlRenderer.Core.Core.Utils;
 
-namespace YamuiFramework.HtmlRenderer.Core.Core.Dom {
+namespace Yamui.Framework.HtmlRenderer.Core.Core.Dom {
     /// <summary>
     /// Base class for css box to handle the css properties.<br/>
     /// Has field and property for every css property that can be set, the properties add additional parsing like

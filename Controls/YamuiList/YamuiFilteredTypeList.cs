@@ -17,6 +17,7 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -26,12 +27,12 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
-using YamuiFramework.Fonts;
-using YamuiFramework.Helper;
-using YamuiFramework.HtmlRenderer.WinForms;
-using YamuiFramework.Themes;
+using Yamui.Framework.Fonts;
+using Yamui.Framework.Helper;
+using Yamui.Framework.HtmlRenderer.WinForms;
+using Yamui.Framework.Themes;
 
-namespace YamuiFramework.Controls.YamuiList {
+namespace Yamui.Framework.Controls.YamuiList {
     /// <summary>
     /// Display a filterable list in which each item as a type
     /// </summary>

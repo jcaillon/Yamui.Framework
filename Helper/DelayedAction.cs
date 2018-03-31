@@ -17,13 +17,14 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 
-namespace YamuiFramework.Helper {
+namespace Yamui.Framework.Helper {
     /// <summary>
     /// Simple class to delay an action
     /// </summary>

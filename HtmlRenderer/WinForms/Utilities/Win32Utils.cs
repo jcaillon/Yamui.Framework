@@ -22,7 +22,7 @@ using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
-namespace YamuiFramework.HtmlRenderer.WinForms.Utilities {
+namespace Yamui.Framework.HtmlRenderer.WinForms.Utilities {
     /// <summary>
     /// Utility for Win32 API.
     /// </summary>

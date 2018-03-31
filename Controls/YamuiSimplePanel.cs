@@ -17,13 +17,14 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-using YamuiFramework.Themes;
+using Yamui.Framework.Themes;
 
-namespace YamuiFramework.Controls {
+namespace Yamui.Framework.Controls {
     [ToolboxBitmap(typeof(Panel))]
     public class YamuiSimplePanel : Panel, IScrollableControl {
         #region Fields

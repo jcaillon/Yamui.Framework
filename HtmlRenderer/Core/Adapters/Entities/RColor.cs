@@ -17,10 +17,11 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Text;
 
-namespace YamuiFramework.HtmlRenderer.Core.Adapters.Entities {
+namespace Yamui.Framework.HtmlRenderer.Core.Adapters.Entities {
     /// <summary>
     /// Represents an ARGB (alpha, red, green, blue) color.
     /// </summary>

@@ -17,12 +17,13 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
-namespace YamuiFramework.Helper {
+namespace Yamui.Framework.Helper {
 
     /// <summary>      
     /// Wrapper for GDI text rendering functions<br/>      

@@ -17,13 +17,14 @@
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Text;
 using System.Windows.Forms;
 
-namespace YamuiFramework.Fonts {
+namespace Yamui.Framework.Fonts {
     public enum FontFunction {
         AppliTitle,
         Small,
