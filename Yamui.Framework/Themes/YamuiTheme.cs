@@ -29,6 +29,7 @@ namespace Yamui.Framework.Themes {
     /// Holds a theme configuration for the YamuiFramework
     /// </summary>
     public class YamuiTheme : GenericThemeHolder {
+
         #region Stored in the config file
 
         public string PageBackGroundImage = "";
@@ -99,6 +100,14 @@ namespace Yamui.Framework.Themes {
 
         public Color AutoCompletionHighlightBack = Color.FromArgb(254, 228, 101);
         public Color AutoCompletionHighlightBorder = Color.FromArgb(255, 171, 0);
+
+        #endregion
+
+        #region Image
+
+        public Image BackgroundImage { set; get; }
+
+        public bool NeedTransparency => BackgroundImage != null;
 
         #endregion
 

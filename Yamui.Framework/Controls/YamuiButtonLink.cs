@@ -18,18 +18,15 @@
 // ========================================================================
 #endregion
 
-using System.Collections;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Windows.Forms.Design;
 using Yamui.Framework.Fonts;
 using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Controls {
-    [Designer("YamuiFramework.Controls.YamuiLinkDesigner")]
+
     [ToolboxBitmap(typeof(LinkLabel))]
-    [DefaultEvent("ButtonPressed")]
     public class YamuiButtonLink : YamuiButton {
         #region Fields
 
@@ -74,28 +71,4 @@ namespace Yamui.Framework.Controls {
         #endregion
     }
 
-    internal class YamuiLinkDesigner : ControlDesigner {
-        protected override void PreFilterProperties(IDictionary properties) {
-            properties.Remove("ImeMode");
-            properties.Remove("Padding");
-            properties.Remove("FlatAppearance");
-            properties.Remove("FlatStyle");
-            properties.Remove("AutoEllipsis");
-            properties.Remove("UseCompatibleTextRendering");
-
-            properties.Remove("Image");
-            properties.Remove("ImageAlign");
-            properties.Remove("ImageIndex");
-            properties.Remove("ImageKey");
-            properties.Remove("ImageList");
-            properties.Remove("TextImageRelation");
-
-            properties.Remove("UseVisualStyleBackColor");
-
-            properties.Remove("Font");
-            properties.Remove("RightToLeft");
-
-            base.PreFilterProperties(properties);
-        }
-    }
 }

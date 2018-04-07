@@ -28,7 +28,8 @@ using System.Windows.Forms.Design;
 using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Controls {
-    [Designer("YamuiFramework.Controls.YamuiColorRadioButtonDesigner")]
+
+    [Designer(typeof(YamuiColorRadioButtonDesigner))]
     [ToolboxBitmap(typeof(RadioButton))]
     public class YamuiColorRadioButton : RadioButton, IScrollableControl {
 

@@ -25,19 +25,18 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using System.Windows.Forms.Design;
 using Yamui.Framework.Fonts;
 using Yamui.Framework.Forms;
 using Yamui.Framework.Helper;
 using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Controls {
+
     /// <summary>
     /// Implements some of the methods/fields of a combo box
     /// </summary>
-    [Designer("YamuiFramework.Controls.YamuiComboBoxDesigner")]
     [ToolboxBitmap(typeof(ComboBox))]
-    [DefaultEvent("SelectedIndexChangedByUser")]
+    [DefaultEvent(nameof(SelectedIndexChangedByUser))]
     public sealed class YamuiComboBox : YamuiButton {
 
         #region private
@@ -493,28 +492,4 @@ namespace Yamui.Framework.Controls {
         #endregion
     }
 
-    #region Designer
-
-    internal class YamuiComboBoxDesigner : ControlDesigner {
-        protected override void PreFilterProperties(IDictionary properties) {
-            properties.Remove("ImeMode");
-            properties.Remove("Padding");
-            properties.Remove("FlatAppearance");
-            properties.Remove("FlatStyle");
-            properties.Remove("AutoEllipsis");
-            properties.Remove("UseCompatibleTextRendering");
-            properties.Remove("Image");
-            properties.Remove("ImageAlign");
-            properties.Remove("ImageIndex");
-            properties.Remove("ImageKey");
-            properties.Remove("ImageList");
-            properties.Remove("TextImageRelation");
-            properties.Remove("UseVisualStyleBackColor");
-            properties.Remove("Font");
-            properties.Remove("RightToLeft");
-            base.PreFilterProperties(properties);
-        }
-    }
-
-    #endregion
 }

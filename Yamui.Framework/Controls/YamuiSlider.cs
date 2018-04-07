@@ -27,7 +27,7 @@ using Yamui.Framework.Themes;
 namespace Yamui.Framework.Controls {
 
     [ToolboxBitmap(typeof(TrackBar))]
-    [DefaultEvent("Scroll")]
+    [DefaultEvent(nameof(Scroll))]
     public class YamuiSlider : YamuiControl {
         #region Fields
 

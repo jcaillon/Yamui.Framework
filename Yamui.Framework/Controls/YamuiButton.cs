@@ -31,9 +31,9 @@ using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Controls {
 
-    [Designer("YamuiFramework.Controls.YamuiButtonDesigner")]
+    [Designer(typeof(YamuiButtonDesigner))]
     [ToolboxBitmap(typeof(Button))]
-    [DefaultEvent("ButtonPressed")]
+    [DefaultEvent(nameof(ButtonPressed))]
     public class YamuiButton : Button, IScrollableControl {
 
         #region Properties

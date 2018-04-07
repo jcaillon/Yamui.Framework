@@ -30,7 +30,7 @@ using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Controls {
 
-    [Designer("YamuiFramework.Controls.YamuiLabelDesigner")]
+    [Designer(typeof(YamuiLabelDesigner))]
     [ToolboxBitmap(typeof(Label))]
     public class YamuiLabel : YamuiControl {
 
@@ -186,11 +186,14 @@ namespace Yamui.Framework.Controls {
 
     }
 
+    
     #region designer
 
     internal class YamuiLabelDesigner : ControlDesigner {
         protected override void PreFilterProperties(IDictionary properties) {
+
             properties.Remove("ImeMode");
+            properties.Remove("Padding");
             properties.Remove("FlatAppearance");
             properties.Remove("FlatStyle");
             properties.Remove("AutoEllipsis");
@@ -203,15 +206,19 @@ namespace Yamui.Framework.Controls {
             properties.Remove("ImageList");
             properties.Remove("TextImageRelation");
 
+            properties.Remove("BackColor");
+            properties.Remove("BackgroundImage");
+            properties.Remove("BackgroundImageLayout");
             properties.Remove("UseVisualStyleBackColor");
 
             properties.Remove("Font");
+            properties.Remove("ForeColor");
             properties.Remove("RightToLeft");
-            properties.Remove("BorderStyle");
 
             base.PreFilterProperties(properties);
         }
     }
 
     #endregion
+
 }

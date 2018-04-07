@@ -25,10 +25,9 @@ using System.Windows.Forms;
 using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Controls {
-    [Designer("YamuiFramework.Controls.YamuiButtonDesigner")]
-    [ToolboxBitmap(typeof(Button))]
-    [DefaultEvent("ButtonPressed")]
+
     public class YamuiButtonImage : YamuiButton {
+
         #region Fields
 
         [DefaultValue(false)]

@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Collections;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using System.Windows.Forms.Design;
 using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Controls {
 
+    [Designer(typeof(YamuiControlDesigner))]
     public class YamuiControl : Control, IScrollableControl {
 
         #region IYamuiControl
@@ -67,6 +71,7 @@ namespace Yamui.Framework.Controls {
         /// Cache mechanism added for VSWhidbey 500516
         /// 3000 character strings take 9 seconds to load the form
         internal sealed class MeasureTextCache2 {
+
             private Size _unconstrainedPreferredSize = InvalidSize;
             private const int MaxCacheSize = 6; // the number of preferred sizes to store
             private int _nextCacheEntry = -1; // the next place in the ring buffer to store a preferred size
@@ -176,4 +181,39 @@ namespace Yamui.Framework.Controls {
 
         #endregion
     }
+
+    #region designer
+
+    internal class YamuiControlDesigner : ControlDesigner {
+        protected override void PreFilterProperties(IDictionary properties) {
+
+            properties.Remove("ImeMode");
+            properties.Remove("Padding");
+            properties.Remove("FlatAppearance");
+            properties.Remove("FlatStyle");
+            properties.Remove("AutoEllipsis");
+            properties.Remove("UseCompatibleTextRendering");
+
+            properties.Remove("Image");
+            properties.Remove("ImageAlign");
+            properties.Remove("ImageIndex");
+            properties.Remove("ImageKey");
+            properties.Remove("ImageList");
+            properties.Remove("TextImageRelation");
+
+            //properties.Remove("BackColor");
+            properties.Remove("BackgroundImage");
+            properties.Remove("BackgroundImageLayout");
+            properties.Remove("UseVisualStyleBackColor");
+
+            properties.Remove("Font");
+            //properties.Remove("ForeColor");
+            properties.Remove("RightToLeft");
+            properties.Remove("Text");
+
+            base.PreFilterProperties(properties);
+        }
+    }
+
+    #endregion
 }

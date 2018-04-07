@@ -25,16 +25,18 @@ using System.Collections;
 using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Security.Permissions;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 using Yamui.Framework.Helper;
 using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Controls {
-
-    [Designer(typeof(YamuiScrollPanelDesigner))]
+    [
+        Designer(typeof(ParentControlDesigner)),
+        Designer(typeof(YamuiScrollPanelDesigner))
+    ]
     public class YamuiScrollPanel : YamuiControl {
-
         #region fields
 
         [DefaultValue(false)]
@@ -113,6 +115,7 @@ namespace Yamui.Framework.Controls {
         private Rectangle _leftoverBar;
         private bool _needBothScroll;
         private int _scrollBarWidth = 15;
+        private FormWindowState? _lastWindowState;
 
         #endregion
 
@@ -152,6 +155,16 @@ namespace Yamui.Framework.Controls {
             HorizontalScroll.OnRedrawScrollBars -= OnRedrawScrollBars;
         }
 
+        protected override CreateParams CreateParams {
+            [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+            get {
+                CreateParams cp = base.CreateParams;
+                /* The window itself contains child windows that should take part in dialog box navigation. If this style is specified, the dialog manager recurses into children of this window when performing navigation operations such as handling the TAB key, an arrow key, or a keyboard mnemonic. */
+                cp.ExStyle |= (int) WinApi.WindowStylesEx.WS_EX_CONTROLPARENT;
+                return cp;
+            }
+        }
+
         #endregion
 
         #region Paint
@@ -161,15 +174,10 @@ namespace Yamui.Framework.Controls {
         /// </summary>
         /// <param name="e"></param>
         protected override void OnPaint(PaintEventArgs e) {
-            // paint background
-            e.Graphics.Clear(YamuiThemeManager.Current.FormBack);
-            if (!DisableBackgroundImage && !DesignMode) {
-                var img = YamuiThemeManager.CurrentThemeImage;
-                if (img != null) {
-                    Rectangle rect = new Rectangle(ClientRectangle.Right - img.Width, ClientRectangle.Height - img.Height, img.Width, img.Height);
-                    e.Graphics.DrawImage(img, rect, 0, 0, img.Width, img.Height, GraphicsUnit.Pixel);
-                }
-            }
+            if (YamuiThemeManager.Current.NeedTransparency)
+                PaintTransparentBackground(e.Graphics, DisplayRectangle);
+            else
+                e.Graphics.Clear(YamuiThemeManager.Current.FormBack);
         }
 
         protected void PaintScrollBars(YamuiScrollHandler yamuiScrollHandler) {
@@ -181,15 +189,18 @@ namespace Yamui.Framework.Controls {
             if (hdc == IntPtr.Zero) {
                 return;
             }
+
             try {
                 // paint the left over between the 2 scrolls (the small square)
                 if (_needBothScroll) {
                     PaintOnRectangle(hdc, ref _leftoverBar, PaintLeftOver);
                 }
+
                 if (VerticalScroll.HasScroll) {
                     var verticalBar = VerticalScroll.BarRect;
                     PaintOnRectangle(hdc, ref verticalBar, PaintVerticalScroll);
                 }
+
                 if (HorizontalScroll.HasScroll) {
                     var horizontalBar = HorizontalScroll.BarRect;
                     PaintOnRectangle(hdc, ref horizontalBar, PaintHorizontalScroll);
@@ -220,6 +231,7 @@ namespace Yamui.Framework.Controls {
                 using (PaintEventArgs e = new PaintEventArgs(g, rect)) {
                     paint(e);
                 }
+
                 bg.Render();
             }
         }
@@ -297,9 +309,10 @@ namespace Yamui.Framework.Controls {
                     var point = PointToClient(new Point(m.LParam.ToInt32()));
                     if (!ClientRectangle.Contains(point)) {
                         m.Result = (IntPtr) WinApi.HitTest.HTBORDER;
-                    } else { 
+                    } else {
                         base.WndProc(ref m);
                     }
+
                     break;
 
                 case (int) WinApi.Messages.WM_MOUSEWHEEL:
@@ -316,6 +329,7 @@ namespace Yamui.Framework.Controls {
                         // propagate the event
                         base.WndProc(ref m);
                     }
+
                     break;
 
                 case (int) WinApi.Messages.WM_KEYDOWN:
@@ -330,8 +344,9 @@ namespace Yamui.Framework.Controls {
                         if (!e.Handled)
                             base.WndProc(ref m);
                     }
+
                     break;
-                    
+
                 case (int) WinApi.Messages.WM_MOUSEMOVE:
                     if (VerticalScroll.IsThumbPressed)
                         VerticalScroll.HandleMouseMove(null, null);
@@ -349,13 +364,13 @@ namespace Yamui.Framework.Controls {
                     WinApi.TrackMouseEvent(tme);
 
                     // PointToClient(new Point(m.LParam.ToInt32()));
-                    VerticalScroll.HandleMouseMove(null, null);  
-                    HorizontalScroll.HandleMouseMove(null, null);  
+                    VerticalScroll.HandleMouseMove(null, null);
+                    HorizontalScroll.HandleMouseMove(null, null);
                     base.WndProc(ref m);
                     break;
 
                 case (int) WinApi.Messages.WM_NCLBUTTONDOWN:
-                    VerticalScroll.HandleMouseDown(null, null);  
+                    VerticalScroll.HandleMouseDown(null, null);
                     HorizontalScroll.HandleMouseDown(null, null);
                     Focus();
                     // here we forward to base button down because it has a internal focus mecanism that we want to exploit
@@ -366,16 +381,16 @@ namespace Yamui.Framework.Controls {
 
                 case (int) WinApi.Messages.WM_NCLBUTTONUP:
                 case (int) WinApi.Messages.WM_LBUTTONUP:
-                    VerticalScroll.HandleMouseUp(null, null);  
+                    VerticalScroll.HandleMouseUp(null, null);
                     HorizontalScroll.HandleMouseUp(null, null);
                     // here we forward this message to base WM_LBUTTONUP to release the internal focus on this control
                     m.Msg = (int) WinApi.Messages.WM_LBUTTONUP;
                     base.WndProc(ref m);
                     break;
-                    
+
                 case (int) WinApi.Messages.WM_NCMOUSELEAVE:
                     VerticalScroll.HandleMouseLeave(null, null);
-                    HorizontalScroll.HandleMouseLeave(null, null);  
+                    HorizontalScroll.HandleMouseLeave(null, null);
                     base.WndProc(ref m);
                     break;
 
@@ -384,7 +399,7 @@ namespace Yamui.Framework.Controls {
                     break;
             }
         }
-        
+
         /// <summary>
         /// Returns true if the bit at the given position is set to true
         /// </summary>
@@ -396,6 +411,7 @@ namespace Yamui.Framework.Controls {
             if (HorizontalScroll.HasScroll) {
                 rect.bottom -= HorizontalScroll.BarThickness;
             }
+
             if (VerticalScroll.HasScroll) {
                 rect.right -= VerticalScroll.BarThickness;
             }
@@ -404,6 +420,13 @@ namespace Yamui.Framework.Controls {
         protected override void OnResize(EventArgs e) {
             ApplyPreferedSize(_preferedSize);
             base.OnResize(e);
+
+            // need to do the thing below to correctly recompute the client/non client areas when the windows is maximized/minimized
+            var newWindowState = FindForm()?.WindowState;
+            if (_lastWindowState != newWindowState) {
+                WinApi.SetWindowPos(Handle, IntPtr.Zero, 0, 0, 0, 0, WinApi.SetWindowPosFlags.SWP_FRAMECHANGED | WinApi.SetWindowPosFlags.SWP_NOACTIVATE | WinApi.SetWindowPosFlags.SWP_NOMOVE | WinApi.SetWindowPosFlags.SWP_NOSIZE | WinApi.SetWindowPosFlags.SWP_NOZORDER);
+            }
+            _lastWindowState = newWindowState;
         }
 
         /// <summary>
@@ -421,7 +444,7 @@ namespace Yamui.Framework.Controls {
         }
 
         #endregion
-        
+
         #region core
 
         /// <summary>
@@ -446,7 +469,7 @@ namespace Yamui.Framework.Controls {
             _needBothScroll = false;
             var needHorizontalScroll = HorizontalScroll.HasScroll;
             var needVerticalScroll = VerticalScroll.UpdateLength(size.Height, null, Height - (needHorizontalScroll ? HorizontalScroll.BarThickness : 0), Width);
-            HorizontalScroll.UpdateLength(size.Width,null, Width - (needVerticalScroll ? VerticalScroll.BarThickness : 0), Height);
+            HorizontalScroll.UpdateLength(size.Width, null, Width - (needVerticalScroll ? VerticalScroll.BarThickness : 0), Height);
 
             if (needHorizontalScroll != HorizontalScroll.HasScroll) {
                 needHorizontalScroll = HorizontalScroll.HasScroll;
@@ -521,7 +544,7 @@ namespace Yamui.Framework.Controls {
                 _preferedSize.Width = controlReach;
             }
         }
-        
+
         /// <summary>
         /// Very important to display the correct scroll value when coming back to a scrolled panel.
         /// Try without it and watch for yourself
@@ -533,10 +556,12 @@ namespace Yamui.Framework.Controls {
                     rect.Y = -VerticalScroll.Value;
                     rect.Width -= HorizontalScroll.BarThickness;
                 }
+
                 if (HorizontalScroll.HasScroll) {
                     rect.X = -HorizontalScroll.Value;
                     rect.Height -= VerticalScroll.BarThickness;
                 }
+
                 return rect;
             }
         }
@@ -548,7 +573,7 @@ namespace Yamui.Framework.Controls {
         #endregion
     }
 
-    internal class YamuiScrollPanelDesigner : ControlDesigner {
+    internal class YamuiScrollPanelDesigner : ScrollableControlDesigner {
         protected override void PreFilterProperties(IDictionary properties) {
             properties.Remove("AutoScrollMargin");
             properties.Remove("AutoScrollMinSize");

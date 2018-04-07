@@ -32,6 +32,8 @@ using Yamui.Framework.HtmlRenderer.WinForms;
 using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Helper {
+
+
     /// <summary>
     /// This class provides various utilies to use in YamuiFramework and outside
     /// </summary>

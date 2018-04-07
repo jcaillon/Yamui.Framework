@@ -30,6 +30,7 @@ using Yamui.Framework.Helper;
 using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Controls {
+
     /// <summary>
     /// Basically, this class is a better tabControl, documentation to be done later 
     /// </summary>
@@ -177,7 +178,6 @@ namespace Yamui.Framework.Controls {
                 _currentPage.Location = new Point(XOffsetPage, YOffsetPage);
                 _currentPage.Size = new Size(Width - XOffsetPage, Height - YOffsetPage);
                 Controls.Add(_currentPage);
-                _currentPage.UpdateBoundsPublic();
 
                 Application.DoEvents();
 
@@ -353,7 +353,7 @@ namespace Yamui.Framework.Controls {
                 e.Graphics.Clear(YamuiThemeManager.Current.FormBack);
                 // background image?
                 if (!DontShowBackGroundImage) {
-                    var img = YamuiThemeManager.CurrentThemeImage;
+                    var img = YamuiThemeManager.Current.BackgroundImage;
                     if (img != null) {
                         Rectangle rect = new Rectangle(ClientRectangle.Right - img.Width, ClientRectangle.Height - img.Height, img.Width, img.Height);
                         e.Graphics.DrawImage(img, rect, 0, 0, img.Width, img.Height, GraphicsUnit.Pixel);

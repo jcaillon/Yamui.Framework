@@ -30,7 +30,7 @@ using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Controls {
 
-    [Designer("YamuiFramework.Controls.YamuiCheckBoxDesigner")]
+    [Designer(typeof(YamuiCheckBoxDesigner))]
     [ToolboxBitmap(typeof(CheckBox))]
     public class YamuiCheckBox : CheckBox, IScrollableControl {
 

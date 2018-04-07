@@ -31,7 +31,8 @@ using Yamui.Framework.Themes;
 // Credits to : http://sourceforge.net/projects/bsfccontrollibr/
 
 namespace Yamui.Framework.Controls {
-    [Designer("YamuiFramework.Controls.YamuiRadioButtonDesigner")]
+
+    [Designer(typeof(YamuiRadioButtonDesigner))]
     [ToolboxBitmap(typeof(RadioButton))]
     public class YamuiRadioButton : RadioButton, IScrollableControl {
         #region Fields

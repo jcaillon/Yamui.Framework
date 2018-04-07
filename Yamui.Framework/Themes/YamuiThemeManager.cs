@@ -28,7 +28,9 @@ using Yamui.Framework.HtmlRenderer.Core.Core.Entities;
 using Yamui.Framework.HtmlRenderer.WinForms;
 
 namespace Yamui.Framework.Themes {
+
     public static class YamuiThemeManager {
+
         #region public fields/events
 
         /// <summary>
@@ -83,7 +85,7 @@ namespace Yamui.Framework.Themes {
                 CurrentThemeCss = null;
 
                 // get the theme background image if any
-                CurrentThemeImage = FindImage(_currentTheme.PageBackGroundImage);
+                _currentTheme.BackgroundImage = FindImage(_currentTheme.PageBackGroundImage);
             }
         }
 
@@ -102,8 +104,6 @@ namespace Yamui.Framework.Themes {
         #endregion
 
         #region internal
-
-        internal static Image CurrentThemeImage { private set; get; }
 
         /// <summary>
         /// Allows to add something to the Text property of every label

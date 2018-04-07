@@ -31,9 +31,10 @@ using Yamui.Framework.Helper;
 using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Controls {
+
     // https://gist.github.com/Ciantic/471698 : keyboard event listener
 
-    [Designer("YamuiFramework.Controls.YamuiRegularTextBox2Designer")]
+    [Designer(typeof(YamuiRegularTextBoxDesigner))]
     public sealed class YamuiTextBox : TextBox, IScrollableControl {
 
         #region Fields
@@ -310,10 +311,10 @@ namespace Yamui.Framework.Controls {
         }
     }
 
-    internal class YamuiRegularTextBox2Designer : ControlDesigner {
+    internal class YamuiRegularTextBoxDesigner : ControlDesigner {
         protected override void PreFilterProperties(IDictionary properties) {
-            properties.Remove("WordWrap");
-            properties.Remove("MinimumSize");
+            //properties.Remove("WordWrap");
+            //properties.Remove("MinimumSize");
             base.PreFilterProperties(properties);
         }
     }

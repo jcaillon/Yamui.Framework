@@ -221,6 +221,315 @@ namespace Yamui.Framework.Helper {
 
         #region Enums
 
+        /// <summary>
+        ///     Special window handles
+        /// </summary>
+        public enum SpecialWindowHandles {
+            // ReSharper disable InconsistentNaming
+            /// <summary>
+            ///     Places the window at the top of the Z order.
+            /// </summary>
+            HWND_TOP = 0,
+
+            /// <summary>
+            ///     Places the window at the bottom of the Z order. If the hWnd parameter identifies a topmost window, the window loses its topmost status and is placed at the bottom of all other windows.
+            /// </summary>
+            HWND_BOTTOM = 1,
+
+            /// <summary>
+            ///     Places the window above all non-topmost windows. The window maintains its topmost position even when it is deactivated.
+            /// </summary>
+            HWND_TOPMOST = -1,
+
+            /// <summary>
+            ///     Places the window above all non-topmost windows (that is, behind all topmost windows). This flag has no effect if the window is already a non-topmost window.
+            /// </summary>
+            HWND_NOTOPMOST = -2
+        }
+
+        [Flags]
+        public enum SetWindowPosFlags : uint {
+            /// <summary>
+            ///     If the calling thread and the thread that owns the window are attached to different input queues, the system posts the request to the thread that owns the window. This prevents the calling thread from blocking its execution while other threads process the request.
+            /// </summary>
+            SWP_ASYNCWINDOWPOS = 0x4000,
+
+            /// <summary>
+            ///     Prevents generation of the WM_SYNCPAINT message.
+            /// </summary>
+            SWP_DEFERERASE = 0x2000,
+
+            /// <summary>
+            ///     Draws a frame (defined in the window's class description) around the window.
+            /// </summary>
+            SWP_DRAWFRAME = 0x0020,
+
+            /// <summary>
+            ///     Applies new frame styles set using the SetWindowLong function. Sends a WM_NCCALCSIZE message to the window, even if the window's size is not being changed. If this flag is not specified, WM_NCCALCSIZE is sent only when the window's size is being changed.
+            /// </summary>
+            SWP_FRAMECHANGED = 0x0020,
+
+            /// <summary>
+            ///     Hides the window.
+            /// </summary>
+            SWP_HIDEWINDOW = 0x0080,
+
+            /// <summary>
+            ///     Does not activate the window. If this flag is not set, the window is activated and moved to the top of either the topmost or non-topmost group (depending on the setting of the hWndInsertAfter parameter).
+            /// </summary>
+            SWP_NOACTIVATE = 0x0010,
+
+            /// <summary>
+            ///     Discards the entire contents of the client area. If this flag is not specified, the valid contents of the client area are saved and copied back into the client area after the window is sized or repositioned.
+            /// </summary>
+            SWP_NOCOPYBITS = 0x0100,
+
+            /// <summary>
+            ///     Retains the current position (ignores X and Y parameters).
+            /// </summary>
+            SWP_NOMOVE = 0x0002,
+
+            /// <summary>
+            ///     Does not change the owner window's position in the Z order.
+            /// </summary>
+            SWP_NOOWNERZORDER = 0x0200,
+
+            /// <summary>
+            ///     Does not redraw changes. If this flag is set, no repainting of any kind occurs. This applies to the client area, the nonclient area (including the title bar and scroll bars), and any part of the parent window uncovered as a result of the window being moved. When this flag is set, the application must explicitly invalidate or redraw any parts of the window and parent window that need redrawing.
+            /// </summary>
+            SWP_NOREDRAW = 0x0008,
+
+            /// <summary>
+            ///     Same as the SWP_NOOWNERZORDER flag.
+            /// </summary>
+            SWP_NOREPOSITION = 0x0200,
+
+            /// <summary>
+            ///     Prevents the window from receiving the WM_WINDOWPOSCHANGING message.
+            /// </summary>
+            SWP_NOSENDCHANGING = 0x0400,
+
+            /// <summary>
+            ///     Retains the current size (ignores the cx and cy parameters).
+            /// </summary>
+            SWP_NOSIZE = 0x0001,
+
+            /// <summary>
+            ///     Retains the current Z order (ignores the hWndInsertAfter parameter).
+            /// </summary>
+            SWP_NOZORDER = 0x0004,
+
+            /// <summary>
+            ///     Displays the window.
+            /// </summary>
+            SWP_SHOWWINDOW = 0x0040,
+        }
+
+        /// <summary>
+        /// The initial state of the frame control. 
+        /// </summary>
+        [Flags()]
+        public enum DrawFrameControlStates {
+            // =====================================================================================
+            // If uType is DFC_BUTTON, uState can be one of the following values.
+            // =====================================================================================
+            /// <summary>
+            /// Check box
+            /// </summary>
+            DFCS_BUTTONCHECK = 0,
+
+            /// <summary>
+            /// Image for radio button (nonsquare needs image)
+            /// </summary>
+            DFCS_BUTTONRADIOIMAGE = 1,
+
+            /// <summary>
+            /// Mask for radio button (nonsquare needs mask)
+            /// </summary>
+            DFCS_BUTTONRADIOMASK = 2,
+
+            /// <summary>
+            /// Radio button
+            /// </summary>
+            DFCS_BUTTONRADIO = 4,
+
+            /// <summary>
+            /// Three-state button
+            /// </summary>
+            DFCS_BUTTON3STATE = 8,
+
+            /// <summary>
+            /// Push button
+            /// </summary>
+            DFCS_BUTTONPUSH = 0x10,
+
+            // =====================================================================================
+            // If uType is DFC_CAPTION, uState can be one of the following values.
+            // =====================================================================================
+            /// <summary>
+            /// Close button
+            /// </summary>
+            DFCS_CAPTIONCLOSE = 0,
+
+            /// <summary>
+            /// Minimize button
+            /// </summary>
+            DFCS_CAPTIONMIN = 1,
+
+            /// <summary>
+            /// Maximize button
+            /// </summary>
+            DFCS_CAPTIONMAX = 2,
+
+            /// <summary>
+            /// Restore button
+            /// </summary>
+            DFCS_CAPTIONRESTORE = 3,
+
+            /// <summary>
+            /// Help button
+            /// </summary>
+            DFCS_CAPTIONHELP = 4,
+
+            // =====================================================================================
+            // If uType is DFC_MENU, uState can be one of the following values.
+            // =====================================================================================
+            /// <summary>
+            /// Submenu arrow
+            /// </summary>
+            DFCS_MENUARROW = 0,
+
+            /// <summary>
+            /// Check mark
+            /// </summary>
+            DFCS_MENUCHECK = 1,
+
+            /// <summary>
+            /// Bullet
+            /// </summary>
+            DFCS_MENUBULLET = 2,
+
+            /// <summary>
+            /// Submenu arrow pointing left. This is used for the right-to-left cascading menus used with right-to-left languages such as Arabic or Hebrew.
+            /// </summary>
+            DFCS_MENUARROWRIGHT = 4,
+
+            // =====================================================================================
+            // If uType is DFC_SCROLL, uState can be one of the following values.
+            // =====================================================================================
+            /// <summary>
+            /// Up arrow of scroll bar
+            /// </summary>
+            DFCS_SCROLLUP = 0,
+
+            /// <summary>
+            /// Down arrow of scroll bar
+            /// </summary>
+            DFCS_SCROLLDOWN = 1,
+
+            /// <summary>
+            /// Left arrow of scroll bar
+            /// </summary>
+            DFCS_SCROLLLEFT = 2,
+
+            /// <summary>
+            /// Right arrow of scroll bar
+            /// </summary>
+            DFCS_SCROLLRIGHT = 3,
+
+            /// <summary>
+            /// Combo box scroll bar
+            /// </summary>
+            DFCS_SCROLLCOMBOBOX = 5,
+
+            /// <summary>
+            /// Size grip in lower-right corner of window
+            /// </summary>
+            DFCS_SCROLLSIZEGRIP = 8,
+
+            /// <summary>
+            /// Size grip in lower-left corner of window. This is used with right-to-left languages such as Arabic or Hebrew.
+            /// </summary>
+            DFCS_SCROLLSIZEGRIPRIGHT = 0x10,
+
+            // =====================================================================================
+            // The following style can be used to adjust the bounding rectangle of the push button.
+            // =====================================================================================
+            /// <summary>
+            /// Bounding rectangle is adjusted to exclude the surrounding edge of the push button.
+            /// </summary>
+            DFCS_ADJUSTRECT = 0x2000,
+
+            // =====================================================================================
+            // One or more of the following values can be used to set the state of the control to be drawn.
+            // =====================================================================================
+            /// <summary>
+            /// Button is inactive (grayed).
+            /// </summary>
+            DFCS_INACTIVE = 0x100,
+
+            /// <summary>
+            /// Button is pushed.
+            /// </summary>
+            DFCS_PUSHED = 0x200,
+
+            /// <summary>
+            /// Button is checked.
+            /// </summary>
+            DFCS_CHECKED = 0x400,
+
+            /// <summary>
+            /// The background remains untouched. This flag can only be combined with DFCS_MENUARROWUP or DFCS_MENUARROWDOWN.
+            /// </summary>
+            DFCS_TRANSPARENT = 0x800,
+
+            /// <summary>
+            /// Button is hot-tracked.
+            /// </summary>
+            DFCS_HOT = 0x1000,
+
+            /// <summary>
+            /// Button has a flat border.
+            /// </summary>
+            DFCS_FLAT = 0x4000,
+
+            /// <summary>
+            /// Button has a monochrome border.
+            /// </summary>
+            DFCS_MONO = 0x8000
+        }
+
+        /// <summary>
+        /// The type of frame control to draw. This parameter can be one of the following values.
+        /// </summary>
+        [Flags]
+        public enum DrawFrameControlTypes {
+            /// <summary>
+            /// Standard button
+            /// </summary>
+            DFC_BUTTON = 4,
+
+            /// <summary>
+            /// Title bar
+            /// </summary>
+            DFC_CAPTION = 1,
+
+            /// <summary>
+            /// Menu bar
+            /// </summary>
+            DFC_MENU = 2,
+
+            /// <summary>
+            /// Popup menu item.
+            /// </summary>
+            DFC_POPUPMENU = 5,
+
+            /// <summary>
+            /// Scroll bar
+            /// </summary>
+            DFC_SCROLL = 3
+        }
+
         public enum HitTest {
             HTNOWHERE = 0,
             HTCLIENT = 1,
@@ -890,20 +1199,24 @@ namespace Yamui.Framework.Helper {
             /// The caller wants to cancel a prior tracking request. The caller should also specify the type of tracking that it wants to cancel. For example, to cancel hover tracking, the caller must pass the TME_CANCEL and TME_HOVER flags.
             /// </summary>
             TME_CANCEL = 0x80000000,
+
             /// <summary>
             /// The caller wants hover notification. Notification is delivered as a WM_MOUSEHOVER message.
             /// If the caller requests hover tracking while hover tracking is already active, the hover timer will be reset.
             /// This flag is ignored if the mouse pointer is not over the specified window or area.
             /// </summary>
             TME_HOVER = 0x00000001,
+
             /// <summary>
             /// The caller wants leave notification. Notification is delivered as a WM_MOUSELEAVE message. If the mouse is not over the specified window or area, a leave notification is generated immediately and no further tracking is performed.
             /// </summary>
             TME_LEAVE = 0x00000002,
+
             /// <summary>
             /// The caller wants hover and leave notification for the nonclient areas. Notification is delivered as WM_NCMOUSEHOVER and WM_NCMOUSELEAVE messages.
             /// </summary>
             TME_NONCLIENT = 0x00000010,
+
             /// <summary>
             /// The function fills in the structure instead of treating it as a tracking request. The structure is filled such that had that structure been passed to TrackMouseEvent, it would generate the current tracking. The only anomaly is that the hover time-out returned is always the actual time-out and not HOVER_DEFAULT, if HOVER_DEFAULT was specified during the original TrackMouseEvent request. 
             /// </summary>
@@ -938,7 +1251,10 @@ namespace Yamui.Framework.Helper {
 
         #region API Calls
 
-        [DllImport("user32")]
+        [DllImport("user32.dll", ExactSpelling = true, CharSet = CharSet.Auto)]
+        public static extern bool DrawFrameControl(HandleRef hDC, ref RECT rect, DrawFrameControlTypes type, DrawFrameControlStates state);
+
+        [DllImport("user32.dll")]
         public static extern bool TrackMouseEvent([In, Out] TRACKMOUSEEVENT lpEventTrack);
 
         [DllImport("user32.dll")]
@@ -949,7 +1265,7 @@ namespace Yamui.Framework.Helper {
 
         [DllImport("user32.dll", SetLastError = true, ExactSpelling = true, CharSet = CharSet.Auto)]
         public static extern int ScrollWindowEx(HandleRef hWnd, int nXAmount, int nYAmount, COMRECT rectScrollRegion, ref RECT rectClip, HandleRef hrgnUpdate, ref RECT prcUpdate, int flags);
-        
+
         [DllImport("user32.dll", ExactSpelling = true, EntryPoint = "GetDC", CharSet = CharSet.Auto)]
         private static extern IntPtr IntGetDC(HandleRef hWnd);
 
@@ -1034,10 +1350,8 @@ namespace Yamui.Framework.Helper {
         [DllImport("User32.dll", EntryPoint = "SendMessage", CharSet = CharSet.Auto)]
         public static extern int SendMessageRefRect(IntPtr hWnd, uint msg, int wParam, ref RECT rect);
 
-        // will be used to set a window to always stay on top
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, SetWindowPosFlags uFlags);
 
         /// <summary>
         /// Gets the handle of the window that currently has focus.
@@ -1074,7 +1388,7 @@ namespace Yamui.Framework.Helper {
 
         [DllImport("user32.dll")]
         public static extern bool RemoveMenu(IntPtr hMenu, uint uPosition, uint uFlags);
-        
+
         [DllImport("user32.dll", ExactSpelling = true, CharSet = CharSet.Auto)]
         public static extern IntPtr SetCapture(HandleRef hwnd);
 

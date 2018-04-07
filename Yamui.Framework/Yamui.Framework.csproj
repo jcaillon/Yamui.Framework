@@ -76,6 +76,9 @@
     <Compile Include="Controls\YamuiScrollPanel.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\YamuiFlowLayoutPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\YamuiTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -201,7 +204,9 @@
     <Compile Include="Helper\DelayedAction.cs" />
     <Compile Include="Helper\DrawHelper.cs" />
     <Compile Include="Helper\GenericThemeHolder.cs" />
+    <Compile Include="Helper\ColorHelper.cs" />
     <Compile Include="Helper\NativeTextRenderer.cs" />
+    <Compile Include="Helper\PaintHelper.cs" />
     <Compile Include="Helper\TabOrderManager.cs" />
     <Compile Include="Helper\Utilities.cs" />
     <Compile Include="Helper\WindowWrapper.cs" />

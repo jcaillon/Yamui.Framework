@@ -20,14 +20,15 @@
 
 using System.ComponentModel;
 using System.ComponentModel.Design;
+using System.Windows.Forms;
+using System.Windows.Forms.Design;
 
 namespace Yamui.Framework.Controls {
 
     [
         Designer("System.Windows.Forms.Design.UserControlDocumentDesigner", typeof(IRootDesigner)),
-        Designer("System.Windows.Forms.Design.ControlDesigner"),
-        DesignerCategory("UserControl"),
-        DefaultEvent("Load")
+        Designer(typeof(ControlDesigner)),
+        DesignerCategory(nameof(UserControl))
     ]
     public class YamuiPage : YamuiScrollPanel {
 

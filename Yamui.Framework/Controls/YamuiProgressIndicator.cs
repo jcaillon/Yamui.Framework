@@ -29,7 +29,7 @@ using System.Windows.Forms.Design;
 using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Controls {
-    [Designer("YamuiFramework.Controls.YamuiProgressIndicatorDesigner")]
+
     [ToolboxBitmap(typeof(ProgressBar))]
     public class YamuiProgressIndicator : YamuiControl {
         #region fields

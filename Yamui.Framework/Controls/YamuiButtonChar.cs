@@ -18,20 +18,16 @@
 // ========================================================================
 #endregion
 
-using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-using System.Windows.Forms.Design;
 using Yamui.Framework.Fonts;
 using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Controls {
-    [Designer("YamuiFramework.Controls.YamuiGoBackButtonDesigner")]
-    [ToolboxBitmap(typeof(Button))]
-    [DefaultEvent("ButtonPressed")]
+
     public class YamuiButtonChar : YamuiButton {
         #region Fields
 
@@ -103,24 +99,4 @@ namespace Yamui.Framework.Controls {
         }
     }
 
-    internal class YamuiGoBackButtonDesigner : ControlDesigner {
-        protected override void PreFilterProperties(IDictionary properties) {
-            properties.Remove("ImeMode");
-            properties.Remove("Padding");
-            properties.Remove("FlatAppearance");
-            properties.Remove("FlatStyle");
-            properties.Remove("AutoEllipsis");
-            properties.Remove("UseCompatibleTextRendering");
-            properties.Remove("Image");
-            properties.Remove("ImageAlign");
-            properties.Remove("ImageIndex");
-            properties.Remove("ImageKey");
-            properties.Remove("ImageList");
-            properties.Remove("TextImageRelation");
-            properties.Remove("UseVisualStyleBackColor");
-            properties.Remove("Font");
-            properties.Remove("RightToLeft");
-            base.PreFilterProperties(properties);
-        }
-    }
 }

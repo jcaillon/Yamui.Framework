@@ -26,6 +26,7 @@ using System.Windows.Forms;
 using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Controls {
+
     /// <summary>
     /// This class displays items on a list o strings, next to each other
     /// each item is clickable and triggers the TabPressed event that provides

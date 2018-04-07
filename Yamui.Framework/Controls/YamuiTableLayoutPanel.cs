@@ -26,17 +26,13 @@ using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Controls {
 
-    [ToolboxBitmap(typeof(Panel))]
+    [ToolboxBitmap(typeof(TableLayoutPanel))]
     public class YamuiTableLayoutPanel : TableLayoutPanel, IScrollableControl {
         #region Fields
 
-        [DefaultValue(false)]
-        [Category("Yamui")]
-        public bool UseCustomBackColor { get; set; }
-
         [Category("Yamui")]
         [DefaultValue(false)]
-        public bool DontUseTransparentBackGround { get; set; }
+        public bool DisableTransparentBackGround { get; set; }
 
         #endregion
 
@@ -48,6 +44,7 @@ namespace Yamui.Framework.Controls {
                 ControlStyles.ResizeRedraw |
                 ControlStyles.UserPaint |
                 ControlStyles.AllPaintingInWmPaint |
+                ControlStyles.DoubleBuffer |
                 ControlStyles.Opaque, true);
         }
 
@@ -55,13 +52,15 @@ namespace Yamui.Framework.Controls {
 
         #region Paint
 
+        /// <summary>
+        /// Paint transparent background
+        /// </summary>
         protected void PaintTransparentBackground(Graphics graphics, Rectangle clipRect) {
-            graphics.Clear(Color.Transparent);
-            if ((Parent != null)) {
+            if (Parent != null) {
                 clipRect.Offset(Location);
                 PaintEventArgs e = new PaintEventArgs(graphics, clipRect);
                 GraphicsState state = graphics.Save();
-                graphics.SmoothingMode = SmoothingMode.HighSpeed;
+                //graphics.SmoothingMode = SmoothingMode.HighSpeed;
                 try {
                     graphics.TranslateTransform(-Location.X, -Location.Y);
                     InvokePaintBackground(Parent, e);
@@ -70,18 +69,16 @@ namespace Yamui.Framework.Controls {
                     graphics.Restore(state);
                     clipRect.Offset(-Location.X, -Location.Y);
                 }
+            } else {
+                graphics.Clear(YamuiThemeManager.Current.FormBack);
             }
         }
-
-        protected override void OnPaintBackground(PaintEventArgs e) {}
-
+        
         protected override void OnPaint(PaintEventArgs e) {
-            if (!UseCustomBackColor && !DontUseTransparentBackGround)
+            if (YamuiThemeManager.Current.NeedTransparency && !DisableTransparentBackGround) 
                 PaintTransparentBackground(e.Graphics, DisplayRectangle);
-            else if (!UseCustomBackColor)
-                e.Graphics.Clear(YamuiThemeManager.Current.FormBack);
             else
-                e.Graphics.Clear(BackColor);
+                e.Graphics.Clear(YamuiThemeManager.Current.FormBack);
         }
 
         #endregion
