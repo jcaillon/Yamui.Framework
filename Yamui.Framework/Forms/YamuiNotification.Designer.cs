@@ -43,7 +43,7 @@ namespace Yamui.Framework.Forms {
             this.contentPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.contentPanel.Location = new System.Drawing.Point(5, 50);
             this.contentPanel.Name = "contentPanel";
-            this.contentPanel.NoBackgroundImage = true;
+            this.contentPanel.DisableBackgroundImage = true;
             this.contentPanel.Size = new System.Drawing.Size(290, 270);
             this.contentPanel.TabIndex = 4;
             // 

@@ -81,7 +81,7 @@ namespace Yamui.Framework.Forms {
             _tooltip = new HtmlToolTip();
 
             var maxWidthInPanel = formMaxWidth - (Padding.Left + Padding.Right);
-            contentPanel.NoBackgroundImage = true;
+            contentPanel.DisableBackgroundImage = true;
 
             // if there was an object data passed on, need to check the max width needed to draw the inputs
             DataObject = dataObject;

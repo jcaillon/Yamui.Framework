@@ -5,17 +5,22 @@ using Yamui.Framework.Helper;
 using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Controls {
-
     
+    /// <summary>
+    /// Store values needed to represent a scrollbar, also provides methods to handle user events and paint the scrollbar
+    /// </summary>
     public class YamuiScrollHandler {
 
         /// <summary>
         /// Action that will be triggered when the value of the scroll changes : this, oldValue, newValue
+        /// You should change the view of your client area when this event happens (do not paint scrollbars now)
         /// </summary>
-        public event Action<YamuiScrollHandler, int, int> OnValueChange;
+        public event EventHandler<YamuiScrollHandlerValueChangedEventArgs> OnValueChange;
 
-
-        public event Action OnRedrawScrollBars;
+        /// <summary>
+        /// Action sent when the scroll bar needs to be redraw
+        /// </summary>
+        public event EventHandler OnRedrawScrollBars;
 
         /// <summary>
         /// Read-only, is the scrollbar vertical
@@ -61,7 +66,8 @@ namespace Yamui.Framework.Controls {
         public int BarThickness {
             get { return _barThickness; }
             set {
-                _barThickness = value;
+                _barThickness = value.ClampMin(5);
+                ComputeScrollFixedValues();
                 InvalidateScrollBar();
             }
         }
@@ -80,22 +86,6 @@ namespace Yamui.Framework.Controls {
         public int LargeChange {
             get { return _largeChange == 0 ? LengthAvailable / 2 : _largeChange; }
             set { _largeChange = value; }
-        }
-
-        /// <summary>
-        /// Extra padding to apply on the right (for horizontal) / bottom (for vertical) to take into account
-        /// the fact that the 2 scrollbars are displayed
-        /// </summary>
-        public int ExtraEndPadding {
-            get { return _extraEndPadding; }
-            set {
-                if (_extraEndPadding != value) {
-                    _extraEndPadding = value;
-                    InvalidateScrollBar();
-                } else {
-                    _extraEndPadding = value;
-                }
-            }
         }
 
         /// <summary>
@@ -133,13 +123,15 @@ namespace Yamui.Framework.Controls {
         /// Returns whether or not the scrollbar is needed
         /// </summary>
         /// <returns></returns>
-        public bool UpdateLength(int lengthToRepresent, int lengthAvailable, int drawLength, int opposedDrawLength) {
+        public bool UpdateLength(int lengthToRepresent, int? lengthAvailable, int drawLength, int opposedDrawLength) {
             LengthToRepresent = lengthToRepresent;
             if (LengthToRepresentMinSize > 0)
                 LengthToRepresent = LengthToRepresent.ClampMin(LengthToRepresentMinSize);
-            LengthAvailable = lengthAvailable;
+            LengthAvailable = lengthAvailable ?? drawLength;
             DrawLength = drawLength;
             OpposedDrawLength = opposedDrawLength;
+
+            ComputeScrollFixedValues();
             AnalyzeScrollNeeded();
             return HasScroll;
         } 
@@ -152,9 +144,15 @@ namespace Yamui.Framework.Controls {
             set {
                 var previousValue = _value;
                 _value = value.Clamp(MinimumValue, MaximumValue);
+
+                // compute new thumb rectangle
+                ThumbRect = IsVertical ? 
+                    new Rectangle(BarOpposedOffset + ThumbPadding, ThumbOffset + (int) (BarScrollFreeSpace * ValuePercent), ThumbThickness, ThumbLenght) : 
+                    new Rectangle(ThumbOffset + (int) (BarScrollFreeSpace * ValuePercent), BarOpposedOffset + ThumbPadding, ThumbLenght, ThumbThickness);
+
                 InvalidateScrollBar();
                 if (HasScroll)
-                    OnValueChange?.Invoke(this, previousValue, _value);
+                    OnValueChange?.Invoke(this, new YamuiScrollHandlerValueChangedEventArgs(previousValue, _value));
             }
         }
         
@@ -241,42 +239,44 @@ namespace Yamui.Framework.Controls {
 
         private const int BarOffset = 0;
 
-        public int MaximumValue => (LengthToRepresent - LengthAvailable).ClampMin(0);
-        
-        private int BarOpposedOffset => OpposedDrawLength - BarThickness;
+        public int MaximumValue { get; set; }
+        private int BarOpposedOffset { get; set; }
+        private int ThumbThickness { get; set; }
+        private int BarLength { get; set; }
+        protected bool CanDisplayThumb { get; set; }
+        protected int ScrollButtonSize { get; set; }
+        private int ThumbLenght { get; set; }
+        protected int ThumbOffset { get; set; }
 
-        private int ThumbThickness => BarThickness - ThumbPadding * 2;
+        /// <summary>
+        /// The total space available to move the thumb in the bar
+        /// </summary>
+        protected int BarScrollSpace { get; set; }
 
-        private int BarLength => DrawLength - ExtraEndPadding;
-        
-        protected bool CanDisplayThumb => BarScrollSpace > 0;
+        /// <summary>
+        /// The total space available to move the thumb in the bar minus the space occupied by the thumb
+        /// </summary>
+        protected int BarScrollFreeSpace { get; set; }
 
-        protected int ScrollButtonSize => BarThickness;
+        /// <summary>
+        /// Rect for the up button
+        /// </summary>
+        protected Rectangle ScrollButtonUp { get; set; }
 
-        private int ThumbLenght => ((int) Math.Floor((BarLength - ThumbPadding * 2) * ((double) LengthAvailable / LengthToRepresent))).ClampMin(BarThickness);
+        /// <summary>
+        /// Rect for the down button
+        /// </summary>
+        protected Rectangle ScrollButtonDown { get; set; }
 
-        protected int ThumbOffset => BarOffset + (HasScrollButtons ? ScrollButtonSize : 0) + ThumbPadding;
-        
-        // The total space available to move the thumb in the bar
-        protected int BarScrollSpace => BarLength - ThumbLenght - ThumbPadding * 2 - (HasScrollButtons ? 2 * ScrollButtonSize : 0);
-        
-        protected Rectangle ScrollBottomUp => IsVertical ? 
-            new Rectangle(BarOpposedOffset, BarOffset, ScrollButtonSize, ScrollButtonSize) : 
-            new Rectangle(BarOffset, BarOpposedOffset, ScrollButtonSize, ScrollButtonSize);
+        /// <summary>
+        /// represents the bar rectangle (that will be painted)
+        /// </summary>
+        public Rectangle BarRect { get; set; }
 
-        protected Rectangle ScrollBottomDown => IsVertical ? 
-            new Rectangle(BarOpposedOffset, BarLength - ScrollButtonSize, ScrollButtonSize, ScrollButtonSize) : 
-            new Rectangle(BarLength - ScrollButtonSize, BarOpposedOffset, ScrollButtonSize, ScrollButtonSize);
-
-        // represents the bar rectangle (that will be painted)
-        public Rectangle BarRect => IsVertical ? 
-            new Rectangle(BarOpposedOffset, BarOffset, BarThickness, BarLength) : 
-            new Rectangle(BarOffset, BarOpposedOffset, BarLength, BarThickness);
-        
-        // represents the thumb rectangle (that will be painted)
-        protected Rectangle ThumbRect => IsVertical ? 
-            new Rectangle(BarOpposedOffset + ThumbPadding, ThumbOffset + (int) (BarScrollSpace * ValuePercent), ThumbThickness, ThumbLenght) : 
-            new Rectangle(ThumbOffset + (int) (BarScrollSpace * ValuePercent), BarOpposedOffset + ThumbPadding, ThumbLenght, ThumbThickness);
+        /// <summary>
+        /// represents the thumb rectangle (that will be painted)
+        /// </summary>
+        protected Rectangle ThumbRect { get; set; }
 
         private int _value;
         private Control _parent;
@@ -288,7 +288,6 @@ namespace Yamui.Framework.Controls {
         private bool _enabled = true;
         private int _thumbPadding = 2;
         private int _barThickness = 15;
-        private int _extraEndPadding;
         private bool _scrollButtonEnabled = true;
         private bool _isButtonUpHovered;
         private bool _isButtonDownHovered;
@@ -328,13 +327,13 @@ namespace Yamui.Framework.Controls {
                 Color buttonColor = YamuiThemeManager.Current.ScrollBarsFg(false, IsButtonUpHovered, IsButtonUpPressed, Enabled);
                 // draw the down arrow
                 using (SolidBrush b = new SolidBrush(buttonColor)) {
-                    e.Graphics.FillPolygon(b, Utilities.GetArrowPolygon(ScrollBottomUp, IsVertical ? AnchorStyles.Top : AnchorStyles.Left));
+                    e.Graphics.FillPolygon(b, Utilities.GetArrowPolygon(ScrollButtonUp, IsVertical ? AnchorStyles.Top : AnchorStyles.Left));
                 }
                 
                 buttonColor = YamuiThemeManager.Current.ScrollBarsFg(false, IsButtonDownHovered, IsButtonDownPressed, Enabled);
                 // draw the down arrow
                 using (SolidBrush b = new SolidBrush(buttonColor)) {
-                    e.Graphics.FillPolygon(b, Utilities.GetArrowPolygon(ScrollBottomDown, IsVertical ? AnchorStyles.Bottom : AnchorStyles.Right));
+                    e.Graphics.FillPolygon(b, Utilities.GetArrowPolygon(ScrollButtonDown, IsVertical ? AnchorStyles.Bottom : AnchorStyles.Right));
                 }
             }
         }
@@ -350,7 +349,7 @@ namespace Yamui.Framework.Controls {
             if (!HasScroll)
                 return;
 
-            OnRedrawScrollBars?.Invoke();
+            OnRedrawScrollBars?.Invoke(this, null);
         }
 
         /// <summary>
@@ -358,19 +357,12 @@ namespace Yamui.Framework.Controls {
         /// </summary>
         private void MoveThumb(int newThumbPos) {
             if (IsVertical) {
-                ValuePercent = (double) (newThumbPos - ThumbOffset) / BarScrollSpace;
+                ValuePercent = (double) (newThumbPos - ThumbOffset) / BarScrollFreeSpace;
             } else {
-                ValuePercent = (double) (newThumbPos - ThumbOffset) / BarScrollSpace;
+                ValuePercent = (double) (newThumbPos - ThumbOffset) / BarScrollFreeSpace;
             }
         }
         
-        /// <summary>
-        /// Returns true if the bit at the given position is set to true
-        /// </summary>
-        private static bool IsBitSet(long b, int pos) {
-            return (b & (1 << pos)) != 0;
-        }
-
         private void AnalyzeScrollNeeded() {
             // if the content is not too tall, no need to display the scroll bars
             if (MaximumValue <= 0 || !Enabled || LengthAvailable <= 0) {
@@ -384,6 +376,29 @@ namespace Yamui.Framework.Controls {
             }
         }
 
+        private void ComputeScrollFixedValues() {
+            // compute fixed values
+            MaximumValue = (LengthToRepresent - LengthAvailable).ClampMin(0);        
+            BarOpposedOffset = OpposedDrawLength - BarThickness;
+            ThumbThickness = BarThickness - ThumbPadding * 2;
+            BarLength = DrawLength;        
+            ScrollButtonSize = BarThickness;
+            BarScrollSpace = BarLength - ThumbPadding * 2 - (HasScrollButtons ? 2 * ScrollButtonSize : 0);
+            ThumbLenght = ((int) Math.Floor((BarScrollSpace) * ((double) LengthAvailable / LengthToRepresent))).ClampMin(BarThickness);
+            ThumbOffset = BarOffset + (HasScrollButtons ? ScrollButtonSize : 0) + ThumbPadding;
+            BarScrollFreeSpace = BarScrollSpace - ThumbLenght;
+            ScrollButtonUp = IsVertical ? 
+                new Rectangle(BarOpposedOffset, BarOffset, ScrollButtonSize, ScrollButtonSize) : 
+                new Rectangle(BarOffset, BarOpposedOffset, ScrollButtonSize, ScrollButtonSize);
+            ScrollButtonDown = IsVertical ? 
+                new Rectangle(BarOpposedOffset, BarLength - ScrollButtonSize, ScrollButtonSize, ScrollButtonSize) : 
+                new Rectangle(BarLength - ScrollButtonSize, BarOpposedOffset, ScrollButtonSize, ScrollButtonSize);
+            BarRect = IsVertical ?
+                new Rectangle(BarOpposedOffset, BarOffset, BarThickness, BarLength) : 
+                new Rectangle(BarOffset, BarOpposedOffset, BarLength, BarThickness);
+            CanDisplayThumb = BarScrollFreeSpace > 0;
+        }
+
         #endregion
 
         #region public
@@ -391,7 +406,7 @@ namespace Yamui.Framework.Controls {
         /// <summary>
         /// Mouse move
         /// </summary>
-        public void HandleMouseMove(MouseEventArgs e) {
+        public void HandleMouseMove(object sender, MouseEventArgs e) {
             if (!HasScroll)
                 return;
 
@@ -407,13 +422,13 @@ namespace Yamui.Framework.Controls {
                     IsThumbHovered = false;
 
                     // hover button up
-                    if (ScrollBottomUp.Contains(mousePosRelativeToThis)) {
+                    if (ScrollButtonUp.Contains(mousePosRelativeToThis)) {
                         IsButtonUpHovered = true;
                     } else {
                         IsButtonUpHovered = false;
 
                         // hover button down
-                        if (ScrollBottomDown.Contains(mousePosRelativeToThis)) {
+                        if (ScrollButtonDown.Contains(mousePosRelativeToThis)) {
                             IsButtonDownHovered = true;
                         } else {
                             IsButtonDownHovered = false;
@@ -432,7 +447,7 @@ namespace Yamui.Framework.Controls {
             }
         }
 
-        public void HandleMouseLeave() {
+        public void HandleMouseLeave(object sender, EventArgs e) {
             IsHovered = false;
             IsButtonUpHovered = false;
             IsButtonDownHovered = false;
@@ -441,10 +456,10 @@ namespace Yamui.Framework.Controls {
         /// <summary>
         /// Mouse down
         /// </summary>
-        public void HandleMouseDown(MouseEventArgs e) {
+        public void HandleMouseDown(object sender, MouseEventArgs e) {
             if (!HasScroll)
                 return;
-            if (e.Button != MouseButtons.Left) 
+            if (e != null && e.Button != MouseButtons.Left) 
                 return;
 
             var mousePosRelativeToThis = _parent.PointToClient(Cursor.Position);
@@ -467,13 +482,13 @@ namespace Yamui.Framework.Controls {
                 } else {
 
                     // hover button up
-                    if (ScrollBottomUp.Contains(mousePosRelativeToThis)) {
+                    if (ScrollButtonUp.Contains(mousePosRelativeToThis)) {
                         IsButtonUpPressed = true;
                         Value -= SmallChange;
                     } else {
 
                         // hover button down
-                        if (ScrollBottomDown.Contains(mousePosRelativeToThis)) {
+                        if (ScrollButtonDown.Contains(mousePosRelativeToThis)) {
                             IsButtonDownPressed = true;
                             Value += SmallChange;
                         } else {
@@ -489,10 +504,10 @@ namespace Yamui.Framework.Controls {
         /// <summary>
         /// Mouse up
         /// </summary>
-        public void HandleMouseUp(MouseEventArgs e) {
+        public void HandleMouseUp(object sender, MouseEventArgs e) {
             if (!HasScroll)
                 return;
-            if (e.Button != MouseButtons.Left) 
+            if (e != null && e.Button != MouseButtons.Left) 
                 return;
 
             IsThumbPressed = false;
@@ -503,7 +518,7 @@ namespace Yamui.Framework.Controls {
         /// <summary>
         /// Handle scroll
         /// </summary>
-        public void HandleScroll(MouseEventArgs e) {
+        public void HandleScroll(object sender, MouseEventArgs e) {
             if (!HasScroll)
                 return;
 
@@ -514,7 +529,7 @@ namespace Yamui.Framework.Controls {
         /// <summary>
         /// Keydown
         /// </summary>
-        public bool HandleKeyDown(KeyEventArgs e) {
+        public bool HandleKeyDown(object sender, KeyEventArgs e) {
             if (!HasScroll)
                 return false;
 
@@ -548,54 +563,23 @@ namespace Yamui.Framework.Controls {
 
             return handled;
         }
-
-        /// <summary>
-        /// Either use this global handling or individual handling above
-        /// </summary>
-        public bool HandleWindowsProc(Message message) {
-            if (!HasScroll)
-                return false;
-            
-            switch (message.Msg) {
-                case (int) WinApi.Messages.WM_MOUSEMOVE:
-                    HandleMouseMove(new MouseEventArgs(MouseButtons.Left, 0, 0, 0, 0));
-                    break;
-                    
-                case (int) WinApi.Messages.WM_MOUSEWHEEL:
-                    // delta negative when scrolling up
-                    var delta = (short) (message.WParam.ToInt64() >> 16);
-                    HandleScroll(new MouseEventArgs(MouseButtons.Left, 0, 0, 0, delta));
-                    return true;
-
-                case (int) WinApi.Messages.WM_KEYDOWN:
-                    // need the parent control to override OnPreviewKeyDown or IsInputKey
-                    var key = (Keys) (message.WParam.ToInt64());
-                    long context = message.LParam.ToInt64();
-
-                    // on key down
-                    if (!IsBitSet(context, 31)) {
-                        return HandleKeyDown(new KeyEventArgs(key));
-                    }
-                    break;
-
-                case (int) WinApi.Messages.WM_LBUTTONDOWN:
-                    HandleMouseDown(new MouseEventArgs(MouseButtons.Left, 0, 0, 0, 0));
-                    break;
-
-                case (int) WinApi.Messages.WM_LBUTTONUP:
-                    HandleMouseUp(new MouseEventArgs(MouseButtons.Left, 0, 0, 0, 0));
-                    break;
-
-                case (int) WinApi.Messages.WM_MOUSELEAVE:
-                    HandleMouseLeave();
-                    break;
-            }
-
-            return false;
-        }
-
-        #endregion
         
+        #endregion
+
+        public override string ToString() {
+            return $"Value = {Value}, Range = {MinimumValue}:{MaximumValue}, Change = {SmallChange}/{LargeChange}";
+        }
     }
-    
+
+    public class YamuiScrollHandlerValueChangedEventArgs : EventArgs {
+
+        public int OldValue { get; }
+
+        public int NewValue { get; }
+
+        public YamuiScrollHandlerValueChangedEventArgs(int oldValue, int newValue) {
+            OldValue = oldValue;
+            NewValue = newValue;
+        }
+    }
 }
