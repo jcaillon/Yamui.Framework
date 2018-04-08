@@ -35,7 +35,7 @@ namespace Yamui.Framework.Forms {
         
         private bool? _dwmCompositionEnabled;
 
-        public bool DwmCompositionEnabled {
+        public virtual bool DwmCompositionEnabled {
             get {
                 if (_dwmCompositionEnabled == null) {
                     CheckDwmCompositionEnabled();
@@ -96,11 +96,11 @@ namespace Yamui.Framework.Forms {
                     break;
 
 
-                //case (int) WinApi.Messages.WM_ACTIVATE:
-                //    if (DwmCompositionEnabled) {
-                //        EnableDwmComposition();
-                //    }
-                //    break;
+                case (int) WinApi.Messages.WM_ACTIVATE:
+                    if (DwmCompositionEnabled) {
+                        EnableDwmComposition();
+                    }
+                    break;
             }
 
             base.WndProc(ref m);
@@ -112,6 +112,11 @@ namespace Yamui.Framework.Forms {
             base.OnControlCreation();
             EnableDwmComposition();
         }
+
+        //protected override void OnShown(EventArgs e) {
+        //    Refresh();
+        //    base.OnShown(e);
+        //}
 
         private void OnGetMinMaxInfo(IntPtr hwnd, IntPtr lParam) {
             var minmaxinfo = (WinApi.MINMAXINFO) Marshal.PtrToStructure(lParam, typeof(WinApi.MINMAXINFO));
@@ -145,6 +150,10 @@ namespace Yamui.Framework.Forms {
             var status = Marshal.AllocHGlobal(sizeof(int));
             Marshal.WriteInt32(status, (int) WinApi.DWMNCRenderingPolicy.Enabled);
             WinApi.DwmSetWindowAttribute(Handle, WinApi.DWMWINDOWATTRIBUTE.NCRenderingPolicy, status, sizeof(int));
+
+            status = Marshal.AllocHGlobal(sizeof(int));
+            Marshal.WriteInt32(status, 1);
+            WinApi.DwmSetWindowAttribute(Handle, WinApi.DWMWINDOWATTRIBUTE.AllowNCPaint, status, sizeof(int));
 
             var margins = new WinApi.MARGINS(1, 1, 1, 1);
             WinApi.DwmExtendFrameIntoClientArea(Handle, ref margins);
