@@ -1,4 +1,5 @@
 ﻿#region header
+
 // ========================================================================
 // Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
 // This file (YamuiExtensions.cs) is part of YamuiFramework.
@@ -16,6 +17,7 @@
 // You should have received a copy of the GNU General Public License
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
+
 #endregion
 
 using System;
@@ -40,6 +42,7 @@ namespace Yamui.Framework.Helper {
                 object endResult = isi.EndInvoke(result);
                 return (TResult) endResult;
             }
+
             return call(isi);
         }
 
@@ -59,6 +62,7 @@ namespace Yamui.Framework.Helper {
             if (isi.InvokeRequired) {
                 return isi.Invoke(call, new object[] {isi});
             }
+
             return call(isi);
         }
 
@@ -96,12 +100,31 @@ namespace Yamui.Framework.Helper {
             if (control.InvokeRequired) {
                 return (TResult) control.Invoke(method);
             }
+
             return method();
         }
 
         #endregion
 
         #region Simple math
+
+        /// <summary>
+        /// Returns the lower 16 bits of a 32 bits integer
+        /// </summary>
+        /// <param name="dwValue"></param>
+        /// <returns></returns>
+        public static int LoWord(this int dwValue) {
+            return dwValue & 0xFFFF;
+        }
+
+        /// <summary>
+        /// Returns the higher 16 bits of a 32 bits integer
+        /// </summary>
+        /// <param name="dwValue"></param>
+        /// <returns></returns>
+        public static int HiWord(this int dwValue) {
+            return (dwValue >> 16) & 0xFFFF;
+        }
 
         /// <summary>
         /// Forces a value between a minimum and a maximum
@@ -113,7 +136,6 @@ namespace Yamui.Framework.Helper {
                 return max;
             return value;
         }
-
 
         /// <summary>
         /// Forces a value between a minimum and a maximum
@@ -223,6 +245,7 @@ namespace Yamui.Framework.Helper {
                     });
                     continue;
                 }
+
                 return value;
             }
         }
@@ -244,12 +267,13 @@ namespace Yamui.Framework.Helper {
                 var baseColor = splitValues[0].Trim().ApplyColorFunctions();
 
                 if (functionName.StartsWith("dark"))
-                    return baseColor.ModifyColorLuminosity(-1*ratio/100);
+                    return baseColor.ModifyColorLuminosity(-1 * ratio / 100);
                 if (functionName.StartsWith("light"))
-                    return baseColor.ModifyColorLuminosity(ratio/100);
+                    return baseColor.ModifyColorLuminosity(ratio / 100);
 
                 return baseColor;
             }
+
             return htmlColor;
         }
 

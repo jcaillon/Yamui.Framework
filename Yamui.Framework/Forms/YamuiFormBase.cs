@@ -48,6 +48,7 @@ namespace Yamui.Framework.Forms {
 
         private bool _reverseX;
         private bool _reverseY;
+        private FormWindowState _lastWindowState;
 
         #endregion
 
@@ -71,9 +72,8 @@ namespace Yamui.Framework.Forms {
                 ControlStyles.ResizeRedraw |
                 ControlStyles.UserPaint |
                 ControlStyles.AllPaintingInWmPaint |
+                ControlStyles.DoubleBuffer |
                 ControlStyles.Opaque, true);
-
-            FormBorderStyle = FormBorderStyle.None;
 
             // icon
             if (YamuiThemeManager.GlobalIcon != null)
@@ -96,11 +96,18 @@ namespace Yamui.Framework.Forms {
             e.Graphics.DrawRectangle(pen, rect);
         }
 
-        protected override void OnPaintBackground(PaintEventArgs e) {}
-
         #endregion
 
         #region WndProc
+
+        protected override void OnCreateControl() {
+            OnControlCreation();
+            base.OnCreateControl();
+        }
+
+        protected virtual void OnControlCreation() {
+            FormBorderStyle = FormBorderStyle.None;
+        }
 
         protected override void WndProc(ref Message m) {
             if (DesignMode) {
@@ -128,6 +135,14 @@ namespace Yamui.Framework.Forms {
                             m.Result = (IntPtr) ht;
                             return;
                         }
+                    }
+                    break;
+
+                case (int) WinApi.Messages.WM_SIZE:
+                    // Allows to resize the form
+                    if (WindowState != _lastWindowState) {
+                        OnWindowStateChanged(null);
+                        _lastWindowState = WindowState;
                     }
                     break;
             }
@@ -198,6 +213,14 @@ namespace Yamui.Framework.Forms {
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Called when the window state changes
+        /// </summary>
+        /// <param name="e"></param>
+        protected virtual void OnWindowStateChanged(EventArgs e) {
+            
+        }
 
         /// <summary>
         /// Returns the best position for a window centered in another one

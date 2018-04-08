@@ -139,10 +139,6 @@ namespace Yamui.Framework.Forms {
             base.WndProc(ref m);
 
             switch (m.Msg) {
-                case (int) WinApi.Messages.WM_GETMINMAXINFO:
-                    // allows the window to be maximized at teh size of the working area instead of the whole screen size
-                    OnGetMinMaxInfo(m.HWnd, m.LParam);
-                    break;
 
                 case (int) WinApi.Messages.WM_SIZE:
                     if (_windowButtonList != null) {
@@ -156,17 +152,7 @@ namespace Yamui.Framework.Forms {
                     break;
             }
         }
-
-        [SecuritySafeCritical]
-        private unsafe void OnGetMinMaxInfo(IntPtr hwnd, IntPtr lParam) {
-            var pmmi = (WinApi.MINMAXINFO*) lParam;
-            var s = Screen.FromHandle(hwnd);
-            pmmi->ptMaxSize.x = s.WorkingArea.Width;
-            pmmi->ptMaxSize.y = s.WorkingArea.Height;
-            pmmi->ptMaxPosition.x = Math.Abs(s.WorkingArea.Left - s.Bounds.Left);
-            pmmi->ptMaxPosition.y = Math.Abs(s.WorkingArea.Top - s.Bounds.Top);
-        }
-
+        
         // test in which part of the form the cursor is in (we return the caption bar if
         // it's on the top of the window or the resizebottomright when it's on the bottom right), 
         // allow to be able to maximize the window by double clicking the "title bar" for instance

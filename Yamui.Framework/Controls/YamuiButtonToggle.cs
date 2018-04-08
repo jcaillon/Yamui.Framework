@@ -27,9 +27,7 @@ using Yamui.Framework.Fonts;
 using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Controls {
-    [Designer("YamuiFramework.Controls.YamuiButtonDesigner")]
-    [ToolboxBitmap(typeof(Button))]
-    [DefaultEvent("ButtonPressed")]
+
     public class YamuiButtonToggle : YamuiButton {
         #region public field
 

@@ -419,7 +419,6 @@ namespace Yamui.Framework.Controls {
 
         protected override void OnResize(EventArgs e) {
             ApplyPreferedSize(_preferedSize);
-            base.OnResize(e);
 
             // need to do the thing below to correctly recompute the client/non client areas when the windows is maximized/minimized
             var newWindowState = FindForm()?.WindowState;
@@ -427,6 +426,7 @@ namespace Yamui.Framework.Controls {
                 WinApi.SetWindowPos(Handle, IntPtr.Zero, 0, 0, 0, 0, WinApi.SetWindowPosFlags.SWP_FRAMECHANGED | WinApi.SetWindowPosFlags.SWP_NOACTIVATE | WinApi.SetWindowPosFlags.SWP_NOMOVE | WinApi.SetWindowPosFlags.SWP_NOSIZE | WinApi.SetWindowPosFlags.SWP_NOZORDER);
             }
             _lastWindowState = newWindowState;
+            base.OnResize(e);
         }
 
         /// <summary>

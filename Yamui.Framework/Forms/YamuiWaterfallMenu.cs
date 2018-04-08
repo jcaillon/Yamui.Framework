@@ -35,7 +35,8 @@ namespace Yamui.Framework.Forms {
     /// <summary>
     /// A class to display a cool custom context menu
     /// </summary>
-    public sealed class YamuiWaterfallMenu : YamuiFormBase {
+    public sealed class YamuiWaterfallMenu : YamuiFormBaseShadow {
+
         #region static fields
 
         /// <summary>
@@ -46,6 +47,8 @@ namespace Yamui.Framework.Forms {
         #endregion
 
         #region public fields
+
+        public new bool UseClassicDropShadow => true;
 
         public bool IamMain = true;
 
@@ -69,7 +72,7 @@ namespace Yamui.Framework.Forms {
         #endregion
 
         #region private fields
-
+        
         private Action<YamuiMenuItem> _do;
 
         private YamuiWaterfallMenu _parentMenu;
