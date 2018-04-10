@@ -26,6 +26,7 @@ namespace Yamui.Framework.Forms {
     /// Form class that does not take focus on show
     /// </summary>
     public class YamuiFormToolWindow : YamuiFormButtons {
+
         #region ShowWithoutActivation & Don't show in ATL+TAB
 
         /// <summary>

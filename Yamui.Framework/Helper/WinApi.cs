@@ -244,34 +244,72 @@ namespace Yamui.Framework.Helper {
 
         #region Enums
 
+        public enum WindowLongParam {
+            /// <summary>Sets a new address for the window procedure.</summary>
+            /// <remarks>You cannot change this attribute if the window does not belong to the same process as the calling thread.</remarks>
+            GWL_WNDPROC = -4,
+
+            /// <summary>Sets a new application instance handle.</summary>
+            GWLP_HINSTANCE = -6,
+
+            GWLP_HWNDPARENT = -8,
+
+            /// <summary>Sets a new identifier of the child window.</summary>
+            /// <remarks>The window cannot be a top-level window.</remarks>
+            GWL_ID = -12,
+
+            /// <summary>Sets a new window style.</summary>
+            GWL_STYLE = -16,
+
+            /// <summary>Sets a new extended window style.</summary>
+            /// <remarks>See <see cref="ExWindowStyles"/>.</remarks>
+            GWL_EXSTYLE = -20,
+
+            /// <summary>Sets the user data associated with the window.</summary>
+            /// <remarks>This data is intended for use by the application that created the window. Its value is initially zero.</remarks>
+            GWL_USERDATA = -21,
+
+            /// <summary>Sets the return value of a message processed in the dialog box procedure.</summary>
+            /// <remarks>Only applies to dialog boxes.</remarks>
+            DWLP_MSGRESULT = 0,
+
+            /// <summary>Sets new extra information that is private to the application, such as handles or pointers.</summary>
+            /// <remarks>Only applies to dialog boxes.</remarks>
+            DWLP_USER = 8,
+
+            /// <summary>Sets the new address of the dialog box procedure.</summary>
+            /// <remarks>Only applies to dialog boxes.</remarks>
+            DWLP_DLGPROC = 4
+        }
+
         /// <summary>
         /// https://msdn.microsoft.com/en-us/library/windows/desktop/aa969530(v=vs.85).aspx?f=255&MSPPError=-2147217396
         /// </summary>
         [Flags]
         public enum DWMWINDOWATTRIBUTE : uint {
             NCRenderingEnabled = 1,
-            NCRenderingPolicy,
-            TransitionsForceDisabled,
-            AllowNCPaint,
-            CaptionButtonBounds,
-            NonClientRtlLayout,
-            ForceIconicRepresentation,
-            Flip3DPolicy,
-            ExtendedFrameBounds,
-            HasIconicBitmap,
-            DisallowPeek,
-            ExcludedFromPeek,
-            Cloak,
-            Cloaked,
-            FreezeRepresentation
+            NCRenderingPolicy = 2,
+            TransitionsForceDisabled = 3,
+            AllowNCPaint = 4,
+            CaptionButtonBounds = 5,
+            NonClientRtlLayout = 6,
+            ForceIconicRepresentation = 7,
+            Flip3DPolicy = 8,
+            ExtendedFrameBounds = 9,
+            HasIconicBitmap = 10,
+            DisallowPeek = 11,
+            ExcludedFromPeek = 12,
+            Cloak = 13,
+            Cloaked = 14,
+            FreezeRepresentation = 15
         }
 
         [Flags]
         public enum DWMNCRenderingPolicy : uint {
-            UseWindowStyle,
-            Disabled,
-            Enabled,
-            Last
+            UseWindowStyle = 0,
+            Disabled = 1,
+            Enabled = 2,
+            Last = 3
         }
 
         /// <summary>
@@ -794,7 +832,7 @@ namespace Yamui.Framework.Helper {
         /// The following styles can be specified wherever a window style is required. After the control has been created, these styles cannot be modified, except as noted.
         /// </summary>
         [Flags]
-        public enum WindowStyles : uint {
+        public enum WindowStyles : int {
             /// <summary>The window has a thin-line border.</summary>
             WS_BORDER = 0x800000,
 
@@ -848,7 +886,7 @@ namespace Yamui.Framework.Helper {
             WS_OVERLAPPEDWINDOW = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_SIZEFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX,
 
             /// <summary>The window is a pop-up window. This style cannot be used with the WS_CHILD style.</summary>
-            WS_POPUP = 0x80000000u,
+            WS_POPUP = unchecked((int)0x80000000),
 
             /// <summary>The window is a pop-up window. The WS_CAPTION and WS_POPUPWINDOW styles must be combined to make the window menu visible.</summary>
             WS_POPUPWINDOW = WS_POPUP | WS_BORDER | WS_SYSMENU,
@@ -1045,6 +1083,9 @@ namespace Yamui.Framework.Helper {
 
         #region API Calls
 
+
+
+
         [DllImport("user32.dll", ExactSpelling = true, CharSet = CharSet.Auto)]
         public static extern bool DrawFrameControl(HandleRef hDC, ref RECT rect, DrawFrameControlTypes type, DrawFrameControlStates state);
 
@@ -1191,6 +1232,49 @@ namespace Yamui.Framework.Helper {
 
         [DllImport("user32.dll")]
         public static extern IntPtr SendMessage(IntPtr hWnd, uint msg, IntPtr wp, IntPtr lp);
+
+        #endregion
+
+        #region unsafe
+
+        //GetWindowLong won't work correctly for 64-bit: we should use GetWindowLongPtr instead.  On
+        //32-bit, GetWindowLongPtr is just #defined as GetWindowLong.  GetWindowLong really should 
+        //take/return int instead of IntPtr/HandleRef, but since we're running this only for 32-bit
+        //it'll be OK.
+        public static IntPtr GetWindowLong(HandleRef hWnd, WindowLongParam nIndex)
+        {
+            if (IntPtr.Size == 4)
+            {
+                return GetWindowLong32(hWnd, (int) nIndex);
+            }
+            return GetWindowLongPtr64(hWnd, (int) nIndex);
+        }
+        [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable")]
+        [DllImport("user32.dll", CharSet = CharSet.Auto, EntryPoint = "GetWindowLong")]
+        public static extern IntPtr GetWindowLong32(HandleRef hWnd, int nIndex);
+
+        [SuppressMessage("Microsoft.Interoperability", "CA1400:PInvokeEntryPointsShouldExist")]
+        [DllImport("user32.dll", CharSet = CharSet.Auto, EntryPoint = "GetWindowLongPtr")]
+        public static extern IntPtr GetWindowLongPtr64(HandleRef hWnd, int nIndex);
+
+        //SetWindowLong won't work correctly for 64-bit: we should use SetWindowLongPtr instead.  On
+        //32-bit, SetWindowLongPtr is just #defined as SetWindowLong.  SetWindowLong really should 
+        //take/return int instead of IntPtr/HandleRef, but since we're running this only for 32-bit
+        //it'll be OK.
+        public static IntPtr SetWindowLong(HandleRef hWnd, WindowLongParam nIndex, HandleRef dwNewLong) 
+        {
+            if (IntPtr.Size == 4)
+            {
+                return SetWindowLongPtr32(hWnd, (int) nIndex, dwNewLong);
+            }
+            return SetWindowLongPtr64(hWnd, (int) nIndex, dwNewLong);
+        }
+        [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable")]
+        [DllImport("user32.dll", CharSet = CharSet.Auto, EntryPoint = "SetWindowLong")]
+        public static extern IntPtr SetWindowLongPtr32(HandleRef hWnd, int nIndex, HandleRef dwNewLong);
+        [SuppressMessage("Microsoft.Interoperability", "CA1400:PInvokeEntryPointsShouldExist")]
+        [DllImport("user32.dll", CharSet = CharSet.Auto, EntryPoint = "SetWindowLongPtr")]
+        public static extern IntPtr SetWindowLongPtr64(HandleRef hWnd, int nIndex, HandleRef dwNewLong);
 
         #endregion
 

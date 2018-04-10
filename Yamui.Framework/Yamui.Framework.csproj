@@ -162,6 +162,9 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Fonts\FontManager.cs" />
+    <Compile Include="Forms\YamuiFormBaseShadow2.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\YamuiFormBaseShadow.cs">
       <SubType>Form</SubType>
     </Compile>

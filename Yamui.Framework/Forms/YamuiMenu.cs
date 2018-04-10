@@ -41,9 +41,7 @@ namespace Yamui.Framework.Forms {
         #endregion
 
         #region public fields
-
-        public new bool UseClassicDropShadow => true;
-
+        
         /// <summary>
         /// When an item is clicked, it will be fed to this method that should, in term, be calling .OnClic of said item
         /// Use this as a wrapper to handle errors for instance

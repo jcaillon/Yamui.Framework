@@ -31,16 +31,13 @@ namespace Yamui.Framework.Forms {
     /// </summary>
     public class YamuiFormBaseShadow : YamuiFormBase {
 
-        #region private fields
-        
-        private bool? _dwmCompositionEnabled;
+        #region CreateParams
 
-        public virtual bool DwmCompositionEnabled {
+        protected override CreateParams CreateParams {
             get {
-                if (_dwmCompositionEnabled == null) {
-                    CheckDwmCompositionEnabled();
-                }
-                return _dwmCompositionEnabled ?? false;
+                var cp = base.CreateParams;
+                cp.Style |= (int) WinApi.WindowStyles.WS_BORDER;
+                return cp;
             }
         }
 
@@ -52,15 +49,6 @@ namespace Yamui.Framework.Forms {
             if (DesignMode) {
                 base.WndProc(ref m);
                 return;
-            }
-
-            if (DwmCompositionEnabled) {
-                IntPtr result;
-                int dwmHandled = WinApi.DwmDefWindowProc(m.HWnd, m.Msg, m.WParam, m.LParam, out result);
-                if (dwmHandled == 1) {
-                    m.Result = result;
-                    return;
-                }
             }
 
             switch (m.Msg) {
@@ -84,22 +72,22 @@ namespace Yamui.Framework.Forms {
                     }
                     break;
 
-                case (int) WinApi.Messages.WM_NCCALCSIZE:
-                    if (DwmCompositionEnabled) {
-                        // We can't use BorderStyle None with Dwm so we respond to this message to say we do not want
-                        // a non client area
-                
-                        //Return Zero
-                        m.Result = IntPtr.Zero;
-                        return;
-                    }
-                    break;
+                //case (int) WinApi.Messages.WM_NCCALCSIZE:
+                //    if (DwmCompositionEnabled) {
+                //        // We can't use BorderStyle None with Dwm so we respond to this message to say we do not want
+                //        // a non client area
+                //
+                //        //Return Zero
+                //        m.Result = IntPtr.Zero;
+                //        return;
+                //    }
+                //    break;
 
 
-                case (int) WinApi.Messages.WM_ACTIVATE:
-                    if (DwmCompositionEnabled) {
-                        EnableDwmComposition();
-                    }
+                //case (int) WinApi.Messages.WM_ACTIVATE:
+                //    if (DwmCompositionEnabled) {
+                //        EnableDwmComposition();
+                //    }
                     break;
             }
 
@@ -108,14 +96,25 @@ namespace Yamui.Framework.Forms {
 
         #endregion
 
-        protected override void OnControlCreation() {
-            base.OnControlCreation();
+        protected override void OnCreateControl() {
+            base.OnCreateControl();
             EnableDwmComposition();
         }
 
         //protected override void OnShown(EventArgs e) {
         //    Refresh();
         //    base.OnShown(e);
+        //}
+        ///// <summary>
+        ///// Prevents a bug that occurs while restoring the form after a minimize operation.
+        ///// </summary>
+        ///// <param name="x">The upper left corner x-coordinate.</param>
+        ///// <param name="y">The upper left corner y-coordinate.</param>
+        ///// <param name="width">The new width of the form (it is too large - use current Width value).</param>
+        ///// <param name="height">The new height of the form (it is too large - use the current Height value).</param>
+        ///// <param name="specified">What kind of boundaries should be changed?!</param>
+        //protected override void SetBoundsCore(int x, int y, int width, int height, BoundsSpecified specified) {
+        //    base.SetBoundsCore(x, y, Width, Height, specified);
         //}
 
         private void OnGetMinMaxInfo(IntPtr hwnd, IntPtr lParam) {
@@ -128,17 +127,7 @@ namespace Yamui.Framework.Forms {
             Marshal.StructureToPtr(minmaxinfo, lParam, true);
         }
 
-       ///// <summary>
-       ///// Prevents a bug that occurs while restoring the form after a minimize operation.
-       ///// </summary>
-       ///// <param name="x">The upper left corner x-coordinate.</param>
-       ///// <param name="y">The upper left corner y-coordinate.</param>
-       ///// <param name="width">The new width of the form (it is too large - use current Width value).</param>
-       ///// <param name="height">The new height of the form (it is too large - use the current Height value).</param>
-       ///// <param name="specified">What kind of boundaries should be changed?!</param>
-       //protected override void SetBoundsCore(int x, int y, int width, int height, BoundsSpecified specified) {
-       //    base.SetBoundsCore(x, y, Width, Height, specified);
-       //}
+
        
         public void DisableDwmComposition() {
             var margins = new WinApi.MARGINS(0, 0, 0, 0);
@@ -151,19 +140,14 @@ namespace Yamui.Framework.Forms {
             Marshal.WriteInt32(status, (int) WinApi.DWMNCRenderingPolicy.Enabled);
             WinApi.DwmSetWindowAttribute(Handle, WinApi.DWMWINDOWATTRIBUTE.NCRenderingPolicy, status, sizeof(int));
 
-            status = Marshal.AllocHGlobal(sizeof(int));
-            Marshal.WriteInt32(status, 1);
-            WinApi.DwmSetWindowAttribute(Handle, WinApi.DWMWINDOWATTRIBUTE.AllowNCPaint, status, sizeof(int));
+            //status = Marshal.AllocHGlobal(sizeof(int));
+            //Marshal.WriteInt32(status, 1);
+            //WinApi.DwmSetWindowAttribute(Handle, WinApi.DWMWINDOWATTRIBUTE.AllowNCPaint, status, sizeof(int));
 
             var margins = new WinApi.MARGINS(1, 1, 1, 1);
             WinApi.DwmExtendFrameIntoClientArea(Handle, ref margins);
             FormBorderStyle = FormBorderStyle.Sizable;
         }
-        
-        private void CheckDwmCompositionEnabled() {
-            bool enabled;
-            WinApi.DwmIsCompositionEnabled(out enabled);
-            _dwmCompositionEnabled = Environment.OSVersion.Version.Major >= 6 && enabled;
-        }
+
     }
 }

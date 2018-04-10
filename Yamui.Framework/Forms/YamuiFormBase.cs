@@ -22,6 +22,7 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Yamui.Framework.Helper;
 using Yamui.Framework.Themes;
@@ -45,7 +46,8 @@ namespace Yamui.Framework.Forms {
         #endregion
 
         #region private fields
-
+                
+        private bool? _dwmCompositionEnabled;
         private bool _reverseX;
         private bool _reverseY;
         private FormWindowState _lastWindowState;
@@ -59,10 +61,46 @@ namespace Yamui.Framework.Forms {
 
         [Category("Yamui")]
         public bool Resizable { get; set; } = true;
+
+        #region private fields
+
+
+        [Browsable(false)]
+        public virtual bool DwmCompositionEnabled {
+            get {
+                if (_dwmCompositionEnabled == null) {
+                    CheckDwmCompositionEnabled();
+                }
+                return _dwmCompositionEnabled ?? false;
+            }
+        }
+
+        #endregion
         
         #endregion
 
         #region constructor
+
+        #region CreateParams
+
+        protected override CreateParams CreateParams {
+            get {
+                var cp = base.CreateParams;
+                cp.ExStyle |= (int) WinApi.WindowStylesEx.WS_EX_COMPOSITED;
+
+                // below is what makes the windows borderless
+                cp.Style &= ~(int) WinApi.WindowStyles.WS_BORDER;
+                cp.Style &= ~(int) WinApi.WindowStyles.WS_SYSMENU;
+                cp.Style &= ~(int) WinApi.WindowStyles.WS_CAPTION;
+                //cp.Style &= ~(int) WinApi.WindowStyles.WS_THICKFRAME;
+                cp.Style |= (int) WinApi.WindowStyles.WS_MINIMIZEBOX;
+                cp.Style |= (int) WinApi.WindowStyles.WS_MAXIMIZEBOX;
+
+                return cp;
+            }
+        }
+
+        #endregion
 
         public YamuiFormBase() {
             // why those styles? check here: 
@@ -100,21 +138,12 @@ namespace Yamui.Framework.Forms {
 
         #region WndProc
 
-        protected override void OnCreateControl() {
-            OnControlCreation();
-            base.OnCreateControl();
-        }
-
-        protected virtual void OnControlCreation() {
-            FormBorderStyle = FormBorderStyle.None;
-        }
-
         protected override void WndProc(ref Message m) {
             if (DesignMode) {
                 base.WndProc(ref m);
                 return;
             }
-
+            
             switch (m.Msg) {
                 case (int) WinApi.Messages.WM_SYSCOMMAND:
                     var sc = m.WParam.ToInt64() & 0xFFF0;
@@ -144,6 +173,12 @@ namespace Yamui.Framework.Forms {
                         OnWindowStateChanged(null);
                         _lastWindowState = WindowState;
                     }
+                    break;
+                    
+                case (int) WinApi.Messages.WM_NCPAINT:
+                    // Allow to display the shadows
+                    //Return Zero
+                    m.Result = IntPtr.Zero;
                     break;
             }
 
@@ -213,6 +248,11 @@ namespace Yamui.Framework.Forms {
         #endregion
 
         #region Methods
+
+        protected void MakeToolWindow(CreateParams cp) {
+            cp.ExStyle |= (int) WinApi.WindowStylesEx.WS_EX_TOOLWINDOW;
+            cp.ExStyle |= (int) WinApi.WindowStylesEx.WS_EX_TOPMOST;
+        }
 
         /// <summary>
         /// Called when the window state changes
@@ -324,6 +364,43 @@ namespace Yamui.Framework.Forms {
             if (Location.Y + Height > screen.WorkingArea.Y + screen.WorkingArea.Height) {
                 Height -= (Location.Y + Height) - (screen.WorkingArea.Y + screen.WorkingArea.Height);
             }
+        }
+        
+        protected void CheckDwmCompositionEnabled() {
+            bool enabled;
+            WinApi.DwmIsCompositionEnabled(out enabled);
+            _dwmCompositionEnabled = Environment.OSVersion.Version.Major >= 6 && enabled;
+        }
+
+        /// <devdoc>
+        ///     The current exStyle of the hWnd
+        /// </devdoc>
+        /// <internalonly/>
+        protected WinApi.WindowStyles WindowExStyle {
+            get {
+                return (WinApi.WindowStyles) unchecked((int)(long)WinApi.GetWindowLong(new HandleRef(this, Handle), WinApi.WindowLongParam.GWL_EXSTYLE));
+            }
+            set {
+                WinApi.SetWindowLong(new HandleRef(this, Handle), WinApi.WindowLongParam.GWL_EXSTYLE, new HandleRef(null, (IntPtr)(int)value));
+            }
+        }
+
+        /// <devdoc>
+        ///     The current style of the hWnd
+        /// </devdoc>
+        /// <internalonly/>
+        protected WinApi.WindowStylesEx WindowStyle {
+            get {
+                return (WinApi.WindowStylesEx) unchecked((int)(long)WinApi.GetWindowLong(new HandleRef(this, Handle), WinApi.WindowLongParam.GWL_STYLE));
+            }
+            set {
+                WinApi.SetWindowLong(new HandleRef(this, Handle), WinApi.WindowLongParam.GWL_STYLE, new HandleRef(null, (IntPtr)(int)value));
+            }
+        }
+
+        protected void SetWindowStyle(int flag, bool value) {
+            int styleFlags = unchecked((int)((long)WinApi.GetWindowLong(new HandleRef(this, Handle), WinApi.WindowLongParam.GWL_STYLE)));
+            WinApi.SetWindowLong(new HandleRef(this, Handle), WinApi.WindowLongParam.GWL_STYLE, new HandleRef(null, (IntPtr)(value? styleFlags | flag: styleFlags & ~flag)));
         }
 
         #endregion
