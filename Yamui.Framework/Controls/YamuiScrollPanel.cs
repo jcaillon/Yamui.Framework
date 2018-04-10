@@ -231,7 +231,6 @@ namespace Yamui.Framework.Controls {
                 using (PaintEventArgs e = new PaintEventArgs(g, rect)) {
                     paint(e);
                 }
-
                 bg.Render();
             }
         }

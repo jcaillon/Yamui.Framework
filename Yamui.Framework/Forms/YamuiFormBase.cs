@@ -1,4 +1,5 @@
 ﻿#region header
+
 // ========================================================================
 // Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
 // This file (YamuiFormBase.cs) is part of YamuiFramework.
@@ -16,6 +17,7 @@
 // You should have received a copy of the GNU General Public License
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
+
 #endregion
 
 using System;
@@ -28,12 +30,10 @@ using Yamui.Framework.Helper;
 using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Forms {
-
     /// <summary>
     /// Form class that implements interesting utilities + shadow + onpaint + movable/resizable borderless
     /// </summary>
     public class YamuiFormBase : Form {
-
         //TODO : see what is done here..
         // https://github.com/Sardau/Sardauscan/tree/master/Sardauscan/Gui/Forms
         // https://github.com/mganss/BorderlessForm
@@ -46,11 +46,12 @@ namespace Yamui.Framework.Forms {
         #endregion
 
         #region private fields
-                
+
         private bool? _dwmCompositionEnabled;
         private bool _reverseX;
         private bool _reverseY;
         private FormWindowState _lastWindowState;
+        protected Padding _nonClientAreaPadding = new Padding(5, 20, 5, 5);
 
         #endregion
 
@@ -62,21 +63,21 @@ namespace Yamui.Framework.Forms {
         [Category("Yamui")]
         public bool Resizable { get; set; } = true;
 
-        #region private fields
-
-
         [Browsable(false)]
         public virtual bool DwmCompositionEnabled {
             get {
                 if (_dwmCompositionEnabled == null) {
                     CheckDwmCompositionEnabled();
                 }
+
                 return _dwmCompositionEnabled ?? false;
             }
         }
 
-        #endregion
-        
+        public virtual Padding NonClientAreaPadding {
+            get { return _nonClientAreaPadding; }
+        }
+
         #endregion
 
         #region constructor
@@ -88,11 +89,11 @@ namespace Yamui.Framework.Forms {
                 var cp = base.CreateParams;
                 cp.ExStyle |= (int) WinApi.WindowStylesEx.WS_EX_COMPOSITED;
 
-                // below is what makes the windows borderless
-                cp.Style &= ~(int) WinApi.WindowStyles.WS_BORDER;
+                // below is what makes the windows borderless but resizable
                 cp.Style &= ~(int) WinApi.WindowStyles.WS_SYSMENU;
                 cp.Style &= ~(int) WinApi.WindowStyles.WS_CAPTION;
-                //cp.Style &= ~(int) WinApi.WindowStyles.WS_THICKFRAME;
+                cp.Style |= (int) WinApi.WindowStyles.WS_BORDER;
+                cp.Style |= (int) WinApi.WindowStyles.WS_THICKFRAME;
                 cp.Style |= (int) WinApi.WindowStyles.WS_MINIMIZEBOX;
                 cp.Style |= (int) WinApi.WindowStyles.WS_MAXIMIZEBOX;
 
@@ -105,13 +106,7 @@ namespace Yamui.Framework.Forms {
         public YamuiFormBase() {
             // why those styles? check here: 
             // https://sites.google.com/site/craigandera/craigs-stuff/windows-forms/flicker-free-control-drawing
-            SetStyle(
-                ControlStyles.OptimizedDoubleBuffer |
-                ControlStyles.ResizeRedraw |
-                ControlStyles.UserPaint |
-                ControlStyles.AllPaintingInWmPaint |
-                ControlStyles.DoubleBuffer |
-                ControlStyles.Opaque, true);
+            SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw | ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.DoubleBuffer | ControlStyles.Opaque, true);
 
             // icon
             if (YamuiThemeManager.GlobalIcon != null)
@@ -123,6 +118,8 @@ namespace Yamui.Framework.Forms {
         #region OnPaint
 
         protected override void OnPaint(PaintEventArgs e) {
+            base.OnPaint(e);
+            return;
             var backColor = YamuiThemeManager.Current.FormBack;
             var borderColor = YamuiThemeManager.Current.FormBorder;
 
@@ -130,7 +127,9 @@ namespace Yamui.Framework.Forms {
 
             // draw the border with Style color
             var rect = new Rectangle(new Point(0, 0), new Size(Width, Height));
-            var pen = new Pen(borderColor, BorderWidth) {Alignment = PenAlignment.Inset};
+            var pen = new Pen(borderColor, BorderWidth) {
+                Alignment = PenAlignment.Inset
+            };
             e.Graphics.DrawRectangle(pen, rect);
         }
 
@@ -143,7 +142,7 @@ namespace Yamui.Framework.Forms {
                 base.WndProc(ref m);
                 return;
             }
-            
+
             switch (m.Msg) {
                 case (int) WinApi.Messages.WM_SYSCOMMAND:
                     var sc = m.WParam.ToInt64() & 0xFFF0;
@@ -154,17 +153,19 @@ namespace Yamui.Framework.Forms {
                                 return;
                             break;
                     }
+
                     break;
 
                 case (int) WinApi.Messages.WM_NCHITTEST:
                     // Allows to resize the form
                     if (Resizable) {
                         var ht = HitTestNca(m.LParam);
-                        if (ht != WinApi.HitTest.HTCLIENT) {
+                        if (ht != WinApi.HitTest.HTNOWHERE) {
                             m.Result = (IntPtr) ht;
                             return;
                         }
                     }
+
                     break;
 
                 case (int) WinApi.Messages.WM_SIZE:
@@ -173,8 +174,9 @@ namespace Yamui.Framework.Forms {
                         OnWindowStateChanged(null);
                         _lastWindowState = WindowState;
                     }
+
                     break;
-                    
+
                 case (int) WinApi.Messages.WM_NCPAINT:
                     // Allow to display the shadows
                     //Return Zero
@@ -189,41 +191,40 @@ namespace Yamui.Framework.Forms {
         /// test in which part of the form the cursor is in, it allows to resize a borderless window
         /// </summary>
         protected virtual WinApi.HitTest HitTestNca(IntPtr lparam) {
-            var cursorLocation = new Point(lparam.ToInt32());
+            var cursorLocation = PointToClient(new Point(lparam.ToInt32()));
+            
+            bool resizeBorder = false;
+            int uRow = 1;
+            int uCol = 1;
 
-            // top left
-            if (RectangleToScreen(new Rectangle(0, 0, ResizeHitDetectionSize, ResizeHitDetectionSize)).Contains(cursorLocation))
-                return WinApi.HitTest.HTTOPLEFT;
+            // Determine if the point is at the top or bottom of the window
+            if (cursorLocation.Y >= 0 && cursorLocation.Y <= NonClientAreaPadding.Top) {
+                resizeBorder = cursorLocation.Y <= ResizeHitDetectionSize;
+                uRow = 0;
+            } else if (cursorLocation.Y <= Height && cursorLocation.Y >= Height - ResizeHitDetectionSize) {
+                uRow = 2;
+            }
 
-            // top
-            if (RectangleToScreen(new Rectangle(ResizeHitDetectionSize, 0, ClientRectangle.Width - 2*ResizeHitDetectionSize, ResizeHitDetectionSize)).Contains(cursorLocation))
-                return WinApi.HitTest.HTTOP;
+            // Determine if the point is at the left or right of the window
+            if (cursorLocation.X >= 0 && cursorLocation.X <= ResizeHitDetectionSize) {
+                uCol = 0;
+            } else if (cursorLocation.X <= Width && cursorLocation.X >= Width - ResizeHitDetectionSize) {
+                uCol = 2;
+            }
 
-            // top right
-            if (RectangleToScreen(new Rectangle(ClientRectangle.Width - ResizeHitDetectionSize, 0, ResizeHitDetectionSize, ResizeHitDetectionSize)).Contains(cursorLocation))
-                return WinApi.HitTest.HTTOPRIGHT;
+            var hitTests = new[] {
+                new[] {
+                    WinApi.HitTest.HTTOPLEFT, resizeBorder ? WinApi.HitTest.HTTOP : WinApi.HitTest.HTCAPTION, WinApi.HitTest.HTTOPRIGHT
+                },
+                new[] {
+                    WinApi.HitTest.HTLEFT, WinApi.HitTest.HTNOWHERE, WinApi.HitTest.HTRIGHT
+                },
+                new[] {
+                    WinApi.HitTest.HTBOTTOMLEFT, WinApi.HitTest.HTBOTTOM, WinApi.HitTest.HTBOTTOMRIGHT
+                },
+            };
 
-            // right
-            if (RectangleToScreen(new Rectangle(ClientRectangle.Width - ResizeHitDetectionSize, ResizeHitDetectionSize, ResizeHitDetectionSize, ClientRectangle.Height - 2*ResizeHitDetectionSize)).Contains(cursorLocation))
-                return WinApi.HitTest.HTRIGHT;
-
-            // bottom right
-            if (RectangleToScreen(new Rectangle(ClientRectangle.Width - ResizeHitDetectionSize, ClientRectangle.Height - ResizeHitDetectionSize, ResizeHitDetectionSize, ResizeHitDetectionSize)).Contains(cursorLocation))
-                return WinApi.HitTest.HTBOTTOMRIGHT;
-
-            // bottom
-            if (RectangleToScreen(new Rectangle(ResizeHitDetectionSize, ClientRectangle.Height - ResizeHitDetectionSize, ClientRectangle.Width - 2*ResizeHitDetectionSize, ResizeHitDetectionSize)).Contains(cursorLocation))
-                return WinApi.HitTest.HTBOTTOM;
-
-            // bottom left
-            if (RectangleToScreen(new Rectangle(0, ClientRectangle.Height - ResizeHitDetectionSize, ResizeHitDetectionSize, ResizeHitDetectionSize)).Contains(cursorLocation))
-                return WinApi.HitTest.HTBOTTOMLEFT;
-
-            // left
-            if (RectangleToScreen(new Rectangle(0, ResizeHitDetectionSize, ResizeHitDetectionSize, ClientRectangle.Height - 2*ResizeHitDetectionSize)).Contains(cursorLocation))
-                return WinApi.HitTest.HTLEFT;
-
-            return WinApi.HitTest.HTCLIENT;
+            return hitTests[uRow][uCol];
         }
 
         #endregion
@@ -242,6 +243,7 @@ namespace Yamui.Framework.Forms {
                 WinApi.ReleaseCapture();
                 WinApi.SendMessage(Handle, (uint) WinApi.Messages.WM_NCLBUTTONDOWN, new IntPtr((int) WinApi.HitTest.HTCAPTION), new IntPtr(0));
             }
+
             base.OnMouseDown(e);
         }
 
@@ -258,9 +260,7 @@ namespace Yamui.Framework.Forms {
         /// Called when the window state changes
         /// </summary>
         /// <param name="e"></param>
-        protected virtual void OnWindowStateChanged(EventArgs e) {
-            
-        }
+        protected virtual void OnWindowStateChanged(EventArgs e) { }
 
         /// <summary>
         /// Returns the best position for a window centered in another one
@@ -278,16 +278,18 @@ namespace Yamui.Framework.Forms {
         /// </summary>
         public Point GetBestMenuPosition(Point spawnLocation) {
             var screen = Screen.FromPoint(spawnLocation);
-            if (spawnLocation.X > screen.WorkingArea.X + screen.WorkingArea.Width/2) {
+            if (spawnLocation.X > screen.WorkingArea.X + screen.WorkingArea.Width / 2) {
                 spawnLocation.X = spawnLocation.X - Width;
                 _reverseX = true;
             } else
                 _reverseX = false;
-            if (spawnLocation.Y > screen.WorkingArea.Y + screen.WorkingArea.Height/2) {
+
+            if (spawnLocation.Y > screen.WorkingArea.Y + screen.WorkingArea.Height / 2) {
                 spawnLocation.Y = spawnLocation.Y - Height;
                 _reverseY = true;
             } else
                 _reverseY = false;
+
             return spawnLocation;
         }
 
@@ -311,11 +313,13 @@ namespace Yamui.Framework.Forms {
                 _reverseX = true;
             } else
                 _reverseX = false;
+
             if (spawnLocation.Y + Height > winRect.Y + winRect.Height) {
                 spawnLocation.Y = spawnLocation.Y - Height - lineHeight;
                 _reverseY = true;
             } else
                 _reverseY = false;
+
             return spawnLocation;
         }
 
@@ -325,9 +329,7 @@ namespace Yamui.Framework.Forms {
         /// (i.e. somewhere on the right of this form and between this.XY and this.Y + this.Height
         /// </summary>
         public Point GetChildBestPosition(Rectangle childRectangle, int parentLineHeight) {
-            return new Point(
-                _reverseX ? (childRectangle.X - childRectangle.Width - Width) : childRectangle.X,
-                childRectangle.Y);
+            return new Point(_reverseX ? (childRectangle.X - childRectangle.Width - Width) : childRectangle.X, childRectangle.Y);
         }
 
         /// <summary>
@@ -335,9 +337,7 @@ namespace Yamui.Framework.Forms {
         /// </summary>
         public Point GetToolTipBestPosition(Size childSize) {
             var screen = Screen.FromPoint(Location);
-            return new Point(
-                (Location.X + Width + childSize.Width > screen.WorkingArea.X + screen.WorkingArea.Width) ? Location.X - childSize.Width : Location.X + Width,
-                _reverseY ? Location.Y + Height - childSize.Height : Location.Y);
+            return new Point((Location.X + Width + childSize.Width > screen.WorkingArea.X + screen.WorkingArea.Width) ? Location.X - childSize.Width : Location.X + Width, _reverseY ? Location.Y + Height - childSize.Height : Location.Y);
         }
 
         /// <summary>
@@ -345,13 +345,14 @@ namespace Yamui.Framework.Forms {
         /// </summary>
         protected void ResizeFormToFitScreen() {
             var loc = Location;
-            loc.Offset(Width/2, Height/2);
+            loc.Offset(Width / 2, Height / 2);
             var screen = Screen.FromPoint(loc);
             if (Location.X < screen.WorkingArea.X) {
                 var rightPos = Location.X + Width;
                 Location = new Point(screen.WorkingArea.X, Location.Y);
                 Width = rightPos - Location.X;
             }
+
             if (Location.X + Width > screen.WorkingArea.X + screen.WorkingArea.Width) {
                 Width -= (Location.X + Width) - (screen.WorkingArea.X + screen.WorkingArea.Width);
             }
@@ -361,11 +362,12 @@ namespace Yamui.Framework.Forms {
                 Location = new Point(Location.X, screen.WorkingArea.Y);
                 Height = bottomPos - Location.Y;
             }
+
             if (Location.Y + Height > screen.WorkingArea.Y + screen.WorkingArea.Height) {
                 Height -= (Location.Y + Height) - (screen.WorkingArea.Y + screen.WorkingArea.Height);
             }
         }
-        
+
         protected void CheckDwmCompositionEnabled() {
             bool enabled;
             WinApi.DwmIsCompositionEnabled(out enabled);
@@ -377,12 +379,8 @@ namespace Yamui.Framework.Forms {
         /// </devdoc>
         /// <internalonly/>
         protected WinApi.WindowStyles WindowExStyle {
-            get {
-                return (WinApi.WindowStyles) unchecked((int)(long)WinApi.GetWindowLong(new HandleRef(this, Handle), WinApi.WindowLongParam.GWL_EXSTYLE));
-            }
-            set {
-                WinApi.SetWindowLong(new HandleRef(this, Handle), WinApi.WindowLongParam.GWL_EXSTYLE, new HandleRef(null, (IntPtr)(int)value));
-            }
+            get { return (WinApi.WindowStyles) unchecked((int) (long) WinApi.GetWindowLong(new HandleRef(this, Handle), WinApi.WindowLongParam.GWL_EXSTYLE)); }
+            set { WinApi.SetWindowLong(new HandleRef(this, Handle), WinApi.WindowLongParam.GWL_EXSTYLE, new HandleRef(null, (IntPtr) (int) value)); }
         }
 
         /// <devdoc>
@@ -390,17 +388,13 @@ namespace Yamui.Framework.Forms {
         /// </devdoc>
         /// <internalonly/>
         protected WinApi.WindowStylesEx WindowStyle {
-            get {
-                return (WinApi.WindowStylesEx) unchecked((int)(long)WinApi.GetWindowLong(new HandleRef(this, Handle), WinApi.WindowLongParam.GWL_STYLE));
-            }
-            set {
-                WinApi.SetWindowLong(new HandleRef(this, Handle), WinApi.WindowLongParam.GWL_STYLE, new HandleRef(null, (IntPtr)(int)value));
-            }
+            get { return (WinApi.WindowStylesEx) unchecked((int) (long) WinApi.GetWindowLong(new HandleRef(this, Handle), WinApi.WindowLongParam.GWL_STYLE)); }
+            set { WinApi.SetWindowLong(new HandleRef(this, Handle), WinApi.WindowLongParam.GWL_STYLE, new HandleRef(null, (IntPtr) (int) value)); }
         }
 
         protected void SetWindowStyle(int flag, bool value) {
-            int styleFlags = unchecked((int)((long)WinApi.GetWindowLong(new HandleRef(this, Handle), WinApi.WindowLongParam.GWL_STYLE)));
-            WinApi.SetWindowLong(new HandleRef(this, Handle), WinApi.WindowLongParam.GWL_STYLE, new HandleRef(null, (IntPtr)(value? styleFlags | flag: styleFlags & ~flag)));
+            int styleFlags = unchecked((int) ((long) WinApi.GetWindowLong(new HandleRef(this, Handle), WinApi.WindowLongParam.GWL_STYLE)));
+            WinApi.SetWindowLong(new HandleRef(this, Handle), WinApi.WindowLongParam.GWL_STYLE, new HandleRef(null, (IntPtr) (value ? styleFlags | flag : styleFlags & ~flag)));
         }
 
         #endregion

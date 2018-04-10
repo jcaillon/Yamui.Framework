@@ -21,6 +21,7 @@
 #endregion
 
 using System;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Yamui.Framework.Helper;
@@ -30,19 +31,7 @@ namespace Yamui.Framework.Forms {
     /// Form class that implements interesting utilities + shadow + onpaint + movable borderless
     /// </summary>
     public class YamuiFormBaseShadow : YamuiFormBase {
-
-        #region CreateParams
-
-        protected override CreateParams CreateParams {
-            get {
-                var cp = base.CreateParams;
-                cp.Style |= (int) WinApi.WindowStyles.WS_BORDER;
-                return cp;
-            }
-        }
-
-        #endregion
-
+        
         #region WndProc
 
         protected override void WndProc(ref Message m) {
@@ -51,11 +40,20 @@ namespace Yamui.Framework.Forms {
                 return;
             }
 
+            if (DwmCompositionEnabled) {
+                IntPtr result;
+                int dwmHandled = WinApi.DwmDefWindowProc(m.HWnd, m.Msg, m.WParam, m.LParam, out result);
+                if (dwmHandled == 1) {
+                    m.Result = result;
+                    return;
+                }
+            }
+
             switch (m.Msg) {
                 case (int) WinApi.Messages.WM_DWMCOMPOSITIONCHANGED:
                     CheckDwmCompositionEnabled();
                     if (DwmCompositionEnabled) {
-                        EnableDwmComposition();
+                        //EnableDwmComposition();
                     } else {
                         DisableDwmComposition();
                     }
@@ -72,22 +70,33 @@ namespace Yamui.Framework.Forms {
                     }
                     break;
 
-                //case (int) WinApi.Messages.WM_NCCALCSIZE:
-                //    if (DwmCompositionEnabled) {
-                //        // We can't use BorderStyle None with Dwm so we respond to this message to say we do not want
-                //        // a non client area
-                //
-                //        //Return Zero
-                //        m.Result = IntPtr.Zero;
-                //        return;
-                //    }
-                //    break;
+                case (int) WinApi.Messages.WM_NCCALCSIZE:
 
+                    if (DwmCompositionEnabled && m.WParam != IntPtr.Zero) {
+                        // we respond to this message to say we do not want a non client area
+                        // When TRUE, LPARAM Points to a NCCALCSIZE_PARAMS structure
+                        var nccsp = (WinApi.NCCALCSIZE_PARAMS) Marshal.PtrToStructure(m.LParam, typeof(WinApi.NCCALCSIZE_PARAMS));
+                        nccsp.rectProposed.left = nccsp.rectProposed.left + 0;
+                        Marshal.StructureToPtr(nccsp, m.LParam, true);
 
-                //case (int) WinApi.Messages.WM_ACTIVATE:
-                //    if (DwmCompositionEnabled) {
-                //        EnableDwmComposition();
-                //    }
+                        //Return Zero
+                        m.Result = IntPtr.Zero;
+                        return;
+                    }
+                    break;
+                    
+                case (int) WinApi.Messages.WM_ACTIVATE:
+                    if (DwmCompositionEnabled) {
+                        EnableDwmComposition();
+                        Refresh();
+                    }
+                    break;
+
+                case (int) WinApi.Messages.WM_CREATE:
+                    if (DwmCompositionEnabled) {
+                        WinApi.SetWindowPos(Handle, IntPtr.Zero, 0, 0, 0, 0, WinApi.SetWindowPosFlags.SWP_FRAMECHANGED | WinApi.SetWindowPosFlags.SWP_NOACTIVATE | WinApi.SetWindowPosFlags.SWP_NOMOVE | WinApi.SetWindowPosFlags.SWP_NOSIZE | WinApi.SetWindowPosFlags.SWP_NOZORDER);
+                        // or GetWindowRect(hWnd, &rcClient); + SetWindowPos(hWnd, SWP_FRAMECHANGED);
+                    }
                     break;
             }
 
@@ -95,6 +104,15 @@ namespace Yamui.Framework.Forms {
         }
 
         #endregion
+
+        protected override void OnPaint(PaintEventArgs e) {
+           // e.Graphics.Clear(Color.Black);
+
+            using (var b = new SolidBrush(Color.Yellow)) {
+                e.Graphics.FillRectangle(b, new Rectangle(new Point(0, 0), Size));
+            }
+            //base.OnPaint(e);
+        }
 
         protected override void OnCreateControl() {
             base.OnCreateControl();
@@ -132,21 +150,19 @@ namespace Yamui.Framework.Forms {
         public void DisableDwmComposition() {
             var margins = new WinApi.MARGINS(0, 0, 0, 0);
             WinApi.DwmExtendFrameIntoClientArea(Handle, ref margins);
-            FormBorderStyle = FormBorderStyle.None;
         }
 
         public void EnableDwmComposition() {
             var status = Marshal.AllocHGlobal(sizeof(int));
-            Marshal.WriteInt32(status, (int) WinApi.DWMNCRenderingPolicy.Enabled);
+            Marshal.WriteInt32(status, (int) WinApi.DWMNCRenderingPolicy.Disabled);
             WinApi.DwmSetWindowAttribute(Handle, WinApi.DWMWINDOWATTRIBUTE.NCRenderingPolicy, status, sizeof(int));
 
-            //status = Marshal.AllocHGlobal(sizeof(int));
-            //Marshal.WriteInt32(status, 1);
-            //WinApi.DwmSetWindowAttribute(Handle, WinApi.DWMWINDOWATTRIBUTE.AllowNCPaint, status, sizeof(int));
+            status = Marshal.AllocHGlobal(sizeof(int));
+            Marshal.WriteInt32(status, 0);
+            WinApi.DwmSetWindowAttribute(Handle, WinApi.DWMWINDOWATTRIBUTE.AllowNCPaint, status, sizeof(int));
 
-            var margins = new WinApi.MARGINS(1, 1, 1, 1);
+            var margins = new WinApi.MARGINS(0,0,0,0);
             WinApi.DwmExtendFrameIntoClientArea(Handle, ref margins);
-            FormBorderStyle = FormBorderStyle.Sizable;
         }
 
     }

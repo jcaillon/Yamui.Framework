@@ -48,6 +48,13 @@ namespace Yamui.Framework.Helper {
                 cyTopHeight = Top;
                 cyBottomHeight = Bottom;
             }
+
+            public MARGINS(Padding nonClientAreaPadding) {
+                cxLeftWidth = nonClientAreaPadding.Left;
+                cxRightWidth = nonClientAreaPadding.Right;
+                cyTopHeight = nonClientAreaPadding.Top;
+                cyBottomHeight = nonClientAreaPadding.Bottom;
+            }
         }
 
         [StructLayout(LayoutKind.Sequential)]
