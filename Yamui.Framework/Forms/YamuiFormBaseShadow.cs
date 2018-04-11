@@ -39,16 +39,7 @@ namespace Yamui.Framework.Forms {
                 base.WndProc(ref m);
                 return;
             }
-
-            if (DwmCompositionEnabled) {
-                IntPtr result;
-                int dwmHandled = WinApi.DwmDefWindowProc(m.HWnd, m.Msg, m.WParam, m.LParam, out result);
-                if (dwmHandled == 1) {
-                    m.Result = result;
-                    return;
-                }
-            }
-
+            
             switch (m.Msg) {
                 case (int) WinApi.Messages.WM_DWMCOMPOSITIONCHANGED:
                     CheckDwmCompositionEnabled();
@@ -71,14 +62,14 @@ namespace Yamui.Framework.Forms {
                     break;
 
                 case (int) WinApi.Messages.WM_NCCALCSIZE:
-
+                
                     if (DwmCompositionEnabled && m.WParam != IntPtr.Zero) {
                         // we respond to this message to say we do not want a non client area
                         // When TRUE, LPARAM Points to a NCCALCSIZE_PARAMS structure
                         var nccsp = (WinApi.NCCALCSIZE_PARAMS) Marshal.PtrToStructure(m.LParam, typeof(WinApi.NCCALCSIZE_PARAMS));
                         nccsp.rectProposed.left = nccsp.rectProposed.left + 0;
                         Marshal.StructureToPtr(nccsp, m.LParam, true);
-
+                
                         //Return Zero
                         m.Result = IntPtr.Zero;
                         return;
@@ -87,8 +78,7 @@ namespace Yamui.Framework.Forms {
                     
                 case (int) WinApi.Messages.WM_ACTIVATE:
                     if (DwmCompositionEnabled) {
-                        EnableDwmComposition();
-                        Refresh();
+                        //EnableDwmComposition();
                     }
                     break;
 
@@ -98,6 +88,17 @@ namespace Yamui.Framework.Forms {
                         // or GetWindowRect(hWnd, &rcClient); + SetWindowPos(hWnd, SWP_FRAMECHANGED);
                     }
                     break;
+
+                case (int) WinApi.Messages.WM_NCACTIVATE:
+                    // Sent to a window when its nonclient area needs to be changed to indicate an active or inactive state
+                    // m.WParam != IntPtr.Zero
+                    m.Result = IntPtr.Zero;
+                    return;
+
+                case (int) WinApi.Messages.WM_ERASEBKGND:
+                    // https://msdn.microsoft.com/en-us/library/windows/desktop/ms648055(v=vs.85).aspx
+                    m.Result = IntPtr.Zero;
+                    return;
             }
 
             base.WndProc(ref m);
@@ -144,24 +145,18 @@ namespace Yamui.Framework.Forms {
             minmaxinfo.ptMaxPosition.y = Math.Abs(s.WorkingArea.Top - s.Bounds.Top);
             Marshal.StructureToPtr(minmaxinfo, lParam, true);
         }
-
-
-       
+        
         public void DisableDwmComposition() {
             var margins = new WinApi.MARGINS(0, 0, 0, 0);
             WinApi.DwmExtendFrameIntoClientArea(Handle, ref margins);
         }
 
         public void EnableDwmComposition() {
-            var status = Marshal.AllocHGlobal(sizeof(int));
-            Marshal.WriteInt32(status, (int) WinApi.DWMNCRenderingPolicy.Disabled);
-            WinApi.DwmSetWindowAttribute(Handle, WinApi.DWMWINDOWATTRIBUTE.NCRenderingPolicy, status, sizeof(int));
+            //var status = Marshal.AllocHGlobal(sizeof(int));
+            //Marshal.WriteInt32(status, 0);
+            //WinApi.DwmSetWindowAttribute(Handle, WinApi.DWMWINDOWATTRIBUTE.AllowNCPaint, status, sizeof(int));
 
-            status = Marshal.AllocHGlobal(sizeof(int));
-            Marshal.WriteInt32(status, 0);
-            WinApi.DwmSetWindowAttribute(Handle, WinApi.DWMWINDOWATTRIBUTE.AllowNCPaint, status, sizeof(int));
-
-            var margins = new WinApi.MARGINS(0,0,0,0);
+            var margins = new WinApi.MARGINS(-1, -1, -1, -1);
             WinApi.DwmExtendFrameIntoClientArea(Handle, ref margins);
         }
 

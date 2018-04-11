@@ -30,6 +30,7 @@ using Yamui.Framework.Helper;
 using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Forms {
+
     /// <summary>
     /// Form class that implements interesting utilities + shadow + onpaint + movable/resizable borderless
     /// </summary>
@@ -52,6 +53,8 @@ namespace Yamui.Framework.Forms {
         private bool _reverseY;
         private FormWindowState _lastWindowState;
         protected Padding _nonClientAreaPadding = new Padding(5, 20, 5, 5);
+        private int _savedHeight;
+        private int _savedWidth;
 
         #endregion
 
@@ -87,16 +90,20 @@ namespace Yamui.Framework.Forms {
         protected override CreateParams CreateParams {
             get {
                 var cp = base.CreateParams;
+
+                if (DesignMode)
+                    return cp;
+
                 cp.ExStyle |= (int) WinApi.WindowStylesEx.WS_EX_COMPOSITED;
 
                 // below is what makes the windows borderless but resizable
                 cp.Style &= ~(int) WinApi.WindowStyles.WS_SYSMENU;
                 cp.Style &= ~(int) WinApi.WindowStyles.WS_CAPTION;
-                cp.Style |= (int) WinApi.WindowStyles.WS_BORDER;
-                cp.Style |= (int) WinApi.WindowStyles.WS_THICKFRAME;
+                cp.Style &= ~(int) WinApi.WindowStyles.WS_BORDER;
                 cp.Style |= (int) WinApi.WindowStyles.WS_MINIMIZEBOX;
                 cp.Style |= (int) WinApi.WindowStyles.WS_MAXIMIZEBOX;
-
+                cp.Style |= (int) WinApi.WindowStyles.WS_THICKFRAME;
+                
                 return cp;
             }
         }
@@ -106,8 +113,14 @@ namespace Yamui.Framework.Forms {
         public YamuiFormBase() {
             // why those styles? check here: 
             // https://sites.google.com/site/craigandera/craigs-stuff/windows-forms/flicker-free-control-drawing
-            SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw | ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.DoubleBuffer | ControlStyles.Opaque, true);
-
+            SetStyle(
+                ControlStyles.OptimizedDoubleBuffer | 
+                ControlStyles.ResizeRedraw | 
+                ControlStyles.UserPaint | 
+                ControlStyles.AllPaintingInWmPaint | 
+                ControlStyles.DoubleBuffer | 
+                ControlStyles.Opaque, true);
+            
             // icon
             if (YamuiThemeManager.GlobalIcon != null)
                 Icon = YamuiThemeManager.GlobalIcon;
@@ -152,8 +165,18 @@ namespace Yamui.Framework.Forms {
                             if (!Movable)
                                 return;
                             break;
+                        case (int) WinApi.SysCommands.SC_RESTORE:
+                            SuspendLayout();
+                            Height = _savedHeight;
+                            Width = _savedWidth;
+                            ResumeLayout(false);
+                            break;
+                        case (int) WinApi.SysCommands.SC_MINIMIZE:
+                        case (int) WinApi.SysCommands.SC_MAXIMIZE:
+                            _savedHeight = Height;
+                            _savedWidth = Width;
+                            break;
                     }
-
                     break;
 
                 case (int) WinApi.Messages.WM_NCHITTEST:
@@ -250,6 +273,11 @@ namespace Yamui.Framework.Forms {
         #endregion
 
         #region Methods
+
+        protected override void OnCreateControl() {
+            Text = null;
+            base.OnCreateControl();
+        }
 
         protected void MakeToolWindow(CreateParams cp) {
             cp.ExStyle |= (int) WinApi.WindowStylesEx.WS_EX_TOOLWINDOW;

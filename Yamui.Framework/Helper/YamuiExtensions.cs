@@ -109,21 +109,31 @@ namespace Yamui.Framework.Helper {
         #region Simple math
 
         /// <summary>
-        /// Returns the lower 16 bits of a 32 bits integer
+        /// Returns the higher 16 bits of a 32 bits integer
         /// </summary>
-        /// <param name="dwValue"></param>
-        /// <returns></returns>
-        public static int LoWord(this int dwValue) {
-            return dwValue & 0xFFFF;
+        public static int HiWord(this int n) {
+            return (n >> 16) & 0xffff;
         }
-
+    
         /// <summary>
         /// Returns the higher 16 bits of a 32 bits integer
         /// </summary>
-        /// <param name="dwValue"></param>
-        /// <returns></returns>
-        public static int HiWord(this int dwValue) {
-            return (dwValue >> 16) & 0xFFFF;
+        public static int HiWord(this IntPtr n) {
+            return HiWord(unchecked((int)(long)n) );
+        }
+    
+        /// <summary>
+        /// Returns the lower 16 bits of a 32 bits integer
+        /// </summary>
+        public static int LoWord(this int n) {
+            return n & 0xffff;
+        }
+    
+        /// <summary>
+        /// Returns the lower 16 bits of a 32 bits integer
+        /// </summary>
+        public static int LoWord(this IntPtr n) {
+            return LoWord(unchecked((int)(long)n));
         }
 
         /// <summary>
