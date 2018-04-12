@@ -34,7 +34,7 @@ namespace Yamui.Framework.Forms {
         
         #region WndProc
 
-        protected override void WndProc(ref Message m) {
+        protected override unsafe void WndProc(ref Message m) {
             if (DesignMode) {
                 base.WndProc(ref m);
                 return;
@@ -62,14 +62,15 @@ namespace Yamui.Framework.Forms {
                     break;
 
                 case (int) WinApi.Messages.WM_NCCALCSIZE:
-                
+                    
                     if (DwmCompositionEnabled && m.WParam != IntPtr.Zero) {
                         // we respond to this message to say we do not want a non client area
                         // When TRUE, LPARAM Points to a NCCALCSIZE_PARAMS structure
+                        
                         var nccsp = (WinApi.NCCALCSIZE_PARAMS) Marshal.PtrToStructure(m.LParam, typeof(WinApi.NCCALCSIZE_PARAMS));
                         nccsp.rectProposed.left = nccsp.rectProposed.left + 0;
                         Marshal.StructureToPtr(nccsp, m.LParam, true);
-                
+                    
                         //Return Zero
                         m.Result = IntPtr.Zero;
                         return;
@@ -90,9 +91,16 @@ namespace Yamui.Framework.Forms {
                     break;
 
                 case (int) WinApi.Messages.WM_NCACTIVATE:
-                    // Sent to a window when its nonclient area needs to be changed to indicate an active or inactive state
-                    // m.WParam != IntPtr.Zero
-                    m.Result = IntPtr.Zero;
+                    if (DwmCompositionEnabled) {
+                        /* Prevent Windows from drawing the default title bar by temporarily
+                           toggling the WS_VISIBLE style. This is recommended in:
+                           https://blogs.msdn.microsoft.com/wpfsdk/2008/09/08/custom-window-chrome-in-wpf/ */
+                        var oldStyle = WindowStyle;
+                        WindowStyle = oldStyle & ~WinApi.WindowStyles.WS_VISIBLE;
+                        DefWndProc(ref m);
+                        WindowStyle = oldStyle;
+                    }
+
                     return;
 
                 case (int) WinApi.Messages.WM_ERASEBKGND:
@@ -103,7 +111,7 @@ namespace Yamui.Framework.Forms {
 
             base.WndProc(ref m);
         }
-
+        
         #endregion
 
         protected override void OnPaint(PaintEventArgs e) {
@@ -152,9 +160,9 @@ namespace Yamui.Framework.Forms {
         }
 
         public void EnableDwmComposition() {
-            //var status = Marshal.AllocHGlobal(sizeof(int));
-            //Marshal.WriteInt32(status, 0);
-            //WinApi.DwmSetWindowAttribute(Handle, WinApi.DWMWINDOWATTRIBUTE.AllowNCPaint, status, sizeof(int));
+            var status = Marshal.AllocHGlobal(sizeof(int));
+            Marshal.WriteInt32(status, (int) WinApi.DWMNCRenderingPolicy.Enabled);
+            WinApi.DwmSetWindowAttribute(Handle, WinApi.DWMWINDOWATTRIBUTE.NCRenderingPolicy, status, sizeof(int));
 
             var margins = new WinApi.MARGINS(-1, -1, -1, -1);
             WinApi.DwmExtendFrameIntoClientArea(Handle, ref margins);

@@ -36,6 +36,25 @@ namespace Yamui.Framework.Helper {
         #region Structs
 
         [StructLayout(LayoutKind.Sequential)]
+        public struct WINDOWINFO {
+            public uint cbSize;
+            public RECT rcWindow;
+            public RECT rcClient;
+            public uint dwStyle;
+            public uint dwExStyle;
+            public uint dwWindowStatus;
+            public uint cxWindowBorders;
+            public uint cyWindowBorders;
+            public ushort atomWindowType;
+            public ushort wCreatorVersion;
+
+            public WINDOWINFO(Boolean? filler) : this() {
+                // Allows automatic initialization of "cbSize" with "new WINDOWINFO(null/true/false)".
+                cbSize = (UInt32) (Marshal.SizeOf(typeof(WINDOWINFO)));
+            }
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
         public struct MARGINS {
             public int cxLeftWidth;
             public int cxRightWidth;
@@ -893,7 +912,7 @@ namespace Yamui.Framework.Helper {
             WS_OVERLAPPEDWINDOW = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_SIZEFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX,
 
             /// <summary>The window is a pop-up window. This style cannot be used with the WS_CHILD style.</summary>
-            WS_POPUP = unchecked((int)0x80000000),
+            WS_POPUP = unchecked((int) 0x80000000),
 
             /// <summary>The window is a pop-up window. The WS_CAPTION and WS_POPUPWINDOW styles must be combined to make the window menu visible.</summary>
             WS_POPUPWINDOW = WS_POPUP | WS_BORDER | WS_SYSMENU,
@@ -1090,8 +1109,9 @@ namespace Yamui.Framework.Helper {
 
         #region API Calls
 
-
-
+        [return: MarshalAs(UnmanagedType.Bool)]
+        [DllImport("user32.dll",SetLastError = true)]
+        public static extern bool GetWindowInfo(IntPtr hwnd, ref WINDOWINFO pwi);
 
         [DllImport("user32.dll", ExactSpelling = true, CharSet = CharSet.Auto)]
         public static extern bool DrawFrameControl(HandleRef hDC, ref RECT rect, DrawFrameControlTypes type, DrawFrameControlStates state);
@@ -1244,18 +1264,21 @@ namespace Yamui.Framework.Helper {
 
         #region unsafe
 
+        [DllImport("user32.dll", CharSet=CharSet.Auto)]
+        public static extern IntPtr DefWindowProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+
         //GetWindowLong won't work correctly for 64-bit: we should use GetWindowLongPtr instead.  On
         //32-bit, GetWindowLongPtr is just #defined as GetWindowLong.  GetWindowLong really should 
         //take/return int instead of IntPtr/HandleRef, but since we're running this only for 32-bit
         //it'll be OK.
-        public static IntPtr GetWindowLong(HandleRef hWnd, WindowLongParam nIndex)
-        {
-            if (IntPtr.Size == 4)
-            {
+        public static IntPtr GetWindowLong(HandleRef hWnd, WindowLongParam nIndex) {
+            if (IntPtr.Size == 4) {
                 return GetWindowLong32(hWnd, (int) nIndex);
             }
+
             return GetWindowLongPtr64(hWnd, (int) nIndex);
         }
+
         [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable")]
         [DllImport("user32.dll", CharSet = CharSet.Auto, EntryPoint = "GetWindowLong")]
         public static extern IntPtr GetWindowLong32(HandleRef hWnd, int nIndex);
@@ -1268,17 +1291,18 @@ namespace Yamui.Framework.Helper {
         //32-bit, SetWindowLongPtr is just #defined as SetWindowLong.  SetWindowLong really should 
         //take/return int instead of IntPtr/HandleRef, but since we're running this only for 32-bit
         //it'll be OK.
-        public static IntPtr SetWindowLong(HandleRef hWnd, WindowLongParam nIndex, HandleRef dwNewLong) 
-        {
-            if (IntPtr.Size == 4)
-            {
+        public static IntPtr SetWindowLong(HandleRef hWnd, WindowLongParam nIndex, HandleRef dwNewLong) {
+            if (IntPtr.Size == 4) {
                 return SetWindowLongPtr32(hWnd, (int) nIndex, dwNewLong);
             }
+
             return SetWindowLongPtr64(hWnd, (int) nIndex, dwNewLong);
         }
+
         [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable")]
         [DllImport("user32.dll", CharSet = CharSet.Auto, EntryPoint = "SetWindowLong")]
         public static extern IntPtr SetWindowLongPtr32(HandleRef hWnd, int nIndex, HandleRef dwNewLong);
+
         [SuppressMessage("Microsoft.Interoperability", "CA1400:PInvokeEntryPointsShouldExist")]
         [DllImport("user32.dll", CharSet = CharSet.Auto, EntryPoint = "SetWindowLongPtr")]
         public static extern IntPtr SetWindowLongPtr64(HandleRef hWnd, int nIndex, HandleRef dwNewLong);
@@ -1288,14 +1312,8 @@ namespace Yamui.Framework.Helper {
         #region GetCharFromKey
 
         [DllImport("user32.dll")]
-        public static extern int ToUnicode(
-            uint wVirtKey,
-            uint wScanCode,
-            byte[] lpKeyState,
-            [Out, MarshalAs(UnmanagedType.LPWStr, SizeParamIndex = 4)]
-            StringBuilder pwszBuff,
-            int cchBuff,
-            uint wFlags);
+        public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpKeyState, [Out, MarshalAs(UnmanagedType.LPWStr, SizeParamIndex = 4)]
+            StringBuilder pwszBuff, int cchBuff, uint wFlags);
 
         [DllImport("user32.dll")]
         public static extern bool GetKeyboardState(byte[] lpKeyState);

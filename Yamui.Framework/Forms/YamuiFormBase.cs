@@ -35,9 +35,6 @@ namespace Yamui.Framework.Forms {
     /// Form class that implements interesting utilities + shadow + onpaint + movable/resizable borderless
     /// </summary>
     public class YamuiFormBase : Form {
-        //TODO : see what is done here..
-        // https://github.com/Sardau/Sardauscan/tree/master/Sardauscan/Gui/Forms
-        // https://github.com/mganss/BorderlessForm
 
         #region Constants
 
@@ -406,8 +403,8 @@ namespace Yamui.Framework.Forms {
         ///     The current exStyle of the hWnd
         /// </devdoc>
         /// <internalonly/>
-        protected WinApi.WindowStyles WindowExStyle {
-            get { return (WinApi.WindowStyles) unchecked((int) (long) WinApi.GetWindowLong(new HandleRef(this, Handle), WinApi.WindowLongParam.GWL_EXSTYLE)); }
+        protected WinApi.WindowStylesEx WindowEStyle {
+            get { return (WinApi.WindowStylesEx) unchecked((int) (long) WinApi.GetWindowLong(new HandleRef(this, Handle), WinApi.WindowLongParam.GWL_EXSTYLE)); }
             set { WinApi.SetWindowLong(new HandleRef(this, Handle), WinApi.WindowLongParam.GWL_EXSTYLE, new HandleRef(null, (IntPtr) (int) value)); }
         }
 
@@ -415,8 +412,8 @@ namespace Yamui.Framework.Forms {
         ///     The current style of the hWnd
         /// </devdoc>
         /// <internalonly/>
-        protected WinApi.WindowStylesEx WindowStyle {
-            get { return (WinApi.WindowStylesEx) unchecked((int) (long) WinApi.GetWindowLong(new HandleRef(this, Handle), WinApi.WindowLongParam.GWL_STYLE)); }
+        protected WinApi.WindowStyles WindowStyle {
+            get { return (WinApi.WindowStyles) unchecked((int) (long) WinApi.GetWindowLong(new HandleRef(this, Handle), WinApi.WindowLongParam.GWL_STYLE)); }
             set { WinApi.SetWindowLong(new HandleRef(this, Handle), WinApi.WindowLongParam.GWL_STYLE, new HandleRef(null, (IntPtr) (int) value)); }
         }
 
