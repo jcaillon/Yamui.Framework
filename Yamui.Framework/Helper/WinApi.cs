@@ -270,6 +270,24 @@ namespace Yamui.Framework.Helper {
             public uint dwHoverTime;
         }
 
+        [StructLayout(LayoutKind.Sequential)]
+        public struct WINDOWPLACEMENT {
+            public int  length;
+            public int  flags;
+            public int  showCmd;
+            // ptMinPosition was a by-value POINT structure
+            public int  ptMinPosition_x;
+            public int  ptMinPosition_y;
+            // ptMaxPosition was a by-value POINT structure
+            public int  ptMaxPosition_x;
+            public int  ptMaxPosition_y;
+            // rcNormalPosition was a by-value RECT structure
+            public int  rcNormalPosition_left;
+            public int  rcNormalPosition_top;
+            public int  rcNormalPosition_right;
+            public int  rcNormalPosition_bottom;
+        }
+
         #endregion
 
         #region Enums
@@ -1351,6 +1369,9 @@ namespace Yamui.Framework.Helper {
         #endregion
 
         #region unsafe
+
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=CharSet.Auto)]
+        public static extern int GetWindowPlacement(HandleRef hWnd, ref WINDOWPLACEMENT placement);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern IntPtr DefWindowProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);

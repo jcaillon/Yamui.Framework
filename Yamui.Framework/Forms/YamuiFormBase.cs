@@ -315,6 +315,7 @@ namespace Yamui.Framework.Forms {
 
                 case (int) WinApi.Messages.WM_WINDOWPOSCHANGED:
                     var newwindowpos = (WinApi.WINDOWPOS) Marshal.PtrToStructure(m.LParam, typeof(WinApi.WINDOWPOS));
+                    DefWndProc(ref m);
                     m.Result = IntPtr.Zero;
                     return;
 
@@ -365,12 +366,7 @@ namespace Yamui.Framework.Forms {
         }
 
         private bool OnNcCalcSize_ModifyProposedRectangle(ref WinApi.RECT rect) {
-            // would be cool to find a better way to know if we are maximized
-            if (rect.left + WindowBorderSize.Width == _lastMinMaxInfo.ptMaxPosition.x &&
-                rect.top + WindowBorderSize.Height == _lastMinMaxInfo.ptMaxPosition.y &&
-                rect.right - rect.left - 2 * WindowBorderSize.Width == _lastMinMaxInfo.ptMaxSize.x &&
-                rect.bottom - rect.top - 2 * WindowBorderSize.Height == _lastMinMaxInfo.ptMaxSize.y) {
-
+            if (IsMaximized()) {
                 // the proposed rect is the maximized position/size that window suggest using the "out of screen" borders
                 // we change that here
                 rect.left += WindowBorderSize.Width;
@@ -382,6 +378,44 @@ namespace Yamui.Framework.Forms {
             return false;
         }
 
+        private bool IsMaximized() {
+            WinApi.WINDOWPLACEMENT wp = new WinApi.WINDOWPLACEMENT {
+                length = Marshal.SizeOf(typeof(WinApi.WINDOWPLACEMENT))
+            };
+            WinApi.GetWindowPlacement(new HandleRef(this, Handle), ref wp);
+            if ((WinApi.ShowWindowCommands) wp.showCmd == WinApi.ShowWindowCommands.SW_SHOWMAXIMIZED) {
+                return true;
+            }
+            /*
+             * switch (wp.showCmd) {
+                    case NativeMethods.SW_NORMAL:
+                    case NativeMethods.SW_RESTORE:
+                    case NativeMethods.SW_SHOW:
+                    case NativeMethods.SW_SHOWNA:
+                    case NativeMethods.SW_SHOWNOACTIVATE:
+                        if (formState[FormStateWindowState] != (int)FormWindowState.Normal) {
+                            formState[FormStateWindowState] = (int)FormWindowState.Normal;
+                        }
+                        break;
+                    case NativeMethods.SW_SHOWMAXIMIZED:
+                        if (formState[FormStateMdiChildMax] == 0) {
+                            formState[FormStateWindowState] = (int)FormWindowState.Maximized;
+                        }
+                        break;
+                    case NativeMethods.SW_SHOWMINIMIZED:
+                    case NativeMethods.SW_MINIMIZE:
+                    case NativeMethods.SW_SHOWMINNOACTIVE:
+                        if (formState[FormStateMdiChildMax] == 0) {
+                            formState[FormStateWindowState] = (int)FormWindowState.Minimized;
+                        }
+                        break;
+                    case NativeMethods.SW_HIDE:
+                    default:
+                        break;
+                }
+             */
+            return false;
+        }
 
         /// <summary>
         /// test in which part of the form the cursor is in, it allows to resize a borderless window
