@@ -109,6 +109,18 @@ namespace Yamui.Framework.Helper {
         #region Simple math
 
         /// <summary>
+        /// Set low and high bits of an int
+        /// </summary>
+        /// <returns></returns>
+        public static int MakeLong(int low, int high) {
+            return (high << 16) | (low & 0xffff);
+        }
+    
+        public static IntPtr MakeLParam(int low, int high) {
+            return (IntPtr) ((high << 16) | (low & 0xffff));
+        }
+
+        /// <summary>
         /// Returns the higher 16 bits of a 32 bits integer
         /// </summary>
         public static int HiWord(this int n) {

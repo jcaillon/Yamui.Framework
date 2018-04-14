@@ -500,10 +500,10 @@ namespace Yamui.Framework.Controls {
                 ref rcClip,
                 WinApi.NullHandleRef,
                 ref rcUpdate,
-                WinApi.SW_INVALIDATE
-                | WinApi.SW_ERASE
-                | WinApi.SW_SCROLLCHILDREN
-                | WinApi.SW_SMOOTHSCROLL);
+                WinApi.ScrollWindowExFlags.SW_ERASE | 
+                WinApi.ScrollWindowExFlags.SW_INVALIDATE | 
+                WinApi.ScrollWindowExFlags.SW_SCROLLCHILDREN | 
+                WinApi.ScrollWindowExFlags.SW_SMOOTHSCROLL);
 
             UpdateChildrenBound();
 

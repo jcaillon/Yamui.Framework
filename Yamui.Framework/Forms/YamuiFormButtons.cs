@@ -34,6 +34,7 @@ namespace Yamui.Framework.Forms {
     /// Form class that adds the top right buttons + resize
     /// </summary>
     public class YamuiFormButtons : YamuiFormBaseFadeIn {
+
         #region constants
 
         protected const int FormButtonWidth = 25;
@@ -194,7 +195,6 @@ namespace Yamui.Framework.Forms {
             }
 
             // display windows buttons
-            RemoveCloseButton();
             if (ControlBox) {
                 AddWindowButton(WindowButtons.Close);
                 if (MaximizeBox)
@@ -215,24 +215,6 @@ namespace Yamui.Framework.Forms {
         #endregion
 
         #region Window Buttons
-
-        /// <summary>
-        /// Allows to remove the default caption bar
-        /// </summary>
-        [SecuritySafeCritical]
-        public void RemoveCloseButton() {
-            var hMenu = WinApi.GetSystemMenu(Handle, false);
-            if (hMenu == IntPtr.Zero)
-                return;
-
-            var n = WinApi.GetMenuItemCount(hMenu);
-            if (n <= 0)
-                return;
-
-            WinApi.RemoveMenu(hMenu, (uint) (n - 1), WinApi.MF_BYPOSITION | WinApi.MF_REMOVE);
-            WinApi.RemoveMenu(hMenu, (uint) (n - 2), WinApi.MF_BYPOSITION | WinApi.MF_REMOVE);
-            WinApi.DrawMenuBar(Handle);
-        }
 
         /// <summary>
         /// Add a particular button on the right top of the form

@@ -90,9 +90,8 @@ namespace Yamui.Framework.Forms {
 
             // Disable Aero transitions, the plexiglass gets too visible
             if (Environment.OSVersion.Version.Major >= 6) {
-                var status = Marshal.AllocHGlobal(sizeof(int));
-                Marshal.WriteInt32(status, 1);
-                WinApi.DwmSetWindowAttribute(Handle, WinApi.DWMWINDOWATTRIBUTE.TransitionsForceDisabled, status, sizeof(int));
+                var status = 1;
+                WinApi.DwmSetWindowAttribute(Handle, WinApi.DWMWINDOWATTRIBUTE.TransitionsForceDisabled, ref status, sizeof(int));
             }
 
             base.Opacity = 0d;
@@ -123,9 +122,8 @@ namespace Yamui.Framework.Forms {
                     Owner.ClientSizeChanged -= Cover_ClientSizeChanged;
                     Owner.VisibleChanged -= Cover_OnVisibleChanged;
                     if (!Owner.IsDisposed && Environment.OSVersion.Version.Major >= 6) {
-                        var status = Marshal.AllocHGlobal(sizeof(int));
-                        Marshal.WriteInt32(status, 0);
-                        WinApi.DwmSetWindowAttribute(Handle, WinApi.DWMWINDOWATTRIBUTE.TransitionsForceDisabled, status, sizeof(int));
+                        var status = 0;
+                        WinApi.DwmSetWindowAttribute(Handle, WinApi.DWMWINDOWATTRIBUTE.TransitionsForceDisabled, ref status, sizeof(int));
                     }
                 }
             } catch (Exception) {

@@ -78,9 +78,8 @@ namespace Yamui.Framework.Forms {
             base.OnCreateControl();
             // Allow to display the shadows
             if (DwmCompositionEnabled) {
-                var status = Marshal.AllocHGlobal(sizeof(int));
-                Marshal.WriteInt32(status, (int) WinApi.DWMNCRenderingPolicy.Enabled);
-                WinApi.DwmSetWindowAttribute(Handle, WinApi.DWMWINDOWATTRIBUTE.NCRenderingPolicy, status, sizeof(int));
+                var status = (int) WinApi.DWMNCRenderingPolicy.Enabled;
+                WinApi.DwmSetWindowAttribute(Handle, WinApi.DWMWINDOWATTRIBUTE.NCRenderingPolicy, ref status, sizeof(int));
 
                 var margins = new WinApi.MARGINS(1, 1, 1, 1);
                 WinApi.DwmExtendFrameIntoClientArea(Handle, ref margins);

@@ -302,7 +302,7 @@ namespace Yamui.Framework.Forms {
             if (list != null && Movable && e.Button == MouseButtons.Left && (new Rectangle(0, list.Height - list.BottomHeight, list.Width, list.BottomHeight)).Contains(e.Location)) {
                 // do as if the cursor was on the title bar
                 WinApi.ReleaseCapture();
-                WinApi.SendMessage(Handle, (uint) WinApi.Messages.WM_NCLBUTTONDOWN, new IntPtr((int) WinApi.HitTest.HTCAPTION), new IntPtr(0));
+                WinApi.SendMessage(Handle, (int) WinApi.Messages.WM_NCLBUTTONDOWN, new IntPtr((int) WinApi.HitTest.HTCAPTION), new IntPtr(0));
             }
         }
 

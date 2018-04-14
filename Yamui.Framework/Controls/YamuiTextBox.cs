@@ -160,7 +160,7 @@ namespace Yamui.Framework.Controls {
             */
             // Send WM_MOUSEWHEEL messages to the parent
             if (!Multiline && m.Msg == (int) WinApi.Messages.WM_MOUSEWHEEL)
-                WinApi.SendMessage(Parent.Handle, (uint) m.Msg, m.WParam, m.LParam);
+                WinApi.SendMessage(Parent.Handle, m.Msg, m.WParam, m.LParam);
             else
                 base.WndProc(ref m);
 

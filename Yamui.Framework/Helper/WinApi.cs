@@ -40,8 +40,8 @@ namespace Yamui.Framework.Helper {
             public uint cbSize;
             public RECT rcWindow;
             public RECT rcClient;
-            public uint dwStyle;
-            public uint dwExStyle;
+            public WindowStyles dwStyle;
+            public WindowStylesEx dwExStyle;
             public uint dwWindowStatus;
             public uint cxWindowBorders;
             public uint cyWindowBorders;
@@ -226,13 +226,17 @@ namespace Yamui.Framework.Helper {
 
         [StructLayout(LayoutKind.Sequential)]
         public struct WINDOWPOS {
-            internal IntPtr hwnd;
-            internal IntPtr hWndInsertAfter;
-            internal int x;
-            internal int y;
-            internal int cx;
-            internal int cy;
-            internal uint flags;
+            public IntPtr hwnd;
+            public IntPtr hWndInsertAfter;
+            public int x;
+            public int y;
+            public int cx;
+            public int cy;
+
+            /// <summary>
+            /// see SetWindowPosFlags
+            /// </summary>
+            public SetWindowPosFlags flags;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -377,11 +381,7 @@ namespace Yamui.Framework.Helper {
             SWP_DEFERERASE = 0x2000,
 
             /// <summary>
-            ///     Draws a frame (defined in the window's class description) around the window.
-            /// </summary>
-            SWP_DRAWFRAME = 0x0020,
-
-            /// <summary>
+            /// Draws a frame (defined in the window's class description) around the window.
             ///     Applies new frame styles set using the SetWindowLong function. Sends a WM_NCCALCSIZE message to the window, even if the window's size is not being changed. If this flag is not specified, WM_NCCALCSIZE is sent only when the window's size is being changed.
             /// </summary>
             SWP_FRAMECHANGED = 0x0020,
@@ -680,6 +680,10 @@ namespace Yamui.Framework.Helper {
             SC_MOVE = 0xF010,
             SC_MINIMIZE = 0xF020,
             SC_MAXIMIZE = 0xF030,
+            /// <summary>
+            /// sent instead of SC_MAXIMIZE when double clicking the caption bar
+            /// </summary>
+            SC_MAXIMIZEDBLCLICK = 0xF032,
             SC_NEXTWINDOW = 0xF040,
             SC_PREVWINDOW = 0xF050,
             SC_CLOSE = 0xF060,
@@ -689,6 +693,10 @@ namespace Yamui.Framework.Helper {
             SC_KEYMENU = 0xF100,
             SC_ARRANGE = 0xF110,
             SC_RESTORE = 0xF120,
+            /// <summary>
+            /// sent instead of SC_RESTORE when double clicking the caption bar
+            /// </summary>
+            SC_RESTOREDBLCLICK = 0xF122,
             SC_TASKLIST = 0xF130,
             SC_SCREENSAVE = 0xF140,
             SC_HOTKEY = 0xF150,
@@ -1081,17 +1089,109 @@ namespace Yamui.Framework.Helper {
             TME_QUERY = 0x40000000,
         }
 
+        public enum ShowWindowCommands {
+            /// <summary>
+            ///        Hides the window and activates another window.
+            /// </summary>
+            SW_HIDE = 0,
+
+            /// <summary>
+            ///        Activates and displays a window. If the window is minimized or maximized, the system restores it to its original size and position. An application should specify this flag when displaying the window for the first time.
+            /// </summary>
+            SW_SHOWNORMAL = 1,
+
+            /// <summary>
+            ///        Activates and displays a window. If the window is minimized or maximized, the system restores it to its original size and position. An application should specify this flag when displaying the window for the first time.
+            /// </summary>
+            SW_NORMAL = 1,
+
+            /// <summary>
+            ///        Activates the window and displays it as a minimized window.
+            /// </summary>
+            SW_SHOWMINIMIZED = 2,
+
+            /// <summary>
+            ///        Activates the window and displays it as a maximized window.
+            /// </summary>
+            SW_SHOWMAXIMIZED = 3,
+
+            /// <summary>
+            ///        Maximizes the specified window.
+            /// </summary>
+            SW_MAXIMIZE = 3,
+
+            /// <summary>
+            ///        Displays a window in its most recent size and position. This value is similar to <see cref="ShowWindowCommands.SW_SHOWNORMAL"/>, except the window is not activated.
+            /// </summary>
+            SW_SHOWNOACTIVATE = 4,
+
+            /// <summary>
+            ///        Activates the window and displays it in its current size and position.
+            /// </summary>
+            SW_SHOW = 5,
+
+            /// <summary>
+            ///        Minimizes the specified window and activates the next top-level window in the z-order.
+            /// </summary>
+            SW_MINIMIZE = 6,
+
+            /// <summary>
+            ///        Displays the window as a minimized window. This value is similar to <see cref="ShowWindowCommands.SW_SHOWMINIMIZED"/>, except the window is not activated.
+            /// </summary>
+            SW_SHOWMINNOACTIVE = 7,
+
+            /// <summary>
+            ///        Displays the window in its current size and position. This value is similar to <see cref="ShowWindowCommands.SW_SHOW"/>, except the window is not activated.
+            /// </summary>
+            SW_SHOWNA = 8,
+
+            /// <summary>
+            ///        Activates and displays the window. If the window is minimized or maximized, the system restores it to its original size and position. An application should specify this flag when restoring a minimized window.
+            /// </summary>
+            SW_RESTORE = 9,
+            SW_SHOWDEFAULT = 10,
+            SW_FORCEMINIMIZE = 11
+        }
+
+        [Flags]
+        public enum ScrollWindowExFlags : uint {
+
+            /// <summary>
+            /// Scrolls all child windows that intersect the rectangle pointed to by the prcScroll parameter. The child windows are scrolled by the number of pixels specified by the dx and dy parameters. The system sends a WM_MOVE message to all child windows that intersect the prcScroll rectangle, even if they do not move
+            /// </summary>
+            SW_SCROLLCHILDREN = 0x0001,
+
+            /// <summary>
+            /// Invalidates the region identified by the hrgnUpdate parameter after scrolling
+            /// </summary>
+            SW_INVALIDATE = 0x0002,
+
+            /// <summary>
+            /// Erases the newly invalidated region by sending a WM_ERASEBKGND message to the window when specified with the SW_INVALIDATE flag
+            /// </summary>
+            SW_ERASE = 0x0004,
+
+            /// <summary>
+            /// Scrolls using smooth scrolling. Use the HIWORD portion of the flags parameter to indicate how much time, in milliseconds, the smooth-scrolling operation should take
+            /// </summary>
+            SW_SMOOTHSCROLL = 0x0010
+        }
+
+        public enum WmSizeEnum {
+            SIZE_RESTORED = 0,
+            SIZE_MINIMIZED = 1,
+            SIZE_MAXIMIZED = 2,
+            SIZE_MAXSHOW = 3,
+            SIZE_MAXHIDE = 4,
+        }
+
         #endregion
 
         #region Fields
 
         public static readonly IntPtr TRUE = new IntPtr(1);
         public static readonly IntPtr FALSE = IntPtr.Zero;
-
-        // Remove menu
-        public const int MF_BYPOSITION = 0x400;
-        public const int MF_REMOVE = 0x1000;
-
+        
         // Changes the client size of a control
         public const int EM_SETRECT = 0xB3;
 
@@ -1109,8 +1209,11 @@ namespace Yamui.Framework.Helper {
 
         #region API Calls
 
+        [DllImport("user32.dll", ExactSpelling = true, CharSet = CharSet.Auto)]
+        public static extern bool ShowWindow(HandleRef hWnd, ShowWindowCommands nCmdShow);
+
         [return: MarshalAs(UnmanagedType.Bool)]
-        [DllImport("user32.dll",SetLastError = true)]
+        [DllImport("user32.dll", SetLastError = true)]
         public static extern bool GetWindowInfo(IntPtr hwnd, ref WINDOWINFO pwi);
 
         [DllImport("user32.dll", ExactSpelling = true, CharSet = CharSet.Auto)]
@@ -1122,11 +1225,8 @@ namespace Yamui.Framework.Helper {
         [DllImport("user32.dll")]
         public static extern bool RedrawWindow(IntPtr hWnd, IntPtr lprcUpdate, IntPtr hrgnUpdate, RedrawWindowFlags flags);
 
-        [DllImport("user32.dll")]
-        public static extern IntPtr SendMessage(IntPtr hWnd, Int32 wMsg, IntPtr wParam, IntPtr lParam);
-
         [DllImport("user32.dll", SetLastError = true, ExactSpelling = true, CharSet = CharSet.Auto)]
-        public static extern int ScrollWindowEx(HandleRef hWnd, int nXAmount, int nYAmount, COMRECT rectScrollRegion, ref RECT rectClip, HandleRef hrgnUpdate, ref RECT prcUpdate, int flags);
+        public static extern int ScrollWindowEx(HandleRef hWnd, int nXAmount, int nYAmount, COMRECT rectScrollRegion, ref RECT rectClip, HandleRef hrgnUpdate, ref RECT prcUpdate, ScrollWindowExFlags flags);
 
         [DllImport("user32.dll", ExactSpelling = true, EntryPoint = "GetDC", CharSet = CharSet.Auto)]
         private static extern IntPtr IntGetDC(HandleRef hWnd);
@@ -1235,22 +1335,10 @@ namespace Yamui.Framework.Helper {
         /// </returns>
         [DllImport("user32.dll")]
         public static extern bool SetForegroundWindow(IntPtr hWnd);
-
-        [DllImport("user32.dll")]
-        public static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
-
+        
         [DllImport("user32.dll", SetLastError = true)]
         public static extern IntPtr SetActiveWindow(IntPtr hWnd);
-
-        [DllImport("user32.dll")]
-        public static extern int GetMenuItemCount(IntPtr hMenu);
-
-        [DllImport("user32.dll")]
-        public static extern bool DrawMenuBar(IntPtr hWnd);
-
-        [DllImport("user32.dll")]
-        public static extern bool RemoveMenu(IntPtr hMenu, uint uPosition, uint uFlags);
-
+        
         [DllImport("user32.dll", ExactSpelling = true, CharSet = CharSet.Auto)]
         public static extern IntPtr SetCapture(HandleRef hwnd);
 
@@ -1258,13 +1346,13 @@ namespace Yamui.Framework.Helper {
         public static extern bool ReleaseCapture();
 
         [DllImport("user32.dll")]
-        public static extern IntPtr SendMessage(IntPtr hWnd, uint msg, IntPtr wp, IntPtr lp);
+        public static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wp, IntPtr lp);
 
         #endregion
 
         #region unsafe
 
-        [DllImport("user32.dll", CharSet=CharSet.Auto)]
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern IntPtr DefWindowProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
 
         //GetWindowLong won't work correctly for 64-bit: we should use GetWindowLongPtr instead.  On
@@ -1397,9 +1485,7 @@ namespace Yamui.Framework.Helper {
         public static extern int DwmIsCompositionEnabled(out bool enabled);
 
         [DllImport("dwmapi.dll", PreserveSig = true)]
-        public static extern int DwmSetWindowAttribute(IntPtr hwnd, DWMWINDOWATTRIBUTE attr, IntPtr pvAttribute, uint cbAttribute);
-
-        public const int DwmwaTransitionsForcedisabled = 3;
+        public static extern int DwmSetWindowAttribute(IntPtr hwnd, DWMWINDOWATTRIBUTE attr, ref int pvAttribute, uint cbAttribute);
 
         #endregion
     }
