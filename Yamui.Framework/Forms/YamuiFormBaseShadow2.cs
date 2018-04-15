@@ -74,17 +74,7 @@ namespace Yamui.Framework.Forms {
 
         #endregion
 
-        protected override void OnCreateControl() {
-            base.OnCreateControl();
-            // Allow to display the shadows
-            if (DwmCompositionEnabled) {
-                var status = (int) WinApi.DWMNCRenderingPolicy.Enabled;
-                WinApi.DwmSetWindowAttribute(Handle, WinApi.DWMWINDOWATTRIBUTE.NCRenderingPolicy, ref status, sizeof(int));
 
-                var margins = new WinApi.MARGINS(1, 1, 1, 1);
-                WinApi.DwmExtendFrameIntoClientArea(Handle, ref margins);
-            }
-        }
     }
 
 }
