@@ -28,6 +28,7 @@ using System.Security;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Input;
+using WpfGlowWindow.Glow;
 
 namespace Yamui.Framework.Helper {
     [SuppressUnmanagedCodeSecurity]
@@ -85,6 +86,10 @@ namespace Yamui.Framework.Helper {
                 this.x = x;
                 this.y = y;
             }
+            public POINT(Point point) {
+                this.x = point.X;
+                this.y = point.Y;
+            }
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -95,6 +100,10 @@ namespace Yamui.Framework.Helper {
             public SIZE(int cx, int cy) {
                 this.cx = cx;
                 this.cy = cy;
+            }
+            public SIZE(Size size) {
+                this.cx = size.Width;
+                this.cy = size.Height;
             }
         }
 
@@ -1114,7 +1123,7 @@ namespace Yamui.Framework.Helper {
             TME_QUERY = 0x40000000,
         }
 
-        public enum ShowWindowCommands {
+        public enum ShowWindowStyle {
             /// <summary>
             ///        Hides the window and activates another window.
             /// </summary>
@@ -1146,7 +1155,7 @@ namespace Yamui.Framework.Helper {
             SW_MAXIMIZE = 3,
 
             /// <summary>
-            ///        Displays a window in its most recent size and position. This value is similar to <see cref="ShowWindowCommands.SW_SHOWNORMAL"/>, except the window is not activated.
+            ///        Displays a window in its most recent size and position. This value is similar to <see cref="ShowWindowStyle.SW_SHOWNORMAL"/>, except the window is not activated.
             /// </summary>
             SW_SHOWNOACTIVATE = 4,
 
@@ -1161,12 +1170,12 @@ namespace Yamui.Framework.Helper {
             SW_MINIMIZE = 6,
 
             /// <summary>
-            ///        Displays the window as a minimized window. This value is similar to <see cref="ShowWindowCommands.SW_SHOWMINIMIZED"/>, except the window is not activated.
+            ///        Displays the window as a minimized window. This value is similar to <see cref="ShowWindowStyle.SW_SHOWMINIMIZED"/>, except the window is not activated.
             /// </summary>
             SW_SHOWMINNOACTIVE = 7,
 
             /// <summary>
-            ///        Displays the window in its current size and position. This value is similar to <see cref="ShowWindowCommands.SW_SHOW"/>, except the window is not activated.
+            ///        Displays the window in its current size and position. This value is similar to <see cref="ShowWindowStyle.SW_SHOW"/>, except the window is not activated.
             /// </summary>
             SW_SHOWNA = 8,
 
@@ -1240,7 +1249,7 @@ namespace Yamui.Framework.Helper {
         #region API Calls
 
         [DllImport("user32.dll", ExactSpelling = true, CharSet = CharSet.Auto)]
-        public static extern bool ShowWindow(HandleRef hWnd, ShowWindowCommands nCmdShow);
+        public static extern bool ShowWindow(HandleRef hWnd, ShowWindowStyle nCmdShow);
 
         [return: MarshalAs(UnmanagedType.Bool)]
         [DllImport("user32.dll", SetLastError = true)]
@@ -1344,6 +1353,10 @@ namespace Yamui.Framework.Helper {
 
         [DllImport("user32.dll", SetLastError = true)]
         public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, SetWindowPosFlags uFlags);
+
+        public static bool SetWindowPos(IntPtr hWnd, SpecialWindowHandles specialHandle, int X, int Y, int cx, int cy, SetWindowPosFlags uFlags) {
+            return SetWindowPos(hWnd, new IntPtr((int) specialHandle), X, Y, cx, cy, uFlags);
+        }
 
         /// <summary>
         /// Gets the handle of the window that currently has focus.
@@ -1520,6 +1533,201 @@ namespace Yamui.Framework.Helper {
         [DllImport("dwmapi.dll", PreserveSig = true)]
         public static extern int DwmSetWindowAttribute(IntPtr hwnd, DWMWINDOWATTRIBUTE attr, ref int pvAttribute, uint cbAttribute);
 
+        #endregion
+
+
+
+        #region Glow
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public extern static bool SetWindowPos(int hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags);
+
+        /// <summary>
+        /// ShowWindow function of USER32
+        /// </summary>
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern bool ShowWindow(int hWnd, int nCmdShow);
+
+        /// <summary>
+        /// ShowWindow function of USER32
+        /// </summary>
+        [DllImport("user32.dll")]
+        public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        /// <summary>
+        /// ShowWindow function of USER32
+        /// </summary>
+        [DllImport("User32.dll", CharSet = CharSet.Auto)]
+        public static extern int ShowWindow(IntPtr hWnd, short cmdShow);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern int CloseWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        public static extern int SetParent(int hWndChild, int hWndParent);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern int SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool DestroyWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern UInt16 RegisterClassW([In] ref WNDCLASS lpWndClass);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern IntPtr CreateWindowExW(
+            UInt32 dwExStyle,
+            [MarshalAs(UnmanagedType.LPWStr)] string lpClassName,
+            [MarshalAs(UnmanagedType.LPWStr)] string lpWindowName,
+            UInt32 dwStyle,
+            Int32 x,
+            Int32 y,
+            Int32 nWidth,
+            Int32 nHeight,
+            IntPtr hWndParent,
+            IntPtr hMenu,
+            IntPtr hInstance,
+            IntPtr lpParam
+        );
+
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern IntPtr DefWindowProcW(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("User32.dll", CharSet = CharSet.Auto)]
+        public static extern bool GetWindowRect(IntPtr hWnd, ref RECT rect);
+
+        [DllImport("User32.dll", CharSet = CharSet.Auto)]
+        public static extern IntPtr GetDC(IntPtr hWnd);
+
+        [DllImport("User32.dll", CharSet = CharSet.Auto)]
+        public static extern bool UpdateLayeredWindow(IntPtr hwnd, IntPtr hdcDst, ref POINT pptDst, ref SIZE psize, IntPtr hdcSrc, ref POINT pprSrc, Int32 crKey, ref BLENDFUNCTION pblend, Int32 dwFlags);
+
+        [DllImport("User32.dll", CharSet = CharSet.Auto)]
+        public static extern int ReleaseDC(IntPtr hWnd, IntPtr hDc);
+
+        [DllImport("User32.dll", CharSet = CharSet.Auto)]
+        public static extern IntPtr LoadCursor(IntPtr hInstance, uint cursor);
+
+        [DllImport("User32.dll", CharSet = CharSet.Auto)]
+        public static extern IntPtr SetCursor(IntPtr hCursor);
+        
+        public static Point GetCursorRelativePosition(IntPtr windowHandle) {
+            POINT lpPoint;
+            GetCursorPos(out lpPoint);
+            ScreenToClient(windowHandle, ref lpPoint);
+            return new Point(lpPoint.x, lpPoint.y);
+        }
+
+        [DllImport("User32.dll", CharSet = CharSet.Auto)]
+        public static extern bool ScreenToClient(IntPtr hWnd, ref POINT pt);
+        
+        [DllImport("User32.dll", CharSet = CharSet.Auto)]
+        public static extern IntPtr SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        public static extern IntPtr GetSystemMenu(IntPtr windowHandle, bool bReset);
+
+        [DllImport("user32.dll")]
+        public static extern int TrackPopupMenu(IntPtr hMenu, uint uFlags, int x, int y, int nReserved, IntPtr hWnd, IntPtr prcRect);
+
+
+        [DllImport("user32.dll", EntryPoint="CreateWindowEx", CharSet=CharSet.Auto, SetLastError=true)]
+        public static extern IntPtr IntCreateWindowEx(int  dwExStyle, string lpszClassName,
+            string lpszWindowName, int style, int x, int y, int width, int height,
+            HandleRef hWndParent, HandleRef hMenu, HandleRef hInst, [MarshalAs(UnmanagedType.AsAny)] object pvParam);
+
+        public static IntPtr CreateWindowEx(int dwExStyle, string lpszClassName,
+            string lpszWindowName, int style, int x, int y, int width, int height,
+            HandleRef hWndParent, HandleRef hMenu, HandleRef hInst, [MarshalAs(UnmanagedType.AsAny)]object pvParam) {
+            return IntCreateWindowEx(dwExStyle, lpszClassName,
+                lpszWindowName, style, x, y, width, height, hWndParent, hMenu,
+                hInst, pvParam);
+        }
+
+        [DllImport("gdi32.dll")]
+        public static extern IntPtr CreateSolidBrush([In] uint color);
+
+        [DllImport("gdi32.dll")]
+        public static extern bool Rectangle(IntPtr hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
+
+        [DllImport("gdi32.dll", EntryPoint = "SelectObject", SetLastError = true)]
+        public static extern IntPtr SelectObject([In] IntPtr hdc, [In] IntPtr hgdiobj);
+
+        [DllImport("gdi32.dll", EntryPoint = "DeleteObject")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool DeleteObject([In] IntPtr hObject);
+
+        [DllImport("gdi32.dll", EntryPoint = "CreateCompatibleDC", SetLastError = true)]
+        public static extern IntPtr CreateCompatibleDC([In] IntPtr hdc);
+
+        [DllImport("gdi32.dll", EntryPoint = "DeleteDC")]
+        public static extern bool DeleteDC([In] IntPtr hdc);
+
+        public delegate IntPtr WndProcHandler(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+    
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        public struct WNDCLASS
+        {
+            public uint style;
+            public IntPtr lpfnWndProc;
+            public int cbClsExtra;
+            public int cbWndExtra;
+            public IntPtr hInstance;
+            public IntPtr hIcon;
+            public IntPtr hCursor;
+            public IntPtr hbrBackground;
+            [MarshalAs(UnmanagedType.LPWStr)]
+            public string lpszMenuName;
+            [MarshalAs(UnmanagedType.LPWStr)]
+            public string lpszClassName;
+        }
+
+        public enum IdcStandardCursors
+        {
+            IDC_ARROW = 32512,
+            IDC_IBEAM = 32513,
+            IDC_WAIT = 32514,
+            IDC_CROSS = 32515,
+            IDC_UPARROW = 32516,
+            IDC_SIZE = 32640,
+            IDC_ICON = 32641,
+            IDC_SIZENWSE = 32642,
+            IDC_SIZENESW = 32643,
+            IDC_SIZEWE = 32644,
+            IDC_SIZENS = 32645,
+            IDC_SIZEALL = 32646,
+            IDC_NO = 32648,
+            IDC_HAND = 32649,
+            IDC_APPSTARTING = 32650,
+            IDC_HELP = 32651
+        }
+
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct BLENDFUNCTION
+        {
+            /// <summary>
+            /// BlendOp field of structure
+            /// </summary>
+            public byte BlendOp;
+
+            /// <summary>
+            /// BlendFlags field of structure
+            /// </summary>
+            public byte BlendFlags;
+
+            /// <summary>
+            /// SourceConstantAlpha field of structure
+            /// </summary>
+            public byte SourceConstantAlpha;
+
+            /// <summary>
+            /// AlphaFormat field of structure
+            /// </summary>
+            public byte AlphaFormat;
+        }
         #endregion
     }
 }

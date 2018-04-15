@@ -72,7 +72,7 @@ namespace Yamui.Framework.Forms {
         [Browsable(false)]
         public bool IsActive { get; set; }
 
-        protected bool IsMaximized => GetWindowPlacement().showCmd == (int) WinApi.ShowWindowCommands.SW_SHOWMAXIMIZED;
+        protected bool IsMaximized => GetWindowPlacement().showCmd == (int) WinApi.ShowWindowStyle.SW_SHOWMAXIMIZED;
 
         #endregion
 
@@ -133,18 +133,18 @@ namespace Yamui.Framework.Forms {
 
         protected override void OnPaint(PaintEventArgs e) {
             
-            using (var b = new SolidBrush(Color.Red)) {
-                e.Graphics.FillRectangle(b, ClientRectangle);
-            }
+            //using (var b = new SolidBrush(Color.Cyan)) {
+            //    e.Graphics.FillRectangle(b, ClientRectangle);
+            //}
 
             // draw the border with Style color
-            var rect2 = new Rectangle(2, 2, e.ClipRectangle.Width - 4, e.ClipRectangle.Height - 4);
+            var rect2 = new Rectangle(1, 1, ClientRectangle.Width - 2, ClientRectangle.Height - 2);
             //var pen2 = new Pen(Color.Red, BorderWidth) {
             //    Alignment = PenAlignment.Inset
             //};
             //e.Graphics.DrawRectangle(pen2, rect2);
             using (var b = new SolidBrush(Color.Yellow)) {
-                e.Graphics.FillRectangle(b, rect2);
+                e.Graphics.FillRectangle(b, ClientRectangle);
             }
 
             return;
@@ -343,7 +343,7 @@ namespace Yamui.Framework.Forms {
         private bool OnNcCalcSize_ModifyProposedRectangle(ref WinApi.RECT rect) {
             var wp = GetWindowPlacement();
             // would be cool to find a better way to know if we are maximized
-            if (wp.showCmd == (int) WinApi.ShowWindowCommands.SW_SHOWMAXIMIZED) {
+            if (wp.showCmd == (int) WinApi.ShowWindowStyle.SW_SHOWMAXIMIZED) {
                 var s = Screen.FromHandle(Handle);
                 // the proposed rect is the maximized position/size that window suggest using the "out of screen" borders
                 // we change that here

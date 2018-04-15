@@ -31,9 +31,10 @@ namespace Yamui.Framework.Forms {
     /// Form class that implements interesting utilities + shadow + onpaint + movable borderless
     /// </summary>
     public class YamuiFormBaseShadow : YamuiFormBase {
-
+        
         protected override CreateParams CreateParams {
             get {
+
                 var cp = base.CreateParams;
 
                 if (DesignMode)

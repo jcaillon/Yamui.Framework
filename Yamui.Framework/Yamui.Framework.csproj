@@ -38,11 +38,14 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -162,6 +165,8 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Fonts\FontManager.cs" />
+    <Compile Include="Forms\Glow\GlowDecorator.cs" />
+    <Compile Include="Forms\Glow\SideGlow.cs" />
     <Compile Include="Forms\YamuiFormBaseShadow2.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -325,6 +330,9 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <EmbeddedResource Include="Forms\YamuiFormBaseShadow2.resx">
+      <DependentUpon>YamuiFormBaseShadow2.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\YamuiMainAppli.resx">
       <DependentUpon>YamuiMainAppli.cs</DependentUpon>
     </EmbeddedResource>
