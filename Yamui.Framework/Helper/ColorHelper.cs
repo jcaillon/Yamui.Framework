@@ -8,26 +8,26 @@ namespace Yamui.Framework.Helper {
         /// <devdoc>
         ///      Creates a new color that is a object of the given color.
         /// </devdoc>
-        public static Color Dark(Color baseColor, float percOfDarkDark) {
+        public static Color Dark(this Color baseColor, float percOfDarkDark) {
             return new HlsColor(baseColor).Darker(percOfDarkDark);
         }
 
         /// <devdoc>
         ///      Creates a new color that is a object of the given color.
         /// </devdoc>
-        public static Color Dark(Color baseColor) {
+        public static Color Dark(this Color baseColor) {
             return new HlsColor(baseColor).Darker(0.5f);
         }
 
         /// <devdoc>
         ///      Creates a new color that is a object of the given color.
         /// </devdoc>
-        public static Color DarkDark(Color baseColor) {
+        public static Color DarkDark(this Color baseColor) {
             return new HlsColor(baseColor).Darker(1.0f);
         }
 
         //returns true if the luminosity of c1 is less than c2.
-        internal static bool IsDarker(Color c1, Color c2) {
+        internal static bool IsDarker(this Color c1, Color c2) {
             HlsColor hc1 = new HlsColor(c1);
             HlsColor hc2 = new HlsColor(c2);
             return (hc1.Luminosity < hc2.Luminosity);
@@ -38,28 +38,28 @@ namespace Yamui.Framework.Helper {
         /// </summary>
         /// <param name="color"></param>
         /// <returns></returns>
-        private static Color InvertColor(Color color) {
+        public static Color InvertColor(this Color color) {
             return Color.FromArgb(color.A, (byte)~color.R, (byte)~color.G, (byte)~color.B);
         }
 
         /// <devdoc>
         ///      Creates a new color that is a object of the given color.
         /// </devdoc>
-        public static Color Light(Color baseColor, float percOfLightLight) {
+        public static Color Light(this Color baseColor, float percOfLightLight) {
             return new HlsColor(baseColor).Lighter(percOfLightLight);
         }
 
         /// <devdoc>
         ///      Creates a new color that is a object of the given color.
         /// </devdoc>
-        public static Color Light(Color baseColor) {
+        public static Color Light(this Color baseColor) {
             return new HlsColor(baseColor).Lighter(0.5f);
         }
 
         /// <devdoc>
         ///      Creates a new color that is a object of the given color.
         /// </devdoc>
-        public static Color LightLight(Color baseColor) {
+        public static Color LightLight(this Color baseColor) {
             return new HlsColor(baseColor).Lighter(1.0f);
         }
     }

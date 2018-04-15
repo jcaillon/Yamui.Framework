@@ -24,18 +24,17 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Yamui.Framework.Helper;
 using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Forms {
-
     /// <summary>
     /// Form class that implements interesting utilities + shadow + onpaint + movable/resizable borderless
     /// </summary>
     public class YamuiFormBase : Form {
-
         #region Constants
 
         public const int BorderWidth = 2;
@@ -55,6 +54,8 @@ namespace Yamui.Framework.Forms {
         private bool _maximized;
         private Size? _windowBorderSize;
         private WinApi.MINMAXINFO _lastMinMaxInfo;
+        private bool _resizing;
+        private bool _moving;
 
         #endregion
 
@@ -72,6 +73,7 @@ namespace Yamui.Framework.Forms {
                 if (_dwmCompositionEnabled == null) {
                     CheckDwmCompositionEnabled();
                 }
+
                 return _dwmCompositionEnabled ?? false;
             }
         }
@@ -89,9 +91,13 @@ namespace Yamui.Framework.Forms {
                     var winfo = GetWindowInfo();
                     _windowBorderSize = new Size(unchecked((int) winfo.cxWindowBorders), unchecked((int) winfo.cyWindowBorders));
                 }
+
                 return _windowBorderSize ?? new Size();
             }
         }
+
+        [Browsable(false)]
+        public bool IsActive { get; set; }
 
         #endregion
 
@@ -105,24 +111,24 @@ namespace Yamui.Framework.Forms {
 
                 if (DesignMode)
                     return cp;
-                
+
                 if (DwmCompositionEnabled) {
                     // below is what makes the windows borderless but resizable
                     cp.Style = (int) WinApi.WindowStyles.WS_CAPTION // needed to have animation on resize for instance
-                        | (int) WinApi.WindowStyles.WS_CLIPCHILDREN
-                        | (int) WinApi.WindowStyles.WS_CLIPSIBLINGS
-                        | (int) WinApi.WindowStyles.WS_OVERLAPPED
-                        | (int) WinApi.WindowStyles.WS_SYSMENU
-                        | (int) WinApi.WindowStyles.WS_MINIMIZEBOX // need to be able to minimize from taskbar
-                        | (int) WinApi.WindowStyles.WS_MAXIMIZEBOX
-                        | (int) WinApi.WindowStyles.WS_THICKFRAME; // needed if we want the window to be able to aero snap on screen borders
+                               | (int) WinApi.WindowStyles.WS_CLIPCHILDREN
+                               | (int) WinApi.WindowStyles.WS_CLIPSIBLINGS
+                               | (int) WinApi.WindowStyles.WS_OVERLAPPED
+                               | (int) WinApi.WindowStyles.WS_SYSMENU
+                               | (int) WinApi.WindowStyles.WS_MINIMIZEBOX // need to be able to minimize from taskbar
+                               | (int) WinApi.WindowStyles.WS_MAXIMIZEBOX
+                               | (int) WinApi.WindowStyles.WS_THICKFRAME; // needed if we want the window to be able to aero snap on screen borders
                 }
 
                 cp.ExStyle = (int) WinApi.WindowStylesEx.WS_EX_COMPOSITED
-                    | (int) WinApi.WindowStylesEx.WS_EX_LEFT
-                    | (int) WinApi.WindowStylesEx.WS_EX_LTRREADING
-                    | (int) WinApi.WindowStylesEx.WS_EX_APPWINDOW
-                    | (int) WinApi.WindowStylesEx.WS_EX_WINDOWEDGE;
+                             | (int) WinApi.WindowStylesEx.WS_EX_LEFT
+                             | (int) WinApi.WindowStylesEx.WS_EX_LTRREADING
+                             | (int) WinApi.WindowStylesEx.WS_EX_APPWINDOW
+                             | (int) WinApi.WindowStylesEx.WS_EX_WINDOWEDGE;
 
                 cp.ClassStyle = 0;
 
@@ -136,11 +142,11 @@ namespace Yamui.Framework.Forms {
             // why those styles? check here: 
             // https://sites.google.com/site/craigandera/craigs-stuff/windows-forms/flicker-free-control-drawing
             SetStyle(
-                ControlStyles.OptimizedDoubleBuffer | 
-                ControlStyles.ResizeRedraw | 
-                ControlStyles.UserPaint | 
-                ControlStyles.AllPaintingInWmPaint | 
-                ControlStyles.DoubleBuffer | 
+                ControlStyles.OptimizedDoubleBuffer |
+                ControlStyles.ResizeRedraw |
+                ControlStyles.UserPaint |
+                ControlStyles.AllPaintingInWmPaint |
+                ControlStyles.DoubleBuffer |
                 ControlStyles.Opaque, true);
             
             // icon
@@ -198,7 +204,6 @@ namespace Yamui.Framework.Forms {
                             break;
                         case (int) WinApi.SysCommands.SC_RESTORE:
                         case (int) WinApi.SysCommands.SC_RESTOREDBLCLICK:
-                            var f = GetWindowInfo();
                             //SuspendLayout();
                             //Height = _savedHeight;
                             //Width = _savedWidth;
@@ -215,6 +220,7 @@ namespace Yamui.Framework.Forms {
                             //_savedWidth = Width;
                             break;
                     }
+
                     break;
 
                 case (int) WinApi.Messages.WM_NCHITTEST:
@@ -225,16 +231,15 @@ namespace Yamui.Framework.Forms {
                     if (ht != WinApi.HitTest.HTNOWHERE) {
                         if (Resizable || ht == WinApi.HitTest.HTCAPTION && Movable || ht != WinApi.HitTest.HTCAPTION) {
                             // when maximized, we don't need the rezising hitTest, it all becomes caption
-                            if (WindowState == FormWindowState.Maximized) {
-                                ht = WinApi.HitTest.HTCAPTION;
+                            if (WindowState == FormWindowState.Maximized && ht != WinApi.HitTest.HTCAPTION) {
+                                ht = WinApi.HitTest.HTNOWHERE;
                             }
-                            m.Result = (IntPtr) ht;
-                            return;
                         }
                     }
-                    break;
+                    m.Result = (IntPtr) ht;
+                    return;
 
-                case (int) WinApi.Messages.WM_WINDOWPOSCHANGING :
+                case (int) WinApi.Messages.WM_WINDOWPOSCHANGING:
                     // https://msdn.microsoft.com/fr-fr/library/windows/desktop/ms632653(v=vs.85).aspx?f=255&MSPPError=-2147217396
                     // https://blogs.msdn.microsoft.com/oldnewthing/20080116-00/?p=23803
                     // The WM_WINDOWPOSCHANGING message is sent early in the window state changing process, unlike WM_WINDOWPOSCHANGED, 
@@ -248,13 +253,30 @@ namespace Yamui.Framework.Forms {
                     m.Result = IntPtr.Zero;
                     break;
 
-
                 case (int) WinApi.Messages.WM_ENTERSIZEMOVE:
                     // Useful if your window contents are dependent on window size but expensive to compute, as they give you a way to defer paints until the end of the resize action. We found WM_WINDOWPOSCHANGING/ED wasn’t reliable for that purpose.
+                    //WindowStyle &= ~WinApi.WindowStyles.WS_CAPTION;
                     break;
                 case (int) WinApi.Messages.WM_EXITSIZEMOVE:
+                    if (_resizing) {
+                        // restore caption style
+                        WindowStyle |= WinApi.WindowStyles.WS_CAPTION;
+                    }
+                    _resizing = false;
+                    _moving = false;
                     break;
 
+                case (int) WinApi.Messages.WM_SIZING:
+                    if (!_resizing) {
+                        // disable caption style to avoid seeing it when resizing 
+                        WindowStyle &= ~WinApi.WindowStyles.WS_CAPTION;
+                    }
+                    _resizing = true;
+                    break;
+
+                case (int) WinApi.Messages.WM_MOVING:
+                    _moving = true;
+                    break;
 
                 case (int) WinApi.Messages.WM_SIZE:
                     var state = (WinApi.WmSizeEnum) m.WParam;
@@ -263,7 +285,6 @@ namespace Yamui.Framework.Forms {
                     break;
 
                 case (int) WinApi.Messages.WM_NCPAINT:
-                    // Allow to display the shadows
                     //Return Zero
                     m.Result = IntPtr.Zero;
                     break;
@@ -272,11 +293,12 @@ namespace Yamui.Framework.Forms {
                     if (DwmCompositionEnabled) {
                         // allows the window to be maximized at the size of the working area instead of the whole screen size
                         OnGetMinMaxInfo(m.HWnd, m.LParam);
-                
+
                         //Return Zero
                         m.Result = IntPtr.Zero;
                         return;
                     }
+
                     break;
 
                 case (int) WinApi.Messages.WM_NCCALCSIZE:
@@ -285,12 +307,15 @@ namespace Yamui.Framework.Forms {
                         if (OnNcCalcSize(ref m))
                             return;
                     }
+
                     break;
-                    
+
+                case (int) WinApi.Messages.WM_ACTIVATEAPP:
+                    IsActive = (int) m.WParam != 0;
+                    break;
+
                 case (int) WinApi.Messages.WM_ACTIVATE:
-                    if (DwmCompositionEnabled) {
-                        //EnableDwmComposition();
-                    }
+                    IsActive = ((int)WinApi.WAFlags.WA_ACTIVE == (int)m.WParam || (int)WinApi.WAFlags.WA_CLICKACTIVE == (int)m.WParam);
                     break;
 
                 case (int) WinApi.Messages.WM_CREATE:
@@ -298,6 +323,9 @@ namespace Yamui.Framework.Forms {
                         //WinApi.SetWindowPos(Handle, IntPtr.Zero, 0, 0, 0, 0, WinApi.SetWindowPosFlags.SWP_FRAMECHANGED | WinApi.SetWindowPosFlags.SWP_NOACTIVATE | WinApi.SetWindowPosFlags.SWP_NOMOVE | WinApi.SetWindowPosFlags.SWP_NOSIZE | WinApi.SetWindowPosFlags.SWP_NOZORDER);
                         // or GetWindowRect(hWnd, &rcClient); + SetWindowPos(hWnd, SWP_FRAMECHANGED);
                     }
+                    break;
+
+                case (int) WinApi.Messages.WM_SHOWWINDOW:
                     break;
 
                 case (int) WinApi.Messages.WM_NCACTIVATE:
@@ -310,12 +338,12 @@ namespace Yamui.Framework.Forms {
                         DefWndProc(ref m);
                         WindowStyle = oldStyle;
                     }
-
                     return;
 
                 case (int) WinApi.Messages.WM_WINDOWPOSCHANGED:
-                    var newwindowpos = (WinApi.WINDOWPOS) Marshal.PtrToStructure(m.LParam, typeof(WinApi.WINDOWPOS));
+                    //var newwindowpos = (WinApi.WINDOWPOS) Marshal.PtrToStructure(m.LParam, typeof(WinApi.WINDOWPOS));
                     DefWndProc(ref m);
+                    UpdateBounds();
                     m.Result = IntPtr.Zero;
                     return;
 
@@ -331,11 +359,32 @@ namespace Yamui.Framework.Forms {
                     } else {
                         DisableDwmComposition();
                     }
+
                     break;
             }
 
             base.WndProc(ref m);
         }
+
+
+
+        //SetClassLong won't work correctly for 64-bit: we should use SetClassLongPtr instead.  On
+        //32-bit, SetClassLongPtr is just #defined as SetClassLong.  SetClassLong really should 
+        //take/return int instead of IntPtr/HandleRef, but since we're running this only for 32-bit
+        //it'll be OK.
+        public static IntPtr SetClassLong(HandleRef hWnd, int nIndex, IntPtr dwNewLong)
+        {
+            if (IntPtr.Size == 4)
+            {
+                return SetClassLongPtr32(hWnd, nIndex, dwNewLong);
+            }
+            return SetClassLongPtr64(hWnd, nIndex, dwNewLong);
+        }
+        [DllImport("user32.dll", CharSet = CharSet.Auto, EntryPoint = "SetClassLong")]
+        public static extern IntPtr SetClassLongPtr32(HandleRef hwnd, int nIndex, IntPtr dwNewLong);
+        [DllImport("user32.dll", CharSet = CharSet.Auto, EntryPoint = "SetClassLongPtr")]
+        public static extern IntPtr SetClassLongPtr64(HandleRef hwnd, int nIndex, IntPtr dwNewLong);
+
 
         /// <summary>
         /// Handles WM_NCCALCSIZE
@@ -366,55 +415,43 @@ namespace Yamui.Framework.Forms {
         }
 
         private bool OnNcCalcSize_ModifyProposedRectangle(ref WinApi.RECT rect) {
-            if (IsMaximized()) {
+            UpdateWindowState();
+            if (WindowState == FormWindowState.Maximized) {
                 // the proposed rect is the maximized position/size that window suggest using the "out of screen" borders
                 // we change that here
-                rect.left += WindowBorderSize.Width;
-                rect.right -= WindowBorderSize.Width;
-                rect.top += WindowBorderSize.Height;
-                rect.bottom -= WindowBorderSize.Height;
+                rect.left = _lastMinMaxInfo.ptMaxPosition.x;
+                rect.right = _lastMinMaxInfo.ptMaxPosition.x + _lastMinMaxInfo.ptMaxSize.x;
+                rect.top = _lastMinMaxInfo.ptMaxPosition.y;
+                rect.bottom = _lastMinMaxInfo.ptMaxPosition.y + _lastMinMaxInfo.ptMaxSize.y;
                 return true;
             }
+
             return false;
         }
 
-        private bool IsMaximized() {
-            WinApi.WINDOWPLACEMENT wp = new WinApi.WINDOWPLACEMENT {
-                length = Marshal.SizeOf(typeof(WinApi.WINDOWPLACEMENT))
-            };
-            WinApi.GetWindowPlacement(new HandleRef(this, Handle), ref wp);
-            if ((WinApi.ShowWindowCommands) wp.showCmd == WinApi.ShowWindowCommands.SW_SHOWMAXIMIZED) {
-                return true;
+        private void UpdateWindowState() {
+            var wp = GetWindowPlacement();
+            switch (wp.showCmd) {
+                case (int) WinApi.ShowWindowCommands.SW_NORMAL:
+                case (int) WinApi.ShowWindowCommands.SW_RESTORE:
+                case (int) WinApi.ShowWindowCommands.SW_SHOW:
+                case (int) WinApi.ShowWindowCommands.SW_SHOWNA:
+                case (int) WinApi.ShowWindowCommands.SW_SHOWNOACTIVATE:
+                    if (WindowState != FormWindowState.Normal)
+                        WindowState = FormWindowState.Normal;
+                    break;
+                case (int) WinApi.ShowWindowCommands.SW_SHOWMAXIMIZED:
+                    if (WindowState != FormWindowState.Maximized) {
+                        WindowState = FormWindowState.Maximized;
+                    }
+                    break;
+                case (int) WinApi.ShowWindowCommands.SW_SHOWMINIMIZED:
+                case (int) WinApi.ShowWindowCommands.SW_MINIMIZE:
+                case (int) WinApi.ShowWindowCommands.SW_SHOWMINNOACTIVE:
+                    if (WindowState != FormWindowState.Minimized)
+                        WindowState = FormWindowState.Minimized;
+                    break;
             }
-            /*
-             * switch (wp.showCmd) {
-                    case NativeMethods.SW_NORMAL:
-                    case NativeMethods.SW_RESTORE:
-                    case NativeMethods.SW_SHOW:
-                    case NativeMethods.SW_SHOWNA:
-                    case NativeMethods.SW_SHOWNOACTIVATE:
-                        if (formState[FormStateWindowState] != (int)FormWindowState.Normal) {
-                            formState[FormStateWindowState] = (int)FormWindowState.Normal;
-                        }
-                        break;
-                    case NativeMethods.SW_SHOWMAXIMIZED:
-                        if (formState[FormStateMdiChildMax] == 0) {
-                            formState[FormStateWindowState] = (int)FormWindowState.Maximized;
-                        }
-                        break;
-                    case NativeMethods.SW_SHOWMINIMIZED:
-                    case NativeMethods.SW_MINIMIZE:
-                    case NativeMethods.SW_SHOWMINNOACTIVE:
-                        if (formState[FormStateMdiChildMax] == 0) {
-                            formState[FormStateWindowState] = (int)FormWindowState.Minimized;
-                        }
-                        break;
-                    case NativeMethods.SW_HIDE:
-                    default:
-                        break;
-                }
-             */
-            return false;
         }
 
         /// <summary>
@@ -422,7 +459,7 @@ namespace Yamui.Framework.Forms {
         /// </summary>
         protected virtual WinApi.HitTest HitTestNca(IntPtr lparam) {
             var cursorLocation = PointToClient(new Point(lparam.ToInt32()));
-            
+
             bool resizeBorder = false;
             int uRow = 1;
             int uCol = 1;
@@ -444,7 +481,7 @@ namespace Yamui.Framework.Forms {
 
             var hitTests = new[] {
                 new[] {
-                    WinApi.HitTest.HTTOPLEFT, resizeBorder ? WinApi.HitTest.HTTOP : WinApi.HitTest.HTCAPTION, WinApi.HitTest.HTTOPRIGHT
+                    WinApi.HitTest.HTTOPLEFT, resizeBorder && WindowState != FormWindowState.Maximized ? WinApi.HitTest.HTTOP : WinApi.HitTest.HTCAPTION, WinApi.HitTest.HTTOPRIGHT
                 },
                 new[] {
                     WinApi.HitTest.HTLEFT, WinApi.HitTest.HTNOWHERE, WinApi.HitTest.HTRIGHT
@@ -470,7 +507,7 @@ namespace Yamui.Framework.Forms {
             _lastMinMaxInfo.ptMaxPosition.y = Math.Abs(s.WorkingArea.Top - s.Bounds.Top);
             Marshal.StructureToPtr(_lastMinMaxInfo, lParam, true);
         }
-        
+
         public void DisableDwmComposition() {
             var margins = new WinApi.MARGINS(0, 0, 0, 0);
             WinApi.DwmExtendFrameIntoClientArea(Handle, ref margins);
@@ -488,9 +525,7 @@ namespace Yamui.Framework.Forms {
         /// Called when the window state changes
         /// </summary>
         /// <param name="e"></param>
-        protected virtual void OnWindowStateChanged(EventArgs e) {
-
-        }
+        protected virtual void OnWindowStateChanged(EventArgs e) { }
 
         /// <summary>
         /// Returns the best position for a window centered in another one
@@ -606,7 +641,7 @@ namespace Yamui.Framework.Forms {
             WinApi.DwmIsCompositionEnabled(out enabled);
             _dwmCompositionEnabled = Environment.OSVersion.Version.Major >= 6 && enabled;
         }
-        
+
         /// <summary>
         /// Set/get current window exstyle
         /// </summary>
@@ -631,6 +666,17 @@ namespace Yamui.Framework.Forms {
             info.cbSize = (uint) Marshal.SizeOf(info);
             WinApi.GetWindowInfo(Handle, ref info);
             return info;
+        }
+
+        /// <summary>
+        /// Retrieves placement information about this window
+        /// </summary>
+        protected WinApi.WINDOWPLACEMENT GetWindowPlacement() {
+            WinApi.WINDOWPLACEMENT wp = new WinApi.WINDOWPLACEMENT {
+                length = Marshal.SizeOf(typeof(WinApi.WINDOWPLACEMENT))
+            };
+            WinApi.GetWindowPlacement(new HandleRef(this, Handle), ref wp);
+            return wp;
         }
 
         #endregion

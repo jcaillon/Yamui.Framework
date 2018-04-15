@@ -1203,6 +1203,11 @@ namespace Yamui.Framework.Helper {
             SIZE_MAXHIDE = 4,
         }
 
+        public enum WAFlags {
+            WA_ACTIVE = 1,
+            WA_CLICKACTIVE = 2,
+        }
+
         #endregion
 
         #region Fields

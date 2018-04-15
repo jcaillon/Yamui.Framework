@@ -12,6 +12,37 @@ using System.Windows.Forms;
 
 namespace Yamui.Framework.Helper {
     public static class PaintHelper {
+
+        
+        /// <include file='doc\ControlPaint.uex' path='docs/doc[@for="ControlPaint.DrawSizeGrip1"]/*' />
+        /// <devdoc>
+        ///      Draws a size grip at the given location.  The color of the size grip is based
+        ///      on the given background color.
+        /// </devdoc>
+        public static void DrawSizeGrip(Graphics graphics, Color backColor, int x, int y, int width, int height) {
+
+            // Note: We don't paint any background to facilitate transparency, background images, etc...
+            //
+            if (graphics == null) {
+                throw new ArgumentNullException("graphics");
+            }
+
+            using( Pen bright = new Pen(backColor.LightLight()) ) {
+                using ( Pen dark = new Pen(backColor.Dark()) ) {
+
+                    int minDim = Math.Min(width, height);
+                    int right = x+width-1;
+                    int bottom = y+height-2;
+
+                    for (int i=0; i<minDim - 4; i+= 4) {
+                        graphics.DrawLine(dark, right - (i + 1) - 2, bottom, right, bottom - (i + 1) - 2);
+                        graphics.DrawLine(dark, right - (i + 2) - 2, bottom, right, bottom - (i + 2) - 2);
+                        graphics.DrawLine(bright, right - (i + 3) - 2, bottom, right, bottom - (i + 3) - 2);
+                    }
+                }
+            }
+        }
+
         [ThreadStatic] private static Bitmap checkImage;
 
         [ThreadStatic] private static ImageAttributes disabledImageAttr; // ImageAttributes used to render disabled images
