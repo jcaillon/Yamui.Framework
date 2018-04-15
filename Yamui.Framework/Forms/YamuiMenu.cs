@@ -31,7 +31,7 @@ using Yamui.Framework.HtmlRenderer.WinForms;
 using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Forms {
-    public class YamuiMenu : YamuiFormBaseShadow {
+    public class YamuiMenu : YamuiFormBase {
         #region Private
 
         private Action<YamuiMenuItem> _clickItemWrapper;

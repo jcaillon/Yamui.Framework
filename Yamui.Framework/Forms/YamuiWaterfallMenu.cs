@@ -35,7 +35,7 @@ namespace Yamui.Framework.Forms {
     /// <summary>
     /// A class to display a cool custom context menu
     /// </summary>
-    public sealed class YamuiWaterfallMenu : YamuiFormBaseShadow {
+    public sealed class YamuiWaterfallMenu : YamuiFormBase {
 
         #region static fields
 

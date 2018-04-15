@@ -32,5 +32,26 @@ namespace Yamui.Framework.Forms {
     /// </summary>
     public class YamuiFormBaseShadow : YamuiFormBase {
 
+        protected override CreateParams CreateParams {
+            get {
+                var cp = base.CreateParams;
+
+                if (DesignMode)
+                    return cp;
+
+                // below is what makes the windows borderless but resizable
+                cp.Style = (int) WinApi.WindowStyles.WS_POPUP; // needed if we want the window to be able to aero snap on screen borders
+
+                cp.ExStyle = (int) WinApi.WindowStylesEx.WS_EX_TOOLWINDOW
+                             | (int) WinApi.WindowStylesEx.WS_EX_TOPMOST
+                             | (int) WinApi.WindowStylesEx.WS_EX_LEFT
+                             | (int) WinApi.WindowStylesEx.WS_EX_LTRREADING;
+
+                cp.ClassStyle = (int) WinApi.WindowClassStyles.DropShadow;
+
+                return cp;
+            }
+        }
+
     }
 }

@@ -164,6 +164,13 @@ namespace Yamui.Framework.Helper {
                 return new RECT(x, y, x + width, y + height);
             }
 
+            public void Set(Rectangle r) {
+                left = r.Left;
+                top = r.Top;
+                right = r.Right;
+                bottom = r.Bottom;
+            }
+
             public Size Size {
                 get { return new Size(right - left, bottom - top); }
             }
