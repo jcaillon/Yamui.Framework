@@ -24,7 +24,7 @@ using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using WpfGlowWindow.Glow;
+using Yamui.Framework.Forms.Glow;
 using Yamui.Framework.Helper;
 
 namespace Yamui.Framework.Forms {
@@ -79,13 +79,6 @@ namespace Yamui.Framework.Forms {
                 base.WndProc(ref m);
         }
 
-        protected override void OnPaint(PaintEventArgs e) {
-            base.OnPaint(e);
-            if (_rightGlow != null) {
-
-                e.Graphics.DrawImage(_rightGlow.GetBitmap(9, 100), new Rectangle(10, 10, 9, 100), 0, 0, 9, 100, GraphicsUnit.Pixel);
-            }
-        }
 
         private void yamuiButton1_ButtonPressed(object sender, EventArgs e)
         {
@@ -94,7 +87,6 @@ namespace Yamui.Framework.Forms {
             _glowDecorator.ActiveColor = Color.Cyan;
             _glowDecorator.InactiveColor = Color.Gray;
             _glowDecorator.Activate(true);
-            _glowDecorator.EnableResize(true);
 
             //_rightGlow = new SideGlow(DockStyle.Right, Handle);
             //var pos = new WinApi.WINDOWPOS();

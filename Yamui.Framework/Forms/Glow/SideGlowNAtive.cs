@@ -14,7 +14,7 @@ namespace Yamui.Framework.Forms.Glow {
     /// </summary>
     /// <remarks>https://msdn.microsoft.com/en-us/library/windows/desktop/ms633556(v=vs.85).aspx?f=255&MSPPError=-2147217396</remarks>
     /// <remarks>http://simostro.synology.me/simone/2016/04/04/glow-window-effect/</remarks>
-    internal class SideGlow : IDisposable {
+    internal class SideGlowNAtive : NativeWindow {
         #region private
 
         private const int ErrorClassAlreadyExists = 1410;
@@ -76,7 +76,7 @@ namespace Yamui.Framework.Forms.Glow {
 
         #region constuctor
 
-        internal SideGlow(DockStyle side, IntPtr parent) {
+        internal SideGlowNAtive(DockStyle side, IntPtr parent) {
             _side = side;
             _parentHandle = parent;
 
@@ -151,7 +151,7 @@ namespace Yamui.Framework.Forms.Glow {
         internal void Close() {
             WinApi.CloseWindow(Handle);
             WinApi.SetParent(Handle, IntPtr.Zero);
-            WinApi.DestroyWindow(new HandleRef(this, Handle));
+            //WinApi.DestroyWindow(Handle);
         }
 
         #endregion
@@ -159,7 +159,7 @@ namespace Yamui.Framework.Forms.Glow {
         #region private
 
         private void CreateWindow(string className) {
-            _wndProcDelegate = CustomWndProc;
+            //_wndProcDelegate = CustomWndProc;
 
             // Create WNDCLASS
             WinApi.WNDCLASS windClass = new WinApi.WNDCLASS {
@@ -205,13 +205,7 @@ namespace Yamui.Framework.Forms.Glow {
                 return;
             }
         }
-
-        private IntPtr CustomWndProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam) {
-            return WinApi.DefWindowProc(hWnd, msg, wParam, lParam);
-        }
-
         private void Render() {
-
 
             // get non client area device
             var screenDc = WinApi.GetDC(WinApi.NullHandleRef);
@@ -225,13 +219,13 @@ namespace Yamui.Framework.Forms.Glow {
                 }
                 try {
                     using (Bitmap bmp = GetWindowBitmap(Size.Width, Size.Height)) {
-                        IntPtr hBitmap = bmp.GetHbitmap(_transparent);
-                        IntPtr hOldBitmap = WinApi.SelectObject(memDc, hBitmap);
-
                         WinApi.POINT newLocation = new WinApi.POINT(Location);
                         WinApi.SIZE newSize = new WinApi.SIZE(Size);
                         WinApi.UpdateLayeredWindow(Handle, screenDc, ref newLocation, ref newSize, memDc, ref _ptZero, 0, ref _blend, WinApi.BlendFlags.ULW_ALPHA);
 
+                        IntPtr hBitmap = bmp.GetHbitmap(_transparent);
+                        IntPtr hOldBitmap = WinApi.SelectObject(memDc, hBitmap);
+                        WinApi.ReleaseDC(WinApi.NullHandleRef, new HandleRef(null, screenDc));
                         if (hBitmap != IntPtr.Zero) {
                             WinApi.SelectObject(memDc, hOldBitmap);
                             WinApi.DeleteObject(hBitmap);
@@ -243,6 +237,7 @@ namespace Yamui.Framework.Forms.Glow {
             } finally {
                 WinApi.ReleaseDC(WinApi.NullHandleRef, new HandleRef(null, screenDc));
             }
+
         }
 
         public Bitmap GetWindowBitmap(int width, int height) {
@@ -297,22 +292,5 @@ namespace Yamui.Framework.Forms.Glow {
         
         #endregion
 
-        #region Dispose
-
-        public void Dispose() {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private void Dispose(bool disposing) {
-            if (_disposed) return;
-            _disposed = true;
-            if (Handle == IntPtr.Zero) return;
-
-            WinApi.DestroyWindow(new HandleRef(this, Handle));
-            Handle = IntPtr.Zero;
-        }
-
-        #endregion
     }
 }

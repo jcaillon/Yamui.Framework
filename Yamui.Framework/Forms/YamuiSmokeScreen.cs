@@ -27,6 +27,7 @@ using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Forms {
     public class YamuiSmokeScreen : Form {
+
         #region fields
 
         private Rectangle _pageRectangle;
@@ -68,6 +69,28 @@ namespace Yamui.Framework.Forms {
 
         #region Constructor
 
+        protected override CreateParams CreateParams {
+            get {
+
+                var cp = base.CreateParams;
+
+                if (DesignMode)
+                    return cp;
+
+                // below is what makes the windows borderless but resizable
+                cp.Style = (int) WinApi.WindowStyles.WS_POPUP; // needed if we want the window to be able to aero snap on screen borders
+
+                cp.ExStyle = (int) WinApi.WindowStylesEx.WS_EX_TOOLWINDOW
+                             | (int) WinApi.WindowStylesEx.WS_EX_TOPMOST
+                             | (int) WinApi.WindowStylesEx.WS_EX_LEFT
+                             | (int) WinApi.WindowStylesEx.WS_EX_LTRREADING;
+
+                cp.ClassStyle = 0;
+
+                return cp;
+            }
+        }
+
         public YamuiSmokeScreen(Form owner, Rectangle pageRectangle) {
             SetStyle(
                 ControlStyles.OptimizedDoubleBuffer |
@@ -87,12 +110,6 @@ namespace Yamui.Framework.Forms {
             owner.LocationChanged += Cover_LocationChanged;
             owner.ClientSizeChanged += Cover_ClientSizeChanged;
             owner.VisibleChanged += Cover_OnVisibleChanged;
-
-            // Disable Aero transitions, the plexiglass gets too visible
-            if (Environment.OSVersion.Version.Major >= 6) {
-                var status = 1;
-                WinApi.DwmSetWindowAttribute(Handle, WinApi.DWMWINDOWATTRIBUTE.TransitionsForceDisabled, ref status, sizeof(int));
-            }
 
             base.Opacity = 0d;
             Show(owner);
@@ -121,10 +138,6 @@ namespace Yamui.Framework.Forms {
                     Owner.LocationChanged -= Cover_LocationChanged;
                     Owner.ClientSizeChanged -= Cover_ClientSizeChanged;
                     Owner.VisibleChanged -= Cover_OnVisibleChanged;
-                    if (!Owner.IsDisposed && Environment.OSVersion.Version.Major >= 6) {
-                        var status = 0;
-                        WinApi.DwmSetWindowAttribute(Handle, WinApi.DWMWINDOWATTRIBUTE.TransitionsForceDisabled, ref status, sizeof(int));
-                    }
                 }
             } catch (Exception) {
                 // ignored

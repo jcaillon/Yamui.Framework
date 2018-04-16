@@ -24,17 +24,56 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Security;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Input;
-using WpfGlowWindow.Glow;
 
 namespace Yamui.Framework.Helper {
     [SuppressUnmanagedCodeSecurity]
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public static partial class WinApi {
         #region Structs
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        public struct WNDCLASS {
+            public uint style;
+            public IntPtr lpfnWndProc;
+            public int cbClsExtra;
+            public int cbWndExtra;
+            public IntPtr hInstance;
+            public IntPtr hIcon;
+            public IntPtr hCursor;
+            public IntPtr hbrBackground;
+            [MarshalAs(UnmanagedType.LPWStr)]
+            public string lpszMenuName;
+            [MarshalAs(UnmanagedType.LPWStr)]
+            public string lpszClassName;
+        }
+        
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct BLENDFUNCTION {
+            /// <summary>
+            /// BlendOp field of structure
+            /// </summary>
+            public byte BlendOp;
+
+            /// <summary>
+            /// BlendFlags field of structure
+            /// </summary>
+            public byte BlendFlags;
+
+            /// <summary>
+            /// SourceConstantAlpha field of structure
+            /// </summary>
+            public byte SourceConstantAlpha;
+
+            /// <summary>
+            /// AlphaFormat field of structure
+            /// </summary>
+            public byte AlphaFormat;
+        }
 
         [StructLayout(LayoutKind.Sequential)]
         public struct WINDOWINFO {
@@ -1224,6 +1263,13 @@ namespace Yamui.Framework.Helper {
             WA_CLICKACTIVE = 2,
         }
 
+        public enum BlendFlags {
+            None = 0x00,
+            ULW_COLORKEY = 0x01,
+            ULW_ALPHA = 0x02,
+            ULW_OPAQUE = 0x04
+        }
+
         #endregion
 
         #region Fields
@@ -1235,14 +1281,6 @@ namespace Yamui.Framework.Helper {
         public const int EM_SETRECT = 0xB3;
 
         public static HandleRef NullHandleRef = new HandleRef(null, IntPtr.Zero);
-
-        public const int SW_SCROLLCHILDREN = 0x0001;
-
-        public const int SW_INVALIDATE = 0x0002;
-
-        public const int SW_ERASE = 0x0004;
-
-        public const int SW_SMOOTHSCROLL = 0x0010;
 
         #endregion
 
@@ -1262,57 +1300,10 @@ namespace Yamui.Framework.Helper {
         public static extern bool TrackMouseEvent([In, Out] TRACKMOUSEEVENT lpEventTrack);
 
         [DllImport("user32.dll")]
-        public static extern bool RedrawWindow(IntPtr hWnd, IntPtr lprcUpdate, IntPtr hrgnUpdate, RedrawWindowFlags flags);
+        public static extern bool RedrawWindow(HandleRef hWnd, IntPtr lprcUpdate, IntPtr hrgnUpdate, RedrawWindowFlags flags);
 
         [DllImport("user32.dll", SetLastError = true, ExactSpelling = true, CharSet = CharSet.Auto)]
         public static extern int ScrollWindowEx(HandleRef hWnd, int nXAmount, int nYAmount, COMRECT rectScrollRegion, ref RECT rectClip, HandleRef hrgnUpdate, ref RECT prcUpdate, ScrollWindowExFlags flags);
-
-        [DllImport("user32.dll", ExactSpelling = true, EntryPoint = "GetDC", CharSet = CharSet.Auto)]
-        private static extern IntPtr IntGetDC(HandleRef hWnd);
-
-        /// <summary>
-        /// Device context for the client area
-        /// </summary>
-        /// <param name="hWnd"></param>
-        /// <returns></returns>
-        public static IntPtr GetDC(HandleRef hWnd) {
-            return IntGetDC(hWnd);
-        }
-
-        [DllImport("user32.dll", ExactSpelling = true, EntryPoint = "GetWindowDC", CharSet = CharSet.Auto)]
-        private static extern IntPtr IntGetWindowDC(HandleRef hWnd);
-
-        /// <summary>
-        /// Device context for the non client area
-        /// </summary>
-        /// <param name="hWnd"></param>
-        /// <returns></returns>
-        public static IntPtr GetWindowDC(HandleRef hWnd) {
-            return IntGetWindowDC(hWnd);
-        }
-
-        [DllImport("user32.dll", ExactSpelling = true, EntryPoint = "ReleaseDC", CharSet = CharSet.Auto)]
-        private static extern int IntReleaseDC(HandleRef hWnd, HandleRef hDC);
-
-        public static int ReleaseDC(HandleRef hWnd, HandleRef hDC) {
-            return IntReleaseDC(hWnd, hDC);
-        }
-
-        [DllImport("user32.dll", ExactSpelling = true, EntryPoint = "EndPaint", CharSet = CharSet.Auto)]
-        private static extern bool IntEndPaint(HandleRef hWnd, ref PAINTSTRUCT lpPaint);
-
-        public static bool EndPaint(HandleRef hWnd, [In, MarshalAs(UnmanagedType.LPStruct)]
-            ref PAINTSTRUCT lpPaint) {
-            return IntEndPaint(hWnd, ref lpPaint);
-        }
-
-        [DllImport("user32.dll", ExactSpelling = true, EntryPoint = "BeginPaint", CharSet = CharSet.Auto)]
-        private static extern IntPtr IntBeginPaint(HandleRef hWnd, [In, Out] ref PAINTSTRUCT lpPaint);
-
-        public static IntPtr BeginPaint(HandleRef hWnd, [In, Out, MarshalAs(UnmanagedType.LPStruct)]
-            ref PAINTSTRUCT lpPaint) {
-            return IntBeginPaint(hWnd, ref lpPaint);
-        }
 
         /// <summary>
         /// Returns a rectangle representing the topleft / bottomright corners of the window
@@ -1389,18 +1380,72 @@ namespace Yamui.Framework.Helper {
         public static extern bool ReleaseCapture();
 
         [DllImport("user32.dll")]
-        public static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wp, IntPtr lp);
+        public static extern IntPtr SendMessage(HandleRef hWnd, int msg, IntPtr wp, IntPtr lp);
+
+        [DllImport("user32.dll", CharSet=CharSet.Auto)]
+        public static extern bool PostMessage(HandleRef hwnd, int msg, IntPtr wparam, IntPtr lparam);
+
+        public static Point GetCursorRelativePosition(IntPtr windowHandle) {
+            POINT lpPoint;
+            GetCursorPos(out lpPoint);
+            ScreenToClient(windowHandle, ref lpPoint);
+            return new Point(lpPoint.x, lpPoint.y);
+        }
 
         #endregion
 
         #region unsafe
 
+        [DllImport("user32.dll", ExactSpelling = true, EntryPoint = "GetDC", CharSet = CharSet.Auto)]
+        private static extern IntPtr IntGetDC(HandleRef hWnd);
+
+        /// <summary>
+        /// Device context for the client area
+        /// </summary>
+        /// <param name="hWnd"></param>
+        /// <returns></returns>
+        public static IntPtr GetDC(HandleRef hWnd) {
+            return IntGetDC(hWnd);
+        }
+
+        [DllImport("user32.dll", ExactSpelling = true, EntryPoint = "GetWindowDC", CharSet = CharSet.Auto)]
+        private static extern IntPtr IntGetWindowDC(HandleRef hWnd);
+
+        /// <summary>
+        /// Device context for the non client area
+        /// </summary>
+        /// <param name="hWnd"></param>
+        /// <returns></returns>
+        public static IntPtr GetWindowDC(HandleRef hWnd) {
+            return IntGetWindowDC(hWnd);
+        }
+
+        [DllImport("user32.dll", ExactSpelling = true, EntryPoint = "ReleaseDC", CharSet = CharSet.Auto)]
+        private static extern int IntReleaseDC(HandleRef hWnd, HandleRef hDC);
+
+        public static int ReleaseDC(HandleRef hWnd, HandleRef hDC) {
+            return IntReleaseDC(hWnd, hDC);
+        }
+
+        [DllImport("user32.dll", ExactSpelling = true, EntryPoint = "EndPaint", CharSet = CharSet.Auto)]
+        private static extern bool IntEndPaint(HandleRef hWnd, ref PAINTSTRUCT lpPaint);
+
+        public static bool EndPaint(HandleRef hWnd, [In, MarshalAs(UnmanagedType.LPStruct)]
+            ref PAINTSTRUCT lpPaint) {
+            return IntEndPaint(hWnd, ref lpPaint);
+        }
+
+        [DllImport("user32.dll", ExactSpelling = true, EntryPoint = "BeginPaint", CharSet = CharSet.Auto)]
+        private static extern IntPtr IntBeginPaint(HandleRef hWnd, [In, Out] ref PAINTSTRUCT lpPaint);
+
+        public static IntPtr BeginPaint(HandleRef hWnd, [In, Out, MarshalAs(UnmanagedType.LPStruct)]
+            ref PAINTSTRUCT lpPaint) {
+            return IntBeginPaint(hWnd, ref lpPaint);
+        }
+
         [DllImport("user32.dll", ExactSpelling=true, CharSet=CharSet.Auto)]
         public static extern int GetWindowPlacement(HandleRef hWnd, ref WINDOWPLACEMENT placement);
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        public static extern IntPtr DefWindowProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
-
+        
         //GetWindowLong won't work correctly for 64-bit: we should use GetWindowLongPtr instead.  On
         //32-bit, GetWindowLongPtr is just #defined as GetWindowLong.  GetWindowLong really should 
         //take/return int instead of IntPtr/HandleRef, but since we're running this only for 32-bit
@@ -1413,11 +1458,9 @@ namespace Yamui.Framework.Helper {
             return GetWindowLongPtr64(hWnd, (int) nIndex);
         }
 
-        [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable")]
         [DllImport("user32.dll", CharSet = CharSet.Auto, EntryPoint = "GetWindowLong")]
         public static extern IntPtr GetWindowLong32(HandleRef hWnd, int nIndex);
 
-        [SuppressMessage("Microsoft.Interoperability", "CA1400:PInvokeEntryPointsShouldExist")]
         [DllImport("user32.dll", CharSet = CharSet.Auto, EntryPoint = "GetWindowLongPtr")]
         public static extern IntPtr GetWindowLongPtr64(HandleRef hWnd, int nIndex);
 
@@ -1433,13 +1476,49 @@ namespace Yamui.Framework.Helper {
             return SetWindowLongPtr64(hWnd, (int) nIndex, dwNewLong);
         }
 
-        [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable")]
         [DllImport("user32.dll", CharSet = CharSet.Auto, EntryPoint = "SetWindowLong")]
         public static extern IntPtr SetWindowLongPtr32(HandleRef hWnd, int nIndex, HandleRef dwNewLong);
 
-        [SuppressMessage("Microsoft.Interoperability", "CA1400:PInvokeEntryPointsShouldExist")]
         [DllImport("user32.dll", CharSet = CharSet.Auto, EntryPoint = "SetWindowLongPtr")]
         public static extern IntPtr SetWindowLongPtr64(HandleRef hWnd, int nIndex, HandleRef dwNewLong);
+
+        [DllImport("user32.dll", EntryPoint="CreateWindowEx", CharSet=CharSet.Auto, SetLastError=true)]
+        public static extern IntPtr IntCreateWindowEx(int  dwExStyle, string lpszClassName,
+            string lpszWindowName, int style, int x, int y, int width, int height,
+            HandleRef hWndParent, HandleRef hMenu, HandleRef hInst, [MarshalAs(UnmanagedType.AsAny)] object pvParam);
+
+        public static IntPtr CreateWindowEx(int dwExStyle, string lpszClassName,
+            string lpszWindowName, int style, int x, int y, int width, int height,
+            HandleRef hWndParent, HandleRef hMenu, HandleRef hInst, [MarshalAs(UnmanagedType.AsAny)]object pvParam) {
+            return IntCreateWindowEx(dwExStyle, lpszClassName,
+                lpszWindowName, style, x, y, width, height, hWndParent, hMenu,
+                hInst, pvParam);
+        }
+
+        [DllImport("user32.dll", ExactSpelling=true, EntryPoint="DestroyWindow", CharSet=CharSet.Auto)]
+        public static extern bool IntDestroyWindow(HandleRef hWnd);
+        public static bool DestroyWindow(HandleRef hWnd) {
+            return IntDestroyWindow(hWnd);
+        }
+        
+        [DllImport("user32.dll", CharSet=CharSet.Auto, SetLastError=true)]
+        public static extern bool UnregisterClass(string className, HandleRef hInstance);
+    
+        [DllImport("user32.dll", CharSet=CharSet.Auto, SetLastError=true)]
+        public static extern short RegisterClassW([In] ref WNDCLASS lpWndClass);
+
+        
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern int CloseWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern int SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
+
+        [DllImport("user32.dll", CharSet=CharSet.Auto)]
+        [ResourceExposure(ResourceScope.None)]
+        public static extern IntPtr DefWindowProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+        
+        public delegate IntPtr WndProcHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
 
         #endregion
 
@@ -1518,140 +1597,22 @@ namespace Yamui.Framework.Helper {
         }
 
         #endregion
-
-        #region DwmApi API calls
-
-        [DllImport("dwmapi.dll")]
-        public static extern int DwmDefWindowProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, out IntPtr result);
-
-        [DllImport("dwmapi.dll")]
-        public static extern int DwmExtendFrameIntoClientArea(IntPtr hdc, ref MARGINS marInset);
-
-        [DllImport("dwmapi.dll")]
-        public static extern int DwmIsCompositionEnabled(out bool enabled);
-
-        [DllImport("dwmapi.dll", PreserveSig = true)]
-        public static extern int DwmSetWindowAttribute(IntPtr hwnd, DWMWINDOWATTRIBUTE attr, ref int pvAttribute, uint cbAttribute);
-
-        #endregion
-
-
-
-        #region Glow
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        public extern static bool SetWindowPos(int hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags);
-
-        /// <summary>
-        /// ShowWindow function of USER32
-        /// </summary>
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        public static extern bool ShowWindow(int hWnd, int nCmdShow);
-
-        /// <summary>
-        /// ShowWindow function of USER32
-        /// </summary>
-        [DllImport("user32.dll")]
-        public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-        /// <summary>
-        /// ShowWindow function of USER32
-        /// </summary>
-        [DllImport("User32.dll", CharSet = CharSet.Auto)]
-        public static extern int ShowWindow(IntPtr hWnd, short cmdShow);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        public static extern int CloseWindow(IntPtr hWnd);
-
-        [DllImport("user32.dll")]
-        public static extern int SetParent(int hWndChild, int hWndParent);
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        public static extern int SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
-
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool DestroyWindow(IntPtr hWnd);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        public static extern UInt16 RegisterClassW([In] ref WNDCLASS lpWndClass);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        public static extern IntPtr CreateWindowExW(
-            UInt32 dwExStyle,
-            [MarshalAs(UnmanagedType.LPWStr)] string lpClassName,
-            [MarshalAs(UnmanagedType.LPWStr)] string lpWindowName,
-            UInt32 dwStyle,
-            Int32 x,
-            Int32 y,
-            Int32 nWidth,
-            Int32 nHeight,
-            IntPtr hWndParent,
-            IntPtr hMenu,
-            IntPtr hInstance,
-            IntPtr lpParam
-        );
-
-        [DllImport("user32.dll", SetLastError = true)]
-        public static extern IntPtr DefWindowProcW(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
-
-        [DllImport("User32.dll", CharSet = CharSet.Auto)]
-        public static extern bool GetWindowRect(IntPtr hWnd, ref RECT rect);
-
-        [DllImport("User32.dll", CharSet = CharSet.Auto)]
-        public static extern IntPtr GetDC(IntPtr hWnd);
-
-        [DllImport("User32.dll", CharSet = CharSet.Auto)]
-        public static extern bool UpdateLayeredWindow(IntPtr hwnd, IntPtr hdcDst, ref POINT pptDst, ref SIZE psize, IntPtr hdcSrc, ref POINT pprSrc, Int32 crKey, ref BLENDFUNCTION pblend, Int32 dwFlags);
-
-        [DllImport("User32.dll", CharSet = CharSet.Auto)]
-        public static extern int ReleaseDC(IntPtr hWnd, IntPtr hDc);
-
-        [DllImport("User32.dll", CharSet = CharSet.Auto)]
-        public static extern IntPtr LoadCursor(IntPtr hInstance, uint cursor);
-
-        [DllImport("User32.dll", CharSet = CharSet.Auto)]
-        public static extern IntPtr SetCursor(IntPtr hCursor);
         
-        public static Point GetCursorRelativePosition(IntPtr windowHandle) {
-            POINT lpPoint;
-            GetCursorPos(out lpPoint);
-            ScreenToClient(windowHandle, ref lpPoint);
-            return new Point(lpPoint.x, lpPoint.y);
-        }
-
+        #region Glow
+        
+        [DllImport("User32.dll", CharSet = CharSet.Auto)]
+        public static extern bool UpdateLayeredWindow(IntPtr hwnd, IntPtr hdcDst, ref POINT pptDst, ref SIZE psize, IntPtr hdcSrc, ref POINT pprSrc, int crKey, ref BLENDFUNCTION pblend, BlendFlags dwFlags);
+        
         [DllImport("User32.dll", CharSet = CharSet.Auto)]
         public static extern bool ScreenToClient(IntPtr hWnd, ref POINT pt);
         
-        [DllImport("User32.dll", CharSet = CharSet.Auto)]
-        public static extern IntPtr SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         public static extern IntPtr GetSystemMenu(IntPtr windowHandle, bool bReset);
 
         [DllImport("user32.dll")]
         public static extern int TrackPopupMenu(IntPtr hMenu, uint uFlags, int x, int y, int nReserved, IntPtr hWnd, IntPtr prcRect);
-
-
-        [DllImport("user32.dll", EntryPoint="CreateWindowEx", CharSet=CharSet.Auto, SetLastError=true)]
-        public static extern IntPtr IntCreateWindowEx(int  dwExStyle, string lpszClassName,
-            string lpszWindowName, int style, int x, int y, int width, int height,
-            HandleRef hWndParent, HandleRef hMenu, HandleRef hInst, [MarshalAs(UnmanagedType.AsAny)] object pvParam);
-
-        public static IntPtr CreateWindowEx(int dwExStyle, string lpszClassName,
-            string lpszWindowName, int style, int x, int y, int width, int height,
-            HandleRef hWndParent, HandleRef hMenu, HandleRef hInst, [MarshalAs(UnmanagedType.AsAny)]object pvParam) {
-            return IntCreateWindowEx(dwExStyle, lpszClassName,
-                lpszWindowName, style, x, y, width, height, hWndParent, hMenu,
-                hInst, pvParam);
-        }
-
-        [DllImport("gdi32.dll")]
-        public static extern IntPtr CreateSolidBrush([In] uint color);
-
-        [DllImport("gdi32.dll")]
-        public static extern bool Rectangle(IntPtr hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
-
+        
         [DllImport("gdi32.dll", EntryPoint = "SelectObject", SetLastError = true)]
         public static extern IntPtr SelectObject([In] IntPtr hdc, [In] IntPtr hgdiobj);
 
@@ -1660,74 +1621,12 @@ namespace Yamui.Framework.Helper {
         public static extern bool DeleteObject([In] IntPtr hObject);
 
         [DllImport("gdi32.dll", EntryPoint = "CreateCompatibleDC", SetLastError = true)]
-        public static extern IntPtr CreateCompatibleDC([In] IntPtr hdc);
+        public static extern IntPtr CreateCompatibleDC(HandleRef hdc);
 
         [DllImport("gdi32.dll", EntryPoint = "DeleteDC")]
-        public static extern bool DeleteDC([In] IntPtr hdc);
+        public static extern bool DeleteDC(HandleRef hdc);
 
-        public delegate IntPtr WndProcHandler(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
     
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        public struct WNDCLASS
-        {
-            public uint style;
-            public IntPtr lpfnWndProc;
-            public int cbClsExtra;
-            public int cbWndExtra;
-            public IntPtr hInstance;
-            public IntPtr hIcon;
-            public IntPtr hCursor;
-            public IntPtr hbrBackground;
-            [MarshalAs(UnmanagedType.LPWStr)]
-            public string lpszMenuName;
-            [MarshalAs(UnmanagedType.LPWStr)]
-            public string lpszClassName;
-        }
-
-        public enum IdcStandardCursors
-        {
-            IDC_ARROW = 32512,
-            IDC_IBEAM = 32513,
-            IDC_WAIT = 32514,
-            IDC_CROSS = 32515,
-            IDC_UPARROW = 32516,
-            IDC_SIZE = 32640,
-            IDC_ICON = 32641,
-            IDC_SIZENWSE = 32642,
-            IDC_SIZENESW = 32643,
-            IDC_SIZEWE = 32644,
-            IDC_SIZENS = 32645,
-            IDC_SIZEALL = 32646,
-            IDC_NO = 32648,
-            IDC_HAND = 32649,
-            IDC_APPSTARTING = 32650,
-            IDC_HELP = 32651
-        }
-
-
-        [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public struct BLENDFUNCTION
-        {
-            /// <summary>
-            /// BlendOp field of structure
-            /// </summary>
-            public byte BlendOp;
-
-            /// <summary>
-            /// BlendFlags field of structure
-            /// </summary>
-            public byte BlendFlags;
-
-            /// <summary>
-            /// SourceConstantAlpha field of structure
-            /// </summary>
-            public byte SourceConstantAlpha;
-
-            /// <summary>
-            /// AlphaFormat field of structure
-            /// </summary>
-            public byte AlphaFormat;
-        }
         #endregion
     }
 }

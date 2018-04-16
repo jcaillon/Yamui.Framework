@@ -101,8 +101,8 @@ namespace Yamui.Framework.Helper {
 
                 if (_suspendCounter == 0) {
                     Action resume = new Action(() => {
-                        WinApi.SendMessage(_owner.Handle, (int) WinApi.Messages.WM_SETREDRAW, new IntPtr(1), IntPtr.Zero);
-                        WinApi.RedrawWindow(_owner.Handle, IntPtr.Zero, IntPtr.Zero, flags);
+                        WinApi.SendMessage(new HandleRef(_owner, _owner.Handle), (int) WinApi.Messages.WM_SETREDRAW, new IntPtr(1), IntPtr.Zero);
+                        WinApi.RedrawWindow(new HandleRef(_owner, _owner.Handle), IntPtr.Zero, IntPtr.Zero, flags);
                     });
                     try {
                         resume();
@@ -115,7 +115,7 @@ namespace Yamui.Framework.Helper {
             public void SuspendDrawing() {
                 try {
                     if (_suspendCounter == 0) {
-                        Action suspend = new Action(() => WinApi.SendMessage(_owner.Handle, (int) WinApi.Messages.WM_SETREDRAW, IntPtr.Zero, IntPtr.Zero));
+                        Action suspend = new Action(() => WinApi.SendMessage(new HandleRef(_owner, _owner.Handle), (int) WinApi.Messages.WM_SETREDRAW, IntPtr.Zero, IntPtr.Zero));
                         try {
                             suspend();
                         } catch (InvalidOperationException) {

@@ -136,16 +136,18 @@ namespace Yamui.Framework.Forms {
             //using (var b = new SolidBrush(Color.Cyan)) {
             //    e.Graphics.FillRectangle(b, ClientRectangle);
             //}
-
-            // draw the border with Style color
-            var rect2 = new Rectangle(1, 1, ClientRectangle.Width - 2, ClientRectangle.Height - 2);
-            //var pen2 = new Pen(Color.Red, BorderWidth) {
-            //    Alignment = PenAlignment.Inset
-            //};
-            //e.Graphics.DrawRectangle(pen2, rect2);
             using (var b = new SolidBrush(Color.Yellow)) {
                 e.Graphics.FillRectangle(b, ClientRectangle);
             }
+
+            // draw the border with Style color
+            var rect2 = new Rectangle(0, 0, ClientRectangle.Width - 1, ClientRectangle.Height - 1);
+            using (var pen2 = new Pen(Color.Cyan, BorderWidth) {
+                    Alignment = PenAlignment.Inset
+                }) {
+                e.Graphics.DrawRectangle(pen2, rect2);
+            }
+
 
             return;
             var backColor = YamuiThemeManager.Current.FormBack;
@@ -408,19 +410,6 @@ namespace Yamui.Framework.Forms {
 
         #region Methods
         
-        public void DisableDwmComposition() {
-            var margins = new WinApi.MARGINS(0, 0, 0, 0);
-            WinApi.DwmExtendFrameIntoClientArea(Handle, ref margins);
-        }
-
-        public void EnableDwmComposition() {
-            var status = (int) WinApi.DWMNCRenderingPolicy.Enabled;
-            WinApi.DwmSetWindowAttribute(Handle, WinApi.DWMWINDOWATTRIBUTE.NCRenderingPolicy, ref status, sizeof(int));
-
-            var margins = new WinApi.MARGINS(-1, -1, -1, -1);
-            WinApi.DwmExtendFrameIntoClientArea(Handle, ref margins);
-        }
-
         /// <summary>
         /// Returns the best position for a window centered in another one
         /// </summary>

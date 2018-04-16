@@ -2,12 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Windows;
 using System.Windows.Forms;
-using System.Windows.Forms.VisualStyles;
 using Yamui.Framework.Helper;
 
-namespace WpfGlowWindow.Glow
+namespace Yamui.Framework.Forms.Glow
 {
     internal class GlowDecorator : IDisposable
     {
@@ -179,15 +177,7 @@ namespace WpfGlowWindow.Glow
 
             _isEnabled = enable;
         }
-
-        internal void EnableResize(bool enable)
-        {
-            foreach (SideGlow sideGlow in _glows)
-            {
-                sideGlow.ExternalResizeEnable = enable;
-            }
-        }
-
+        
         #endregion
 
         #region [private]
