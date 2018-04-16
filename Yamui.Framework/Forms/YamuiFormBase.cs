@@ -142,7 +142,7 @@ namespace Yamui.Framework.Forms {
 
             // draw the border with Style color
             var rect2 = new Rectangle(0, 0, ClientRectangle.Width - 1, ClientRectangle.Height - 1);
-            using (var pen2 = new Pen(Color.Cyan, BorderWidth) {
+            using (var pen2 = new Pen(Focused ? Color.Cyan : Color.Orange, BorderWidth) {
                     Alignment = PenAlignment.Inset
                 }) {
                 e.Graphics.DrawRectangle(pen2, rect2);
@@ -191,7 +191,6 @@ namespace Yamui.Framework.Forms {
                             //ResumeLayout(false);
                             break;
                         case WinApi.SysCommands.SC_MINIMIZE:
-                            var f2 = GetWindowInfo();
                             //_savedHeight = Height;
                             //_savedWidth = Width;
                             break;

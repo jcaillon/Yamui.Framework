@@ -5,19 +5,13 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Yamui.Framework.Helper;
 
-namespace Yamui.Framework.Forms.Glow
-{
-    internal class GlowDecorator : IDisposable
-    {
+namespace Yamui.Framework.Forms.Glow {
+    internal class GlowDecorator : IDisposable {
         #region [private]
 
         private IntPtr _parentWindowHndl;
         private Form _window;
-        private SideGlow _topGlow;
-        private SideGlow _leftGlow;
-        private SideGlow _bottomGlow;
-        private SideGlow _rightGlow;
-        private readonly List<SideGlow> _glows = new List<SideGlow>();
+        private readonly List<YamuiShadowBorder> _glows = new List<YamuiShadowBorder>();
         private Color _activeColor = Color.Cyan;
         private Color _inactiveColor = Color.Gray;
         private bool _isAttached;
@@ -28,62 +22,34 @@ namespace Yamui.Framework.Forms.Glow
 
         #region [internal] API and Properties
 
-        internal bool SetTopMost
-        {
-            get
-            {
-                return _setTopMost;
-            }
-            set
-            {
-                _setTopMost = value;
-                AlignSideGlowTopMost();
-            }
-        }
+        internal Color ActiveColor {
+            get { return _activeColor; }
 
-        internal Color ActiveColor
-        {
-            get
-            {
-                return _activeColor;
-            }
-
-            set
-            {
+            set {
                 _activeColor = value;
-                foreach (SideGlow sideGlow in _glows)
-                {
+                foreach (YamuiShadowBorder sideGlow in _glows) {
                     sideGlow.ActiveColor = _activeColor;
                 }
             }
         }
 
-        internal Color InactiveColor
-        {
-            get
-            {
-                return _inactiveColor;
-            }
+        internal Color InactiveColor {
+            get { return _inactiveColor; }
 
-            set
-            {
+            set {
                 _inactiveColor = value;
-                foreach (SideGlow sideGlow in _glows)
-                {
+                foreach (YamuiShadowBorder sideGlow in _glows) {
                     sideGlow.InactiveColor = _inactiveColor;
                 }
             }
         }
 
-        internal bool IsEnabled
-        {
+        internal bool IsEnabled {
             get { return _isEnabled; }
         }
 
-        internal void Attach(Form window, bool enable = true)
-        {
-            if (_isAttached)
-            {
+        internal void Attach(Form window, bool enable = true) {
+            if (_isAttached) {
                 return;
             }
 
@@ -91,21 +57,15 @@ namespace Yamui.Framework.Forms.Glow
             _window = window;
             _parentWindowHndl = window.Handle;
 
-            _topGlow = new SideGlow(DockStyle.Top, _parentWindowHndl);
-            _leftGlow = new SideGlow(DockStyle.Left, _parentWindowHndl);
-            _bottomGlow = new SideGlow(DockStyle.Bottom, _parentWindowHndl);
-            _rightGlow = new SideGlow(DockStyle.Right, _parentWindowHndl);
+            _glows.Add(new YamuiShadowBorder(DockStyle.Top, _parentWindowHndl));
+            _glows.Add(new YamuiShadowBorder(DockStyle.Left, _parentWindowHndl));
+            _glows.Add(new YamuiShadowBorder(DockStyle.Bottom, _parentWindowHndl));
+            _glows.Add(new YamuiShadowBorder(DockStyle.Right, _parentWindowHndl));
 
-            _glows.Add(_topGlow);
-            _glows.Add(_leftGlow);
-            _glows.Add(_bottomGlow);
-            _glows.Add(_rightGlow);
-
-            WinApi.ShowWindow(new HandleRef(_topGlow, _topGlow.Handle), WinApi.ShowWindowStyle.SW_SHOWNOACTIVATE);
-            WinApi.ShowWindow(new HandleRef(_topGlow, _leftGlow.Handle), WinApi.ShowWindowStyle.SW_SHOWNOACTIVATE);
-            WinApi.ShowWindow(new HandleRef(_bottomGlow, _leftGlow.Handle), WinApi.ShowWindowStyle.SW_SHOWNOACTIVATE);
-            WinApi.ShowWindow(new HandleRef(_rightGlow, _leftGlow.Handle), WinApi.ShowWindowStyle.SW_SHOWNOACTIVATE);
-
+            foreach (var yamuiShadowBorder in _glows) {
+                yamuiShadowBorder.Show(true);
+            }
+            
             _isEnabled = false;
             AlignSideGlowTopMost();
             Enable(true);
@@ -113,274 +73,178 @@ namespace Yamui.Framework.Forms.Glow
 
         private WinApi.WINDOWPOS _lastLocation;
 
-        public IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-        {
-            if (!_isEnabled) return (IntPtr)0;
+        public IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled) {
+            if (!_isEnabled) 
+                return (IntPtr) 0;
 
-            switch (msg)
-            {
-                case (int)WinApi.Messages.WM_WINDOWPOSCHANGED:
-                    _lastLocation = (WinApi.WINDOWPOS)Marshal.PtrToStructure(lParam, typeof(WinApi.WINDOWPOS));
-                    WindowPosChanged(_lastLocation);
+            switch ((WinApi.Messages) msg) {
+                case WinApi.Messages.WM_ENTERSIZEMOVE:
+                    // Useful if your window contents are dependent on window size but expensive to compute, as they give you a way to defer paints until the end of the resize action. We found WM_WINDOWPOSCHANGING/ED wasn’t reliable for that purpose.
+                    //Show(false);
                     break;
-                case (int)WinApi.Messages.WM_SETFOCUS:
-                    SetFocus();
+
+                case WinApi.Messages.WM_EXITSIZEMOVE:
+                    //Show(true);
                     break;
-                case (int)WinApi.Messages.WM_KILLFOCUS:
-                    KillFocus();
+
+                case WinApi.Messages.WM_SIZING:
+
                     break;
-                case (int)WinApi.Messages.WM_SIZE:
-                    Size(wParam, lParam);
+
+                case WinApi.Messages.WM_MOVING:
+                    break;
+
+                case WinApi.Messages.WM_SIZE:
+                    // var state = (WinApi.WmSizeEnum) m.WParam;
+                    // var wid = m.LParam.LoWord();
+                    // var h = m.LParam.HiWord();
+                    // Size(wParam, lParam);
+                    break;
+
+                case WinApi.Messages.WM_ACTIVATEAPP:
+                    UpdateFocus((int) wParam != 0);
+                    break;
+
+                case WinApi.Messages.WM_ACTIVATE:
+                    UpdateFocus(((int)WinApi.WAFlags.WA_ACTIVE == (int)wParam || (int)WinApi.WAFlags.WA_CLICKACTIVE == (int)wParam));
+                    break;
+                    
+                case WinApi.Messages.WM_SHOWWINDOW:
+                    break;
+
+                case WinApi.Messages.WM_WINDOWPOSCHANGING:
+                    // the default From handler for this message messes up the restored height/width for non client area window
+                    // var newwindowpos = (WinApi.WINDOWPOS) Marshal.PtrToStructure(m.LParam, typeof(WinApi.WINDOWPOS));
+                    _lastLocation = (WinApi.WINDOWPOS) Marshal.PtrToStructure(lParam, typeof(WinApi.WINDOWPOS));
+                    UpdateLocations(_lastLocation);
+                    UpdateSizes(_lastLocation.cx, _lastLocation.cy);
+                    break;
+
+                case WinApi.Messages.WM_SETFOCUS:
+                    //UpdateFocus();
+                    //UpdateZOrder();
+                    break;
+                case WinApi.Messages.WM_KILLFOCUS:
+                    //KillFocus();
+                    //UpdateZOrder();
                     break;
             }
 
-            return (IntPtr)0;
+            return (IntPtr) 0;
         }
 
-        internal void Detach()
-        {
+        internal void Detach() {
             _isAttached = false;
-
             Show(false);
-
-            UnregisterEvents();
         }
 
         /// <summary>
         /// Enables or disables the glow effect on the window
         /// </summary>
         /// <param name="enable">Enable mode</param>
-        internal void Enable(bool enable)
-        {
-            if (_isEnabled && !enable)
-            {
+        internal void Enable(bool enable) {
+            if (_isEnabled && !enable) {
                 Show(false);
-                UnregisterEvents();
-            }
-            else if (!_isEnabled && enable)
-            {
-                RegisterEvents();
-                if (_window != null)
-                {
-                    UpdateLocations(new WinApi.WINDOWPOS
-                    {
-                        x = (int)_window.Left,
-                        y = (int)_window.Top,
-                        cx = (int)_window.Width,
-                        cy = (int)_window.Height,
+            } else if (!_isEnabled && enable) {
+                if (_window != null) {
+                    UpdateLocations(new WinApi.WINDOWPOS {
+                        x = _window.Left,
+                        y = _window.Top,
+                        cx = _window.Width,
+                        cy = _window.Height,
                         flags = WinApi.SetWindowPosFlags.SWP_SHOWWINDOW
                     });
-
-                    UpdateSizes((int)_window.Width, (int)_window.Height);
+                    UpdateSizes(_window.Width, _window.Height);
+                    UpdateFocus(_window.Focused);
                 }
             }
 
             _isEnabled = enable;
         }
-        
+
         #endregion
 
         #region [private]
 
-        private void DestroyGlows()
-        {
+        private void DestroyGlows() {
             _parentWindowHndl = IntPtr.Zero;
-
             CloseGlows();
-
             _window = null;
         }
-
-        private void HandleWindowVisibleChanged(object sender, EventArgs e)
-        {
-            Show(_window.Visible);
-        }
-
-        private void RegisterEvents()
-        {
-            if (_window != null)
-            {
-                _window.VisibleChanged += HandleWindowVisibleChanged;
-            }
-        }
-
-        private void UnregisterEvents()
-        {
-            if (_window != null)
-            {
-                _window.VisibleChanged -= HandleWindowVisibleChanged;
-            }
-        }
         
-        private void CloseGlows()
-        {
-            foreach (var sideGlow in _glows)
-            {
+        private void CloseGlows() {
+            foreach (var sideGlow in _glows) {
                 sideGlow.Close();
+                sideGlow.Dispose();
             }
-
             _glows.Clear();
-
-            _topGlow = null;
-            _bottomGlow = null;
-            _leftGlow = null;
-            _rightGlow = null;
         }
 
-        private void Show(bool show)
-        {
-            foreach (SideGlow sideGlow in _glows) sideGlow.Show(show);
+        private void Show(bool show) {
+            foreach (YamuiShadowBorder sideGlow in _glows) {
+                sideGlow.Show(show);
+            }
         }
 
-        private void UpdateZOrder()
-        {
-            foreach (SideGlow sideGlow in _glows)
-            {
+        private void UpdateZOrder() {
+            foreach (YamuiShadowBorder sideGlow in _glows) {
                 sideGlow.UpdateZOrder();
             }
         }
 
-        private void UpdateFocus(bool isFocused)
-        {
-            foreach (SideGlow sideGlow in _glows)
-            {
+        private void UpdateFocus(bool isFocused) {
+            foreach (YamuiShadowBorder sideGlow in _glows) {
                 sideGlow.ParentWindowIsFocused = isFocused;
             }
         }
 
-        private void UpdateSizes(int width, int height)
-        {
-            foreach (SideGlow sideGlow in _glows)
-            {
+        private void UpdateSizes(int width, int height) {
+            foreach (YamuiShadowBorder sideGlow in _glows) {
                 sideGlow.SetSize(width, height);
             }
         }
 
-        private void UpdateLocations(WinApi.WINDOWPOS location)
-        {
-            foreach (SideGlow sideGlow in _glows)
-            {
+        private void UpdateLocations(WinApi.WINDOWPOS location) {
+            foreach (YamuiShadowBorder sideGlow in _glows) {
                 sideGlow.SetLocation(location);
             }
-
-            if (((int) location.flags & (int)WinApi.SetWindowPosFlags.SWP_HIDEWINDOW) != 0)
-            {
+            if (((int) location.flags & (int) WinApi.SetWindowPosFlags.SWP_HIDEWINDOW) != 0) {
                 Show(false);
-            }
-            else if (((int) location.flags & (int)WinApi.SetWindowPosFlags.SWP_SHOWWINDOW) != 0)
-            {
+            } else if (((int) location.flags & (int) WinApi.SetWindowPosFlags.SWP_SHOWWINDOW) != 0) {
                 Show(true);
                 UpdateZOrder();
             }
         }
 
-        private void AlignSideGlowTopMost()
-        {
-            if (_glows == null)
-            {
+        private void AlignSideGlowTopMost() {
+            if (_glows == null) {
                 return;
             }
-
-            foreach (SideGlow glow in _glows)
-            {
+            foreach (YamuiShadowBorder glow in _glows) {
                 glow.IsTopMost = _setTopMost;
                 glow.UpdateZOrder();
             }
         }
 
         #endregion
-
-        #region [WM_events handlers]
-
-        public void SetFocus()
-        {
-            if (!_isEnabled) return;
-            UpdateFocus(true);
-            UpdateZOrder();
-        }
-
-        public void KillFocus()
-        {
-            if (!_isEnabled) return;
-            UpdateFocus(false);
-            UpdateZOrder();
-        }
-
-        public void WindowPosChanged(WinApi.WINDOWPOS location)
-        {
-            if (!_isEnabled) return;
-            UpdateLocations(location);
-        }
-
-        public void Activate(bool isActive)
-        {
-            if (!_isEnabled) return;
-            UpdateZOrder();
-        }
-
-        public void Size(IntPtr wParam, IntPtr lParam)
-        {
-            if (!_isEnabled) return;
-            if ((int)wParam == 2 || (int)wParam == 1) // maximized/minimized
-            {
-                Show(false);
-            }
-            else
-            {
-                Show(true);
-                int width = lParam.LoWord();
-                int height = lParam.HiWord();
-                UpdateSizes(width, height);
-            }
-        }
-
-        #endregion
-
+        
         #region Dispose
 
         private bool _isDisposed;
 
         /// <summary>
-        /// IsDisposed status
-        /// </summary>
-        public bool IsDisposed
-        {
-            get { return _isDisposed; }
-        }
-
-        /// <summary>
         /// Standard Dispose
         /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Dispose
-        /// </summary>
-        /// <param name="disposing">True if disposing, false otherwise</param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_isDisposed)
-            {
-                if (disposing)
-                {
-                    // release unmanaged resources
-                }
-
+        public void Dispose() {
+            if (!_isDisposed) {
                 _isDisposed = true;
-
                 Detach();
                 DestroyGlows();
-
-                UnregisterEvents();
-
                 _window = null;
             }
+            GC.SuppressFinalize(this);
         }
-
+        
         #endregion
     }
 }

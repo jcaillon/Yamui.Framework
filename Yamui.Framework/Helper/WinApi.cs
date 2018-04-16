@@ -73,6 +73,14 @@ namespace Yamui.Framework.Helper {
             /// AlphaFormat field of structure
             /// </summary>
             public byte AlphaFormat;
+
+            public BLENDFUNCTION(byte alpha) {
+                // https://msdn.microsoft.com/en-us/library/windows/desktop/dd183393(v=vs.85).aspx?f=255&MSPPError=-2147217396
+                BlendOp = 0x00; // AC_SRC_OVER
+                BlendFlags = 0; // must be zero
+                SourceConstantAlpha = alpha;
+                AlphaFormat = 0x01; // AC_SRC_ALPHA
+            }
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -88,6 +96,7 @@ namespace Yamui.Framework.Helper {
             public ushort atomWindowType;
             public ushort wCreatorVersion;
 
+            // ReSharper disable once UnusedParameter.Local
             public WINDOWINFO(Boolean? filler) : this() {
                 // Allows automatic initialization of "cbSize" with "new WINDOWINFO(null/true/false)".
                 cbSize = (UInt32) (Marshal.SizeOf(typeof(WINDOWINFO)));
@@ -126,8 +135,8 @@ namespace Yamui.Framework.Helper {
                 this.y = y;
             }
             public POINT(Point point) {
-                this.x = point.X;
-                this.y = point.Y;
+                x = point.X;
+                y = point.Y;
             }
         }
 
@@ -141,8 +150,8 @@ namespace Yamui.Framework.Helper {
                 this.cy = cy;
             }
             public SIZE(Size size) {
-                this.cx = size.Width;
-                this.cy = size.Height;
+                cx = size.Width;
+                cy = size.Height;
             }
         }
 
@@ -365,7 +374,7 @@ namespace Yamui.Framework.Helper {
             GWL_STYLE = -16,
 
             /// <summary>Sets a new extended window style.</summary>
-            /// <remarks>See <see cref="ExWindowStyles"/>.</remarks>
+            /// <remarks>See <see cref="WindowStylesEx"/>.</remarks>
             GWL_EXSTYLE = -20,
 
             /// <summary>Sets the user data associated with the window.</summary>
@@ -939,7 +948,7 @@ namespace Yamui.Framework.Helper {
         /// The following styles can be specified wherever a window style is required. After the control has been created, these styles cannot be modified, except as noted.
         /// </summary>
         [Flags]
-        public enum WindowStyles : int {
+        public enum WindowStyles {
             /// <summary>The window has a thin-line border.</summary>
             WS_BORDER = 0x800000,
 
@@ -1263,7 +1272,7 @@ namespace Yamui.Framework.Helper {
             WA_CLICKACTIVE = 2,
         }
 
-        public enum BlendFlags {
+        public enum BlendingFlags {
             None = 0x00,
             ULW_COLORKEY = 0x01,
             ULW_ALPHA = 0x02,
@@ -1520,6 +1529,9 @@ namespace Yamui.Framework.Helper {
         
         public delegate IntPtr WndProcHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
 
+        [DllImport("kernel32.dll", CharSet=CharSet.Auto)]
+        public static extern IntPtr GetModuleHandle(string modName);
+
         #endregion
 
         #region GetCharFromKey
@@ -1601,7 +1613,7 @@ namespace Yamui.Framework.Helper {
         #region Glow
         
         [DllImport("User32.dll", CharSet = CharSet.Auto)]
-        public static extern bool UpdateLayeredWindow(IntPtr hwnd, IntPtr hdcDst, ref POINT pptDst, ref SIZE psize, IntPtr hdcSrc, ref POINT pprSrc, int crKey, ref BLENDFUNCTION pblend, BlendFlags dwFlags);
+        public static extern bool UpdateLayeredWindow(IntPtr hwnd, IntPtr hdcDst, ref POINT pptDst, ref SIZE psize, IntPtr hdcSrc, ref POINT pprSrc, int crKey, ref BLENDFUNCTION pblend, BlendingFlags dwFlags);
         
         [DllImport("User32.dll", CharSet = CharSet.Auto)]
         public static extern bool ScreenToClient(IntPtr hWnd, ref POINT pt);

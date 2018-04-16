@@ -15,9 +15,9 @@ namespace Yamui.Framework.Forms.Glow {
     /// <remarks>https://msdn.microsoft.com/en-us/library/windows/desktop/ms633556(v=vs.85).aspx?f=255&MSPPError=-2147217396</remarks>
     /// <remarks>http://simostro.synology.me/simone/2016/04/04/glow-window-effect/</remarks>
     internal class SideGlowNAtive : NativeWindow {
+
         #region private
 
-        private const int ErrorClassAlreadyExists = 1410;
         private const int AcSrcOver = 0x00;
         private const int AcSrcAlpha = 0x01;
         private const int Thickness = 9;
@@ -27,15 +27,13 @@ namespace Yamui.Framework.Forms.Glow {
         private readonly Color _transparent = Color.FromArgb(0);
 
         private WinApi.POINT _ptZero = new WinApi.POINT(0, 0);
-        private bool _disposed;
-        private WinApi.WndProcHandler _wndProcDelegate;
         
         private readonly DockStyle _side;
         private const WinApi.SetWindowPosFlags NoSizeNoMove = WinApi.SetWindowPosFlags.SWP_NOSIZE | WinApi.SetWindowPosFlags.SWP_NOMOVE;
 
         private bool _parentWindowIsFocused;
         private Color _activeColor = Color.Cyan;
-        private Color _inactiveColor = Color.LightGray;
+        private Color _inactiveColor = Color.Orange;
         private WinApi.BLENDFUNCTION _blend;
 
         public Point Location { get; private set; }
@@ -56,8 +54,6 @@ namespace Yamui.Framework.Forms.Glow {
                 Render();
             }
         }
-
-        internal IntPtr Handle { get; private set; }
 
         internal bool ParentWindowIsFocused {
             set {
@@ -87,7 +83,7 @@ namespace Yamui.Framework.Forms.Glow {
                 AlphaFormat = AcSrcAlpha
             };
             
-            CreateWindow($"GlowSide_{side}_{parent}");
+            CreateWindow();
         }
 
         #endregion
@@ -149,8 +145,10 @@ namespace Yamui.Framework.Forms.Glow {
 
 
         internal void Close() {
-            WinApi.CloseWindow(Handle);
-            WinApi.SetParent(Handle, IntPtr.Zero);
+            DestroyHandle();
+            ReleaseHandle();
+            //WinApi.CloseWindow(Handle);
+            //WinApi.SetParent(Handle, IntPtr.Zero);
             //WinApi.DestroyWindow(Handle);
         }
 
@@ -158,52 +156,24 @@ namespace Yamui.Framework.Forms.Glow {
 
         #region private
 
-        private void CreateWindow(string className) {
-            //_wndProcDelegate = CustomWndProc;
-
-            // Create WNDCLASS
-            WinApi.WNDCLASS windClass = new WinApi.WNDCLASS {
-                lpszClassName = className,
-                lpfnWndProc = Marshal.GetFunctionPointerForDelegate(_wndProcDelegate)
-            };
-
-            var classAtom = WinApi.RegisterClassW(ref windClass);
-            int lastError = Marshal.GetLastWin32Error();
-            if (classAtom == 0 && lastError != ErrorClassAlreadyExists) {
-                throw new Exception("Could not register window class");
-            }
-            
-            var extendedStyle = (
+        private void CreateWindow() {
+            var cp = new CreateParams();
+            cp.Caption = "fuck";
+            cp.X = 100;
+            cp.Y = 100;
+            cp.Width = 300;
+            cp.Height = 300;
+            cp.Style = (int) (
+                WinApi.WindowStyles.WS_CLIPSIBLINGS |
+                WinApi.WindowStyles.WS_CLIPCHILDREN |
+                WinApi.WindowStyles.WS_POPUP);
+            cp.ExStyle = (int) (
                 WinApi.WindowStylesEx.WS_EX_LEFT |
                 WinApi.WindowStylesEx.WS_EX_LTRREADING |
                 WinApi.WindowStylesEx.WS_EX_RIGHTSCROLLBAR |
                 WinApi.WindowStylesEx.WS_EX_LAYERED |
                 WinApi.WindowStylesEx.WS_EX_TOOLWINDOW);
-
-            var style = (
-                WinApi.WindowStyles.WS_CLIPSIBLINGS |
-                WinApi.WindowStyles.WS_CLIPCHILDREN |
-                WinApi.WindowStyles.WS_POPUP);
-
-            // Create window
-            Handle = WinApi.CreateWindowEx(
-                (int) extendedStyle,
-                className,
-                className,
-                (int) style,
-                0,
-                0,
-                0,
-                0,
-                new HandleRef(this, _parentHandle),
-                WinApi.NullHandleRef,
-                WinApi.NullHandleRef,
-                IntPtr.Zero
-            );
-
-            if (Handle == IntPtr.Zero) {
-                return;
-            }
+            CreateHandle(cp);
         }
         private void Render() {
 
@@ -221,7 +191,7 @@ namespace Yamui.Framework.Forms.Glow {
                     using (Bitmap bmp = GetWindowBitmap(Size.Width, Size.Height)) {
                         WinApi.POINT newLocation = new WinApi.POINT(Location);
                         WinApi.SIZE newSize = new WinApi.SIZE(Size);
-                        WinApi.UpdateLayeredWindow(Handle, screenDc, ref newLocation, ref newSize, memDc, ref _ptZero, 0, ref _blend, WinApi.BlendFlags.ULW_ALPHA);
+                        WinApi.UpdateLayeredWindow(Handle, screenDc, ref newLocation, ref newSize, memDc, ref _ptZero, 0, ref _blend, WinApi.BlendingFlags.ULW_ALPHA);
 
                         IntPtr hBitmap = bmp.GetHbitmap(_transparent);
                         IntPtr hOldBitmap = WinApi.SelectObject(memDc, hBitmap);

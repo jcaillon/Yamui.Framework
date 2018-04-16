@@ -35,7 +35,6 @@ namespace Yamui.Framework.Forms {
     {
         private Controls.YamuiButton yamuiButton1;
         private GlowDecorator _glowDecorator;
-        private SideGlow _rightGlow;
 
         public YamuiFormBaseShadow2() {
             InitializeComponent();
@@ -75,20 +74,18 @@ namespace Yamui.Framework.Forms {
             bool handled = false;
             if (_glowDecorator != null)
                 _glowDecorator.WndProc(m.HWnd, m.Msg, m.WParam, m.LParam, ref handled);
-            if (!handled)
-                base.WndProc(ref m);
+            base.WndProc(ref m);
         }
 
 
         private void yamuiButton1_ButtonPressed(object sender, EventArgs e)
         {
-            _glowDecorator = new GlowDecorator();
+            _glowDecorator = _glowDecorator ?? new GlowDecorator();
             _glowDecorator.Attach(this);
             _glowDecorator.ActiveColor = Color.Cyan;
-            _glowDecorator.InactiveColor = Color.Gray;
-            _glowDecorator.Activate(true);
+            _glowDecorator.InactiveColor = Color.Orange;
 
-            //_rightGlow = new SideGlow(DockStyle.Right, Handle);
+            //var _rightGlow = new SideGlowNAtive(DockStyle.Right, Handle);
             //var pos = new WinApi.WINDOWPOS();
             //pos.x = Left;
             //pos.y = Top;
@@ -97,7 +94,6 @@ namespace Yamui.Framework.Forms {
             //_rightGlow.SetLocation(pos);
             //_rightGlow.SetSize(Width, Height);
             //_rightGlow.Show(true);
-            //WinApi.ShowWindow(new HandleRef(_rightGlow, _rightGlow.Handle), WinApi.ShowWindowStyle.SW_SHOWNOACTIVATE);
         }
     }
 
