@@ -33,7 +33,7 @@ using System.Windows.Input;
 namespace Yamui.Framework.Helper {
     [SuppressUnmanagedCodeSecurity]
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public static partial class WinApi {
+    public static class WinApi {
         #region Structs
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
@@ -46,12 +46,10 @@ namespace Yamui.Framework.Helper {
             public IntPtr hIcon;
             public IntPtr hCursor;
             public IntPtr hbrBackground;
-            [MarshalAs(UnmanagedType.LPWStr)]
-            public string lpszMenuName;
-            [MarshalAs(UnmanagedType.LPWStr)]
-            public string lpszClassName;
+            [MarshalAs(UnmanagedType.LPWStr)] public string lpszMenuName;
+            [MarshalAs(UnmanagedType.LPWStr)] public string lpszClassName;
         }
-        
+
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public struct BLENDFUNCTION {
             /// <summary>
@@ -134,6 +132,7 @@ namespace Yamui.Framework.Helper {
                 this.x = x;
                 this.y = y;
             }
+
             public POINT(Point point) {
                 x = point.X;
                 y = point.Y;
@@ -149,6 +148,7 @@ namespace Yamui.Framework.Helper {
                 this.cx = cx;
                 this.cy = cy;
             }
+
             public SIZE(Size size) {
                 cx = size.Width;
                 cy = size.Height;
@@ -336,20 +336,27 @@ namespace Yamui.Framework.Helper {
 
         [StructLayout(LayoutKind.Sequential)]
         public struct WINDOWPLACEMENT {
-            public int  length;
-            public int  flags;
-            public int  showCmd;
+            public int length;
+            public int flags;
+
+            public ShowWindowStyle showCmd;
+
             // ptMinPosition was a by-value POINT structure
-            public int  ptMinPosition_x;
-            public int  ptMinPosition_y;
+            public int ptMinPosition_x;
+
+            public int ptMinPosition_y;
+
             // ptMaxPosition was a by-value POINT structure
-            public int  ptMaxPosition_x;
-            public int  ptMaxPosition_y;
+            public int ptMaxPosition_x;
+
+            public int ptMaxPosition_y;
+
             // rcNormalPosition was a by-value RECT structure
-            public int  rcNormalPosition_left;
-            public int  rcNormalPosition_top;
-            public int  rcNormalPosition_right;
-            public int  rcNormalPosition_bottom;
+            public int rcNormalPosition_left;
+            public int rcNormalPosition_top;
+            public int rcNormalPosition_right;
+            public int rcNormalPosition_bottom;
+
         }
 
         #endregion
@@ -762,6 +769,7 @@ namespace Yamui.Framework.Helper {
             SC_MOVE = 0xF010,
             SC_MINIMIZE = 0xF020,
             SC_MAXIMIZE = 0xF030,
+
             /// <summary>
             /// sent instead of SC_MAXIMIZE when double clicking the caption bar
             /// </summary>
@@ -775,6 +783,7 @@ namespace Yamui.Framework.Helper {
             SC_KEYMENU = 0xF100,
             SC_ARRANGE = 0xF110,
             SC_RESTORE = 0xF120,
+
             /// <summary>
             /// sent instead of SC_RESTORE when double clicking the caption bar
             /// </summary>
@@ -1237,7 +1246,6 @@ namespace Yamui.Framework.Helper {
 
         [Flags]
         public enum ScrollWindowExFlags : uint {
-
             /// <summary>
             /// Scrolls all child windows that intersect the rectangle pointed to by the prcScroll parameter. The child windows are scrolled by the number of pixels specified by the dx and dy parameters. The system sends a WM_MOVE message to all child windows that intersect the prcScroll rectangle, even if they do not move
             /// </summary>
@@ -1285,7 +1293,7 @@ namespace Yamui.Framework.Helper {
 
         public static readonly IntPtr TRUE = new IntPtr(1);
         public static readonly IntPtr FALSE = IntPtr.Zero;
-        
+
         // Changes the client size of a control
         public const int EM_SETRECT = 0xB3;
 
@@ -1378,10 +1386,10 @@ namespace Yamui.Framework.Helper {
         /// </returns>
         [DllImport("user32.dll")]
         public static extern bool SetForegroundWindow(IntPtr hWnd);
-        
+
         [DllImport("user32.dll", SetLastError = true)]
         public static extern IntPtr SetActiveWindow(IntPtr hWnd);
-        
+
         [DllImport("user32.dll", ExactSpelling = true, CharSet = CharSet.Auto)]
         public static extern IntPtr SetCapture(HandleRef hwnd);
 
@@ -1391,7 +1399,7 @@ namespace Yamui.Framework.Helper {
         [DllImport("user32.dll")]
         public static extern IntPtr SendMessage(HandleRef hWnd, int msg, IntPtr wp, IntPtr lp);
 
-        [DllImport("user32.dll", CharSet=CharSet.Auto)]
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern bool PostMessage(HandleRef hwnd, int msg, IntPtr wparam, IntPtr lparam);
 
         public static Point GetCursorRelativePosition(IntPtr windowHandle) {
@@ -1404,6 +1412,10 @@ namespace Yamui.Framework.Helper {
         #endregion
 
         #region unsafe
+
+        [DllImport("user32.dll", ExactSpelling=true, CharSet=CharSet.Auto)]
+        [ResourceExposure(ResourceScope.None)]
+        public static extern bool SetWindowPlacement(HandleRef hWnd, [In] ref WINDOWPLACEMENT placement);
 
         [DllImport("user32.dll", ExactSpelling = true, EntryPoint = "GetDC", CharSet = CharSet.Auto)]
         private static extern IntPtr IntGetDC(HandleRef hWnd);
@@ -1452,9 +1464,9 @@ namespace Yamui.Framework.Helper {
             return IntBeginPaint(hWnd, ref lpPaint);
         }
 
-        [DllImport("user32.dll", ExactSpelling=true, CharSet=CharSet.Auto)]
+        [DllImport("user32.dll", ExactSpelling = true, CharSet = CharSet.Auto)]
         public static extern int GetWindowPlacement(HandleRef hWnd, ref WINDOWPLACEMENT placement);
-        
+
         //GetWindowLong won't work correctly for 64-bit: we should use GetWindowLongPtr instead.  On
         //32-bit, GetWindowLongPtr is just #defined as GetWindowLong.  GetWindowLong really should 
         //take/return int instead of IntPtr/HandleRef, but since we're running this only for 32-bit
@@ -1491,45 +1503,45 @@ namespace Yamui.Framework.Helper {
         [DllImport("user32.dll", CharSet = CharSet.Auto, EntryPoint = "SetWindowLongPtr")]
         public static extern IntPtr SetWindowLongPtr64(HandleRef hWnd, int nIndex, HandleRef dwNewLong);
 
-        [DllImport("user32.dll", EntryPoint="CreateWindowEx", CharSet=CharSet.Auto, SetLastError=true)]
-        public static extern IntPtr IntCreateWindowEx(int  dwExStyle, string lpszClassName,
+        [DllImport("user32.dll", EntryPoint = "CreateWindowEx", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern IntPtr IntCreateWindowEx(int dwExStyle, string lpszClassName,
             string lpszWindowName, int style, int x, int y, int width, int height,
             HandleRef hWndParent, HandleRef hMenu, HandleRef hInst, [MarshalAs(UnmanagedType.AsAny)] object pvParam);
 
         public static IntPtr CreateWindowEx(int dwExStyle, string lpszClassName,
             string lpszWindowName, int style, int x, int y, int width, int height,
-            HandleRef hWndParent, HandleRef hMenu, HandleRef hInst, [MarshalAs(UnmanagedType.AsAny)]object pvParam) {
+            HandleRef hWndParent, HandleRef hMenu, HandleRef hInst, [MarshalAs(UnmanagedType.AsAny)] object pvParam) {
             return IntCreateWindowEx(dwExStyle, lpszClassName,
                 lpszWindowName, style, x, y, width, height, hWndParent, hMenu,
                 hInst, pvParam);
         }
 
-        [DllImport("user32.dll", ExactSpelling=true, EntryPoint="DestroyWindow", CharSet=CharSet.Auto)]
+        [DllImport("user32.dll", ExactSpelling = true, EntryPoint = "DestroyWindow", CharSet = CharSet.Auto)]
         public static extern bool IntDestroyWindow(HandleRef hWnd);
+
         public static bool DestroyWindow(HandleRef hWnd) {
             return IntDestroyWindow(hWnd);
         }
-        
-        [DllImport("user32.dll", CharSet=CharSet.Auto, SetLastError=true)]
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern bool UnregisterClass(string className, HandleRef hInstance);
-    
-        [DllImport("user32.dll", CharSet=CharSet.Auto, SetLastError=true)]
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern short RegisterClassW([In] ref WNDCLASS lpWndClass);
 
-        
         [DllImport("user32.dll", SetLastError = true)]
         public static extern int CloseWindow(IntPtr hWnd);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern int SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
 
-        [DllImport("user32.dll", CharSet=CharSet.Auto)]
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
         [ResourceExposure(ResourceScope.None)]
         public static extern IntPtr DefWindowProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
-        
+
         public delegate IntPtr WndProcHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
 
-        [DllImport("kernel32.dll", CharSet=CharSet.Auto)]
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
         public static extern IntPtr GetModuleHandle(string modName);
 
         #endregion
@@ -1609,22 +1621,25 @@ namespace Yamui.Framework.Helper {
         }
 
         #endregion
-        
+
         #region Glow
-        
+
+        [DllImport("User32.dll", ExactSpelling=true, CharSet=CharSet.Auto, SetLastError=true)]
+        [ResourceExposure(ResourceScope.None)]
+        public static extern bool SetLayeredWindowAttributes(HandleRef hwnd, int crKey, byte bAlpha, int dwFlags);
+
         [DllImport("User32.dll", CharSet = CharSet.Auto)]
         public static extern bool UpdateLayeredWindow(IntPtr hwnd, IntPtr hdcDst, ref POINT pptDst, ref SIZE psize, IntPtr hdcSrc, ref POINT pprSrc, int crKey, ref BLENDFUNCTION pblend, BlendingFlags dwFlags);
-        
+
         [DllImport("User32.dll", CharSet = CharSet.Auto)]
         public static extern bool ScreenToClient(IntPtr hWnd, ref POINT pt);
-        
 
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         public static extern IntPtr GetSystemMenu(IntPtr windowHandle, bool bReset);
 
         [DllImport("user32.dll")]
         public static extern int TrackPopupMenu(IntPtr hMenu, uint uFlags, int x, int y, int nReserved, IntPtr hWnd, IntPtr prcRect);
-        
+
         [DllImport("gdi32.dll", EntryPoint = "SelectObject", SetLastError = true)]
         public static extern IntPtr SelectObject([In] IntPtr hdc, [In] IntPtr hgdiobj);
 
@@ -1638,7 +1653,7 @@ namespace Yamui.Framework.Helper {
         [DllImport("gdi32.dll", EntryPoint = "DeleteDC")]
         public static extern bool DeleteDC(HandleRef hdc);
 
-    
         #endregion
+
     }
 }

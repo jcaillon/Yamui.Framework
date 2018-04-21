@@ -30,7 +30,7 @@ namespace Yamui.Framework.Controls.YamuiList {
     /// <summary>
     /// A class to display a cool custom context menu
     /// </summary>
-    public sealed class MoreTypesForm : YamuiFormBase {
+    public sealed class MoreTypesForm : YamuiForm {
         #region private fields
 
         private HtmlToolTip _tooltip = new HtmlToolTip();

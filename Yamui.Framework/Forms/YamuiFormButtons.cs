@@ -23,17 +23,17 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
-using System.Security;
 using System.Windows.Forms;
 using Yamui.Framework.Helper;
 using Yamui.Framework.HtmlRenderer.WinForms;
 using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Forms {
+
     /// <summary>
     /// Form class that adds the top right buttons + resize
     /// </summary>
-    public class YamuiFormButtons : YamuiFormBaseFadeIn {
+    public class YamuiFormButtons : YamuiFormFadeIn {
 
         #region constants
 
@@ -141,7 +141,7 @@ namespace Yamui.Framework.Forms {
 
             switch (m.Msg) {
 
-                case (int) WinApi.Messages.WM_SIZE:
+                case (int) Window.Msg.WM_SIZE:
                     if (_windowButtonList != null) {
                         YamuiFormButton btn;
                         _windowButtonList.TryGetValue(WindowButtons.Maximize, out btn);

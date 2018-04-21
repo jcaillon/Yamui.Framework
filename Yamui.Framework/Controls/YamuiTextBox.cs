@@ -141,7 +141,7 @@ namespace Yamui.Framework.Controls {
 
         protected override void WndProc(ref Message m) {
             /*
-            if (m.Msg == (int) WinApi.Messages.WM_PAINT) {
+            if (m.Msg == (int) WinMessages.Messages.WM_PAINT) {
                 //DrawHelper.HandleWmPaint(ref m, this, CustomPaint2);
                 var hdc = WinApi.GetDC(new HandleRef(this, Handle));
                 if (hdc == IntPtr.Zero) {
@@ -160,12 +160,12 @@ namespace Yamui.Framework.Controls {
             }
             */
             // Send WM_MOUSEWHEEL messages to the parent
-            if (!Multiline && m.Msg == (int) WinApi.Messages.WM_MOUSEWHEEL)
+            if (!Multiline && m.Msg == (int) Window.Msg.WM_MOUSEWHEEL)
                 WinApi.SendMessage(new HandleRef(Parent, Parent.Handle), m.Msg, m.WParam, m.LParam);
             else
                 base.WndProc(ref m);
 
-            if (m.Msg == (int) WinApi.Messages.WM_PAINT) {
+            if (m.Msg == (int) Window.Msg.WM_PAINT) {
                 using (var graphics = CreateGraphics()) {
                     CustomPaint(graphics);
                 }

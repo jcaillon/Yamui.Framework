@@ -2,11 +2,14 @@
 using System.Security;
 
 namespace Yamui.Framework.Helper {
+
     [SuppressUnmanagedCodeSecurity]
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public static partial class WinApi {
+    public static class Window {
         //https://www.pinvoke.net/default.aspx/Constants.WM
-        public enum Messages {
+
+        [SuppressMessage("ReSharper", "UnusedMember.Global")]
+        public enum Msg {
 
             /// <summary>
             /// The WM_ACTIVATE message is sent when a window is being activated or deactivated. This message is sent first to the window procedure of the top-level window being deactivated; it is then sent to the window procedure of the top-level window being activated.

@@ -38,7 +38,6 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -165,23 +164,21 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Fonts\FontManager.cs" />
-    <Compile Include="Forms\Glow\FloatingWindow.cs" />
-    <Compile Include="Forms\Glow\GlowDecorator.cs" />
-    <Compile Include="Forms\Glow\SideGlowNAtive.cs" />
-    <Compile Include="Forms\Glow\YamuiShadowBorder.cs" />
-    <Compile Include="Forms\YamuiFormBaseShadow2.cs">
+    <Compile Include="Forms\SideGlowNative.cs" />
+    <Compile Include="Forms\YamuiShadowBorder.cs" />
+    <Compile Include="Forms\YamuiFormOption.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\YamuiFormBaseShadow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\YamuiFormBaseFadeIn.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\YamuiFormBase.cs">
+    <Compile Include="Forms\YamuiFormShadow.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\YamuiFormToolWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\YamuiFormFadeIn.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\YamuiForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\YamuiFormButtons.cs">
@@ -219,7 +216,8 @@
     <Compile Include="Helper\PaintHelper.cs" />
     <Compile Include="Helper\TabOrderManager.cs" />
     <Compile Include="Helper\Utilities.cs" />
-    <Compile Include="Helper\WinApi2.cs" />
+    <Compile Include="Helper\WinInterop\User32.cs" />
+    <Compile Include="Helper\WinInterop\Msg.cs" />
     <Compile Include="Helper\WindowWrapper.cs" />
     <Compile Include="Helper\YamuiExtensions.cs" />
     <Compile Include="Helper\YamuiVirtualScrollBar.cs" />
@@ -320,7 +318,7 @@
     <Compile Include="HtmlRenderer\WinForms\Utilities\ClipboardHelper.cs" />
     <Compile Include="HtmlRenderer\WinForms\Utilities\Utils.cs" />
     <Compile Include="HtmlRenderer\WinForms\Utilities\Win32Utils.cs" />
-    <Compile Include="Helper\WinApi.cs" />
+    <Compile Include="Helper\WinInterop\WinApi.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -332,8 +330,8 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <EmbeddedResource Include="Forms\YamuiFormBaseShadow2.resx">
-      <DependentUpon>YamuiFormBaseShadow2.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\YamuiFormShadow.resx">
+      <DependentUpon>YamuiFormShadow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\YamuiMainAppli.resx">
       <DependentUpon>YamuiMainAppli.cs</DependentUpon>

@@ -3,7 +3,6 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
-using System.Runtime.Versioning;
 using System.Windows.Forms;
 using Yamui.Framework.Helper;
 
@@ -14,11 +13,13 @@ namespace Yamui.Framework.Forms.Glow {
     /// renders the "glowing effect" on one of the sides
     /// </summary>
     /// <remarks>https://msdn.microsoft.com/en-us/library/windows/desktop/ms633556(v=vs.85).aspx?f=255&MSPPError=-2147217396</remarks>
-    /// <remarks>http://www.nuonsoft.com/blog/2009/05/27/how-to-use-updatelayeredwindow/</remarks>
     /// <remarks>http://simostro.synology.me/simone/2016/04/04/glow-window-effect/</remarks>
-    internal class YamuiShadowBorder : IDisposable, IWin32Window {
+    internal class SideGlowNAtive : NativeWindow {
+
         #region private
 
+        private const int AcSrcOver = 0x00;
+        private const int AcSrcAlpha = 0x01;
         private const int Thickness = 9;
 
         private readonly byte[] _alphas = {64, 46, 25, 19, 10, 07, 02, 01, 00};
@@ -26,8 +27,6 @@ namespace Yamui.Framework.Forms.Glow {
         private readonly Color _transparent = Color.FromArgb(0);
 
         private WinApi.POINT _ptZero = new WinApi.POINT(0, 0);
-        private bool _disposed;
-        private WinApi.WndProcHandler _wndProcDelegate;
         
         private readonly DockStyle _side;
         private const WinApi.SetWindowPosFlags NoSizeNoMove = WinApi.SetWindowPosFlags.SWP_NOSIZE | WinApi.SetWindowPosFlags.SWP_NOMOVE;
@@ -36,8 +35,6 @@ namespace Yamui.Framework.Forms.Glow {
         private Color _activeColor = Color.Cyan;
         private Color _inactiveColor = Color.Orange;
         private WinApi.BLENDFUNCTION _blend;
-
-        private WinApi.WNDCLASS _windowClass;
 
         public Point Location { get; private set; }
         public Size Size { get; private set; }
@@ -58,8 +55,6 @@ namespace Yamui.Framework.Forms.Glow {
             }
         }
 
-        public IntPtr Handle { get; private set; }
-
         internal bool ParentWindowIsFocused {
             set {
                 _parentWindowIsFocused = value;
@@ -77,21 +72,18 @@ namespace Yamui.Framework.Forms.Glow {
 
         #region constuctor
 
-        internal YamuiShadowBorder(DockStyle side, IntPtr parent) {
+        internal SideGlowNAtive(DockStyle side, IntPtr parent) {
             _side = side;
             _parentHandle = parent;
 
-            AppDomain.CurrentDomain.ProcessExit += OnShutdown;
-            AppDomain.CurrentDomain.DomainUnload += OnShutdown;
-
-            _blend = new WinApi.BLENDFUNCTION(255);
+            _blend = new WinApi.BLENDFUNCTION {
+                BlendOp = AcSrcOver,
+                BlendFlags = 0,
+                SourceConstantAlpha = 255,
+                AlphaFormat = AcSrcAlpha
+            };
             
             CreateWindow();
-        }
-
-        private void OnShutdown(object sender, EventArgs eventArgs) {
-            Close();
-            WinApi.UnregisterClass(_windowClass.lpszClassName, new HandleRef(this, WinApi.GetModuleHandle(null)));
         }
 
         #endregion
@@ -137,86 +129,55 @@ namespace Yamui.Framework.Forms.Glow {
             }
 
             Location = new Point(left, top);
-            WinApi.SetWindowPos(Handle, !IsTopMost ? WinApi.SpecialWindowHandles.HWND_NOTOPMOST : WinApi.SpecialWindowHandles.HWND_TOPMOST, left, top, 0, 0, WinApi.SetWindowPosFlags.SWP_NOSIZE | WinApi.SetWindowPosFlags.SWP_NOACTIVATE);
+            WinApi.SetWindowPos(Handle, !IsTopMost ? WinApi.SpecialWindowHandles.HWND_NOTOPMOST : WinApi.SpecialWindowHandles.HWND_TOPMOST, left, top, 0, 0, 0);
+            UpdateZOrder(left, top, WinApi.SetWindowPosFlags.SWP_NOSIZE | WinApi.SetWindowPosFlags.SWP_NOACTIVATE);
         }
 
-        private void UpdateZOrder(int left, int top, WinApi.SetWindowPosFlags flags) {
+        internal void UpdateZOrder(int left, int top, WinApi.SetWindowPosFlags flags) {
             WinApi.SetWindowPos(Handle, !IsTopMost ? WinApi.SpecialWindowHandles.HWND_NOTOPMOST : WinApi.SpecialWindowHandles.HWND_TOPMOST, left, top, 0, 0, flags);
             WinApi.SetWindowPos(Handle, _parentHandle, 0, 0, 0, 0, NoSizeNoMove | WinApi.SetWindowPosFlags.SWP_NOACTIVATE);
         }
 
         internal void UpdateZOrder() {
-            //WinApi.SetWindowPos(Handle, !IsTopMost ? WinApi.SpecialWindowHandles.HWND_NOTOPMOST : WinApi.SpecialWindowHandles.HWND_TOPMOST, 0, 0, 0, 0, NoSizeNoMove | WinApi.SetWindowPosFlags.SWP_NOACTIVATE);
+            WinApi.SetWindowPos(Handle, !IsTopMost ? WinApi.SpecialWindowHandles.HWND_NOTOPMOST : WinApi.SpecialWindowHandles.HWND_TOPMOST, 0, 0, 0, 0, NoSizeNoMove | WinApi.SetWindowPosFlags.SWP_NOACTIVATE);
             WinApi.SetWindowPos(Handle, _parentHandle, 0, 0, 0, 0, NoSizeNoMove | WinApi.SetWindowPosFlags.SWP_NOACTIVATE);
         }
 
 
         internal void Close() {
-            WinApi.CloseWindow(Handle);
-            if (Handle != IntPtr.Zero)
-                WinApi.DestroyWindow(new HandleRef(this, Handle));
+            DestroyHandle();
+            ReleaseHandle();
+            //WinApi.CloseWindow(Handle);
+            //WinApi.SetParent(Handle, IntPtr.Zero);
+            //WinApi.DestroyWindow(Handle);
         }
 
         #endregion
 
         #region private
 
-        private void RegisterClass() {
-            _wndProcDelegate = CustomWndProc;
-            String appDomain = Convert.ToString(AppDomain.CurrentDomain.GetHashCode(), 16);
-            _windowClass = new WinApi.WNDCLASS {
-                lpszClassName = $"{nameof(YamuiShadowBorder)}.{_side}_{_parentHandle}.{VersioningHelper.MakeVersionSafeName(appDomain, ResourceScope.Process, ResourceScope.AppDomain)}",
-                lpfnWndProc = Marshal.GetFunctionPointerForDelegate(_wndProcDelegate)
-            };
-
-            var classAtom = WinApi.RegisterClassW(ref _windowClass);
-            int lastError = Marshal.GetLastWin32Error();
-            if (classAtom == 0) {
-                throw new Exception("Could not register window class : " + lastError);
-            }
-        }
-
         private void CreateWindow() {
-            _wndProcDelegate = CustomWndProc;
-
-            // Create WNDCLASS
-            RegisterClass();
-            var extendedStyle = (
+            var cp = new CreateParams();
+            cp.Caption = "zqege";
+            cp.X = 100;
+            cp.Y = 100;
+            cp.Width = 300;
+            cp.Height = 300;
+            cp.Style = (int) (
+                WinApi.WindowStyles.WS_CLIPSIBLINGS |
+                WinApi.WindowStyles.WS_CLIPCHILDREN |
+                WinApi.WindowStyles.WS_POPUP);
+            cp.ExStyle = (int) (
                 WinApi.WindowStylesEx.WS_EX_LEFT |
                 WinApi.WindowStylesEx.WS_EX_LTRREADING |
                 WinApi.WindowStylesEx.WS_EX_RIGHTSCROLLBAR |
                 WinApi.WindowStylesEx.WS_EX_LAYERED |
-                WinApi.WindowStylesEx.WS_EX_TRANSPARENT |
                 WinApi.WindowStylesEx.WS_EX_TOOLWINDOW);
-
-            var style = (
-                WinApi.WindowStyles.WS_CLIPSIBLINGS |
-                WinApi.WindowStyles.WS_CLIPCHILDREN |
-                WinApi.WindowStyles.WS_POPUP);
-
-            // Create window
-            Handle = WinApi.CreateWindowEx(
-                (int) extendedStyle,
-                _windowClass.lpszClassName,
-                _windowClass.lpszClassName,
-                (int) style,
-                0,
-                0,
-                0,
-                0,
-                new HandleRef(this, _parentHandle),
-                WinApi.NullHandleRef,
-                WinApi.NullHandleRef,
-                IntPtr.Zero
-            );
+            CreateHandle(cp);
         }
-
-        private IntPtr CustomWndProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam) {
-
-            return WinApi.DefWindowProc(hWnd, msg, wParam, lParam);
-        }
-
         private void Render() {
+
+            // get non client area device
             var screenDc = WinApi.GetDC(WinApi.NullHandleRef);
             if (screenDc == IntPtr.Zero) {
                 return;
@@ -228,13 +189,13 @@ namespace Yamui.Framework.Forms.Glow {
                 }
                 try {
                     using (Bitmap bmp = GetWindowBitmap(Size.Width, Size.Height)) {
-                        IntPtr hBitmap = bmp.GetHbitmap(_transparent);
-                        IntPtr hOldBitmap = WinApi.SelectObject(memDc, hBitmap);
-
                         WinApi.POINT newLocation = new WinApi.POINT(Location);
                         WinApi.SIZE newSize = new WinApi.SIZE(Size);
                         WinApi.UpdateLayeredWindow(Handle, screenDc, ref newLocation, ref newSize, memDc, ref _ptZero, 0, ref _blend, WinApi.BlendingFlags.ULW_ALPHA);
 
+                        IntPtr hBitmap = bmp.GetHbitmap(_transparent);
+                        IntPtr hOldBitmap = WinApi.SelectObject(memDc, hBitmap);
+                        WinApi.ReleaseDC(WinApi.NullHandleRef, new HandleRef(null, screenDc));
                         if (hBitmap != IntPtr.Zero) {
                             WinApi.SelectObject(memDc, hOldBitmap);
                             WinApi.DeleteObject(hBitmap);
@@ -246,6 +207,7 @@ namespace Yamui.Framework.Forms.Glow {
             } finally {
                 WinApi.ReleaseDC(WinApi.NullHandleRef, new HandleRef(null, screenDc));
             }
+
         }
 
         public Bitmap GetWindowBitmap(int width, int height) {
@@ -300,19 +262,5 @@ namespace Yamui.Framework.Forms.Glow {
         
         #endregion
 
-        #region Dispose
-
-        public void Dispose() {
-            if (_disposed) 
-                return;
-            _disposed = true;
-            if (Handle == IntPtr.Zero) 
-                return;
-            WinApi.DestroyWindow(new HandleRef(this, Handle));
-            Handle = IntPtr.Zero;
-            GC.SuppressFinalize(this);
-        }
-
-        #endregion
     }
 }

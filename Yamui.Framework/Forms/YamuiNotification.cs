@@ -33,6 +33,23 @@ namespace Yamui.Framework.Forms {
 
     public sealed partial class YamuiNotification : YamuiFormToolWindow {
 
+        /// <summary>
+        /// This indicates that the form should not take focus when shown
+        /// However, if you specify TopMost = true, then this doesn't work anymore, hence why we
+        /// specify it through the CreateParams
+        /// </summary>
+        protected override bool ShowWithoutActivation {
+            get { return true; }
+        }
+
+        protected override CreateParams CreateParams {
+            get {
+                CreateParams createParams = base.CreateParams;
+                createParams.ExStyle |= (int) WinApi.WindowStylesEx.WS_EX_TOPMOST;
+                return createParams;
+            }
+        }
+
         #region Static
 
         private static List<YamuiNotification> _openNotifications = new List<YamuiNotification>();

@@ -32,7 +32,7 @@ using Yamui.Framework.HtmlRenderer.WinForms;
 using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Forms {
-    public class YamuiMenu : YamuiFormBase {
+    public class YamuiMenu : YamuiForm {
         #region Private
 
         private Action<YamuiMenuItem> _clickItemWrapper;
@@ -303,7 +303,7 @@ namespace Yamui.Framework.Forms {
             if (list != null && Movable && e.Button == MouseButtons.Left && (new Rectangle(0, list.Height - list.BottomHeight, list.Width, list.BottomHeight)).Contains(e.Location)) {
                 // do as if the cursor was on the title bar
                 WinApi.ReleaseCapture();
-                WinApi.SendMessage(new HandleRef(this, Handle), (int) WinApi.Messages.WM_NCLBUTTONDOWN, new IntPtr((int) WinApi.HitTest.HTCAPTION), new IntPtr(0));
+                WinApi.SendMessage(new HandleRef(this, Handle), (int) Window.Msg.WM_NCLBUTTONDOWN, new IntPtr((int) WinApi.HitTest.HTCAPTION), new IntPtr(0));
             }
         }
 

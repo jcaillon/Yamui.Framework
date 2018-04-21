@@ -275,7 +275,7 @@ namespace Yamui.Framework.Controls {
             }
 
             switch (m.Msg) {
-                case (int) WinApi.Messages.WM_NCCALCSIZE:
+                case (int) Window.Msg.WM_NCCALCSIZE:
                     // Here we reduce the size of the client area with the scrollbar width
                     var formRect = new Rectangle();
                     WinApi.GetWindowRect(m.HWnd, ref formRect);
@@ -297,13 +297,13 @@ namespace Yamui.Framework.Controls {
                     m.Result = IntPtr.Zero;
                     break;
 
-                case (int) WinApi.Messages.WM_NCPAINT:
+                case (int) Window.Msg.WM_NCPAINT:
                     PaintScrollBars(null);
                     // we handled everything
                     m.Result = IntPtr.Zero;
                     break;
 
-                case (int) WinApi.Messages.WM_NCHITTEST:
+                case (int) Window.Msg.WM_NCHITTEST:
                     // we need to correctly handle this if we want the non client area events (WM_NC*) to fire properly!
                     var point = PointToClient(new Point(m.LParam.ToInt32()));
                     if (!ClientRectangle.Contains(point)) {
@@ -314,7 +314,7 @@ namespace Yamui.Framework.Controls {
 
                     break;
 
-                case (int) WinApi.Messages.WM_MOUSEWHEEL:
+                case (int) Window.Msg.WM_MOUSEWHEEL:
                     if (HasScroll) {
                         // delta negative when scrolling up
                         var delta = (short) (m.WParam.ToInt64() >> 16);
@@ -331,7 +331,7 @@ namespace Yamui.Framework.Controls {
 
                     break;
 
-                case (int) WinApi.Messages.WM_KEYDOWN:
+                case (int) Window.Msg.WM_KEYDOWN:
                     // needto override OnPreviewKeyDown or IsInputKey to receive this
                     var key = (Keys) (m.WParam.ToInt64());
                     long context = m.LParam.ToInt64();
@@ -346,7 +346,7 @@ namespace Yamui.Framework.Controls {
 
                     break;
 
-                case (int) WinApi.Messages.WM_MOUSEMOVE:
+                case (int) Window.Msg.WM_MOUSEMOVE:
                     if (VerticalScroll.IsThumbPressed)
                         VerticalScroll.HandleMouseMove(null, null);
                     if (HorizontalScroll.IsThumbPressed)
@@ -354,7 +354,7 @@ namespace Yamui.Framework.Controls {
                     base.WndProc(ref m);
                     break;
 
-                case (int) WinApi.Messages.WM_NCMOUSEMOVE:
+                case (int) Window.Msg.WM_NCMOUSEMOVE:
                     // track mouse leaving (otherwise the WM_NCMOUSELEAVE message would not fire)
                     WinApi.TRACKMOUSEEVENT tme = new WinApi.TRACKMOUSEEVENT();
                     tme.cbSize = (uint) Marshal.SizeOf(tme);
@@ -368,26 +368,26 @@ namespace Yamui.Framework.Controls {
                     base.WndProc(ref m);
                     break;
 
-                case (int) WinApi.Messages.WM_NCLBUTTONDOWN:
+                case (int) Window.Msg.WM_NCLBUTTONDOWN:
                     VerticalScroll.HandleMouseDown(null, null);
                     HorizontalScroll.HandleMouseDown(null, null);
                     Focus();
                     // here we forward to base button down because it has a internal focus mecanism that we want to exploit
                     // if we don't do that, the mouse MOVE events are not fired outside the bounds of this control!
-                    m.Msg = (int) WinApi.Messages.WM_LBUTTONDOWN;
+                    m.Msg = (int) Window.Msg.WM_LBUTTONDOWN;
                     base.WndProc(ref m);
                     break;
 
-                case (int) WinApi.Messages.WM_NCLBUTTONUP:
-                case (int) WinApi.Messages.WM_LBUTTONUP:
+                case (int) Window.Msg.WM_NCLBUTTONUP:
+                case (int) Window.Msg.WM_LBUTTONUP:
                     VerticalScroll.HandleMouseUp(null, null);
                     HorizontalScroll.HandleMouseUp(null, null);
                     // here we forward this message to base WM_LBUTTONUP to release the internal focus on this control
-                    m.Msg = (int) WinApi.Messages.WM_LBUTTONUP;
+                    m.Msg = (int) Window.Msg.WM_LBUTTONUP;
                     base.WndProc(ref m);
                     break;
 
-                case (int) WinApi.Messages.WM_NCMOUSELEAVE:
+                case (int) Window.Msg.WM_NCMOUSELEAVE:
                     VerticalScroll.HandleMouseLeave(null, null);
                     HorizontalScroll.HandleMouseLeave(null, null);
                     base.WndProc(ref m);

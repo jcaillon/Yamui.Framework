@@ -31,6 +31,7 @@ using System.Windows.Forms;
 
 namespace Yamui.Framework.Helper {
     public static class YamuiExtensions {
+
         #region ui thread safe invoke
 
         /// <summary>
@@ -107,14 +108,36 @@ namespace Yamui.Framework.Helper {
         #endregion
 
         #region Simple math
+        
+        /// <summary>
+        /// The return value is the high-order double word of the specified value.
+        /// </summary>
+        public static int HiDword(this long pDWord) => (int)((pDWord >> 32) & 0xFFFFFFFF);
 
         /// <summary>
-        /// Set low and high bits of an int
+        /// The return value is the low-order word of the specified value.
         /// </summary>
-        /// <returns></returns>
-        public static int MakeLong(int low, int high) {
-            return (high << 16) | (low & 0xffff);
-        }
+        public static int LoDword(this long pDWord) => (int)pDWord;
+
+        /// <summary>
+        /// The return value is the high-order byte of the specified value.
+        /// </summary>
+        public static byte HiByte(this short pWord) => (byte)((pWord >> 8) & 0xFF);
+
+        /// <summary>
+        /// The return value is the low-order byte of the specified value.
+        /// </summary>
+        public static byte LoByte(this short pWord) => (byte)pWord;
+
+        /// <summary>
+        /// Make an short from 2-bytes.
+        /// </summary>
+        public static short MakeWord(byte low, byte high) => (short)(low | (ushort)(high << 8));
+
+        /// <summary>
+        /// Make an integer putting <paramref name="low"/> in low 2-bytes and <paramref name="high"/> in high 2-bytes.
+        /// </summary>
+        public static int MakeLong(short low, short high) => (int)((ushort)low | (uint)(high << 16));
     
         public static IntPtr MakeLParam(int low, int high) {
             return (IntPtr) ((high << 16) | (low & 0xffff));
@@ -123,30 +146,22 @@ namespace Yamui.Framework.Helper {
         /// <summary>
         /// Returns the higher 16 bits of a 32 bits integer
         /// </summary>
-        public static int HiWord(this int n) {
-            return (n >> 16) & 0xffff;
-        }
+        public static int HiWord(this int n) => (n >> 16) & 0xffff;
     
         /// <summary>
         /// Returns the higher 16 bits of a 32 bits integer
         /// </summary>
-        public static int HiWord(this IntPtr n) {
-            return HiWord(unchecked((int)(long)n) );
-        }
+        public static int HiWord(this IntPtr n) => HiWord(unchecked((int)(long)n) );
     
         /// <summary>
         /// Returns the lower 16 bits of a 32 bits integer
         /// </summary>
-        public static int LoWord(this int n) {
-            return n & 0xffff;
-        }
+        public static int LoWord(this int n) => n & 0xffff;
     
         /// <summary>
         /// Returns the lower 16 bits of a 32 bits integer
         /// </summary>
-        public static int LoWord(this IntPtr n) {
-            return LoWord(unchecked((int)(long)n));
-        }
+        public static int LoWord(this IntPtr n) => LoWord(unchecked((int)(long)n));
 
         /// <summary>
         /// Forces a value between a minimum and a maximum

@@ -34,12 +34,11 @@ namespace Yamui.Framework.Forms {
     /// <summary>
     /// Form class that implements interesting utilities + shadow + onpaint + movable/resizable borderless
     /// </summary>
-    public class YamuiFormBase : Form {
+    public abstract partial class YamuiForm : Form {
 
         #region Constants
 
         public const int BorderWidth = 1;
-        public const int ResizeHitDetectionSize = 5;
 
         #endregion
 
@@ -47,8 +46,10 @@ namespace Yamui.Framework.Forms {
 
         private bool _reverseX;
         private bool _reverseY;
-        protected Padding _nonClientAreaPadding = new Padding(5, 20, 5, 5);
+        protected Padding _nonClientAreaPadding = new Padding(5, 5, 5, 5);
         private WinApi.MINMAXINFO _lastMinMaxInfo;
+        private bool _isActive;
+        private WinApi.HitTest[][] _hitTests;
 
         #endregion
 
@@ -64,22 +65,32 @@ namespace Yamui.Framework.Forms {
         public virtual Padding NonClientAreaPadding => _nonClientAreaPadding;
 
         [Browsable(false)]
+        public virtual int TitleBarHeight => 20;
+
+        [Browsable(false)]
         public bool Resizing { get; private set; }
 
         [Browsable(false)]
         public bool Moving { get; private set; }
 
         [Browsable(false)]
-        public bool IsActive { get; set; }
+        public bool IsActive {
+            get { return _isActive; }
+            set {
+                if (_isActive != value) {
+                    _isActive = value;
+                    Invalidate();
+                }
+            }
+        }
 
-        protected bool IsMaximized => GetWindowPlacement().showCmd == (int) WinApi.ShowWindowStyle.SW_SHOWMAXIMIZED;
+        [Browsable(false)]
+        protected bool IsMaximized => GetWindowPlacement().showCmd == WinApi.ShowWindowStyle.SW_SHOWMAXIMIZED;
 
         #endregion
 
         #region constructor
-
-        #region CreateParams
-
+        
         protected override CreateParams CreateParams {
             get {
                 var cp = base.CreateParams;
@@ -88,20 +99,20 @@ namespace Yamui.Framework.Forms {
                     return cp;
 
                 // below is what makes the windows borderless but resizable
-                cp.Style = (int) WinApi.WindowStyles.WS_CAPTION // needed to have animation on resize for instance
-                    | (int) WinApi.WindowStyles.WS_CLIPCHILDREN
-                    | (int) WinApi.WindowStyles.WS_CLIPSIBLINGS
-                    | (int) WinApi.WindowStyles.WS_OVERLAPPED
-                    | (int) WinApi.WindowStyles.WS_SYSMENU
-                    | (int) WinApi.WindowStyles.WS_MINIMIZEBOX // need to be able to minimize from taskbar
-                    | (int) WinApi.WindowStyles.WS_MAXIMIZEBOX
-                    | (int) WinApi.WindowStyles.WS_THICKFRAME; // needed if we want the window to be able to aero snap on screen borders
+                cp.Style = (int) (WinApi.WindowStyles.WS_CAPTION // enables aero minimize animation/transition
+                    | WinApi.WindowStyles.WS_CLIPCHILDREN
+                    | WinApi.WindowStyles.WS_CLIPSIBLINGS
+                    | WinApi.WindowStyles.WS_OVERLAPPED
+                    | WinApi.WindowStyles.WS_SYSMENU // enables the context menu with the move, close, maximize, minize... commands (shift + right-click on the task bar item)
+                    | WinApi.WindowStyles.WS_MINIMIZEBOX // need to be able to minimize from taskbar
+                    | WinApi.WindowStyles.WS_MAXIMIZEBOX // same for maximize
+                    | WinApi.WindowStyles.WS_THICKFRAME); // without this the window cannot be resized and so aero snap, de-maximizing and minimizing won't work
 
-                cp.ExStyle = (int) WinApi.WindowStylesEx.WS_EX_COMPOSITED
-                    | (int) WinApi.WindowStylesEx.WS_EX_LEFT
-                    | (int) WinApi.WindowStylesEx.WS_EX_LTRREADING
-                    | (int) WinApi.WindowStylesEx.WS_EX_APPWINDOW
-                    | (int) WinApi.WindowStylesEx.WS_EX_WINDOWEDGE;
+                cp.ExStyle = (int) (WinApi.WindowStylesEx.WS_EX_COMPOSITED
+                    | WinApi.WindowStylesEx.WS_EX_LEFT
+                    | WinApi.WindowStylesEx.WS_EX_LTRREADING
+                    | WinApi.WindowStylesEx.WS_EX_APPWINDOW
+                    | WinApi.WindowStylesEx.WS_EX_WINDOWEDGE);
                     
                 cp.ClassStyle = 0;
 
@@ -109,9 +120,7 @@ namespace Yamui.Framework.Forms {
             }
         }
 
-        #endregion
-
-        public YamuiFormBase() {
+        protected YamuiForm() {
             // why those styles? check here: 
             // https://sites.google.com/site/craigandera/craigs-stuff/windows-forms/flicker-free-control-drawing
             SetStyle(
@@ -125,6 +134,19 @@ namespace Yamui.Framework.Forms {
             // icon
             if (YamuiThemeManager.GlobalIcon != null)
                 Icon = YamuiThemeManager.GlobalIcon;
+
+            // init hittest table
+            _hitTests = new[] {
+                new[] {
+                    WinApi.HitTest.HTTOPLEFT, WinApi.HitTest.HTTOP, WinApi.HitTest.HTTOPRIGHT
+                },
+                new[] {
+                    WinApi.HitTest.HTLEFT, WinApi.HitTest.HTNOWHERE, WinApi.HitTest.HTRIGHT
+                },
+                new[] {
+                    WinApi.HitTest.HTBOTTOMLEFT, WinApi.HitTest.HTBOTTOM, WinApi.HitTest.HTBOTTOMRIGHT
+                },
+            };
         }
 
         #endregion
@@ -132,35 +154,8 @@ namespace Yamui.Framework.Forms {
         #region OnPaint
 
         protected override void OnPaint(PaintEventArgs e) {
-            
-            //using (var b = new SolidBrush(Color.Cyan)) {
-            //    e.Graphics.FillRectangle(b, ClientRectangle);
-            //}
-            using (var b = new SolidBrush(Color.Yellow)) {
-                e.Graphics.FillRectangle(b, ClientRectangle);
-            }
-
-            // draw the border with Style color
-            var rect2 = new Rectangle(0, 0, ClientRectangle.Width - 1, ClientRectangle.Height - 1);
-            using (var pen2 = new Pen(Focused ? Color.Cyan : Color.Orange, BorderWidth) {
-                    Alignment = PenAlignment.Inset
-                }) {
-                e.Graphics.DrawRectangle(pen2, rect2);
-            }
-
-
-            return;
             var backColor = YamuiThemeManager.Current.FormBack;
-            var borderColor = YamuiThemeManager.Current.FormBorder;
-
             e.Graphics.Clear(backColor);
-
-            // draw the border with Style color
-            var rect = new Rectangle(new Point(0, 0), new Size(Width, Height));
-            var pen = new Pen(borderColor, BorderWidth) {
-                Alignment = PenAlignment.Inset
-            };
-            e.Graphics.DrawRectangle(pen, rect);
         }
 
         #endregion
@@ -173,9 +168,9 @@ namespace Yamui.Framework.Forms {
                 return;
             }
             
-            switch ((WinApi.Messages) m.Msg) {
+            switch ((Window.Msg) m.Msg) {
 
-                case WinApi.Messages.WM_SYSCOMMAND:
+                case Window.Msg.WM_SYSCOMMAND:
                     var sc = (int) m.WParam;
                     switch ((WinApi.SysCommands) sc) {
                         // prevent the window from moving
@@ -183,26 +178,10 @@ namespace Yamui.Framework.Forms {
                             if (!Movable)
                                 return;
                             break;
-                        case WinApi.SysCommands.SC_RESTORE:
-                        case WinApi.SysCommands.SC_RESTOREDBLCLICK:
-                            //SuspendLayout();
-                            //Height = _savedHeight;
-                            //Width = _savedWidth;
-                            //ResumeLayout(false);
-                            break;
-                        case WinApi.SysCommands.SC_MINIMIZE:
-                            //_savedHeight = Height;
-                            //_savedWidth = Width;
-                            break;
-                        case WinApi.SysCommands.SC_MAXIMIZE:
-                        case WinApi.SysCommands.SC_MAXIMIZEDBLCLICK:
-                            //_savedHeight = Height;
-                            //_savedWidth = Width;
-                            break;
                     }
                     break;
 
-                case WinApi.Messages.WM_NCHITTEST:
+                case Window.Msg.WM_NCHITTEST:
                     // here we return on which part of the window the cursor currently is :
                     // this allows to resize the windows when grabbing edges
                     // and allows to move/double click to maximize the window if the cursor is on the caption (title) bar
@@ -216,7 +195,7 @@ namespace Yamui.Framework.Forms {
                     m.Result = (IntPtr) ht;
                     return;
 
-                case WinApi.Messages.WM_WINDOWPOSCHANGING:
+                case Window.Msg.WM_WINDOWPOSCHANGING:
                     // https://msdn.microsoft.com/fr-fr/library/windows/desktop/ms632653(v=vs.85).aspx?f=255&MSPPError=-2147217396
                     // https://blogs.msdn.microsoft.com/oldnewthing/20080116-00/?p=23803
                     // The WM_WINDOWPOSCHANGING message is sent early in the window state changing process, unlike WM_WINDOWPOSCHANGED, 
@@ -226,11 +205,11 @@ namespace Yamui.Framework.Forms {
                     // var windowpos = (WinApi.WINDOWPOS) Marshal.PtrToStructure(m.LParam, typeof(WinApi.WINDOWPOS));
                     break;
 
-                case WinApi.Messages.WM_ENTERSIZEMOVE:
+                case Window.Msg.WM_ENTERSIZEMOVE:
                     // Useful if your window contents are dependent on window size but expensive to compute, as they give you a way to defer paints until the end of the resize action. We found WM_WINDOWPOSCHANGING/ED wasn’t reliable for that purpose.
                     break;
 
-                case WinApi.Messages.WM_EXITSIZEMOVE:
+                case Window.Msg.WM_EXITSIZEMOVE:
                     if (Resizing) {
                         // restore caption style
                         WindowStyle |= WinApi.WindowStyles.WS_CAPTION;
@@ -239,7 +218,7 @@ namespace Yamui.Framework.Forms {
                     Moving = false;
                     break;
 
-                case WinApi.Messages.WM_SIZING:
+                case Window.Msg.WM_SIZING:
                     if (!Resizing) {
                         // disable caption style to avoid seeing it when resizing 
                         WindowStyle &= ~WinApi.WindowStyles.WS_CAPTION;
@@ -247,46 +226,43 @@ namespace Yamui.Framework.Forms {
                     Resizing = true;
                     break;
 
-                case WinApi.Messages.WM_MOVING:
+                case Window.Msg.WM_MOVING:
                     Moving = true;
                     break;
 
-                case WinApi.Messages.WM_SIZE:
+                case Window.Msg.WM_SIZE:
                     // var state = (WinApi.WmSizeEnum) m.WParam;
                     // var wid = m.LParam.LoWord();
                     // var h = m.LParam.HiWord();
                     break;
 
-                case WinApi.Messages.WM_NCPAINT:
+                case Window.Msg.WM_NCPAINT:
                     //Return Zero
                     m.Result = IntPtr.Zero;
                     break;
 
-                case WinApi.Messages.WM_GETMINMAXINFO:
+                case Window.Msg.WM_GETMINMAXINFO:
                     // allows the window to be maximized at the size of the working area instead of the whole screen size
                     OnGetMinMaxInfo(ref m);
                     //Return Zero
                     m.Result = IntPtr.Zero;
                     return;
 
-                case WinApi.Messages.WM_NCCALCSIZE:
+                case Window.Msg.WM_NCCALCSIZE:
                     // we respond to this message to say we do not want a non client area
                     if (OnNcCalcSize(ref m))
                         return;
                     break;
 
-                case WinApi.Messages.WM_ACTIVATEAPP:
+                case Window.Msg.WM_ACTIVATEAPP:
                     IsActive = (int) m.WParam != 0;
                     break;
 
-                case WinApi.Messages.WM_ACTIVATE:
+                case Window.Msg.WM_ACTIVATE:
                     IsActive = ((int)WinApi.WAFlags.WA_ACTIVE == (int)m.WParam || (int)WinApi.WAFlags.WA_CLICKACTIVE == (int)m.WParam);
                     break;
                     
-                case WinApi.Messages.WM_SHOWWINDOW:
-                    break;
-
-                case WinApi.Messages.WM_NCACTIVATE:
+                case Window.Msg.WM_NCACTIVATE:
                     /* Prevent Windows from drawing the default title bar by temporarily
                         toggling the WS_VISIBLE style. This is recommended in:
                         https://blogs.msdn.microsoft.com/wpfsdk/2008/09/08/custom-window-chrome-in-wpf/ */
@@ -296,7 +272,7 @@ namespace Yamui.Framework.Forms {
                     WindowStyle = oldStyle;
                     return;
 
-                case WinApi.Messages.WM_WINDOWPOSCHANGED:
+                case Window.Msg.WM_WINDOWPOSCHANGED:
                     // the default From handler for this message messes up the restored height/width for non client area window
                     // var newwindowpos = (WinApi.WINDOWPOS) Marshal.PtrToStructure(m.LParam, typeof(WinApi.WINDOWPOS));
                     DefWndProc(ref m);
@@ -304,7 +280,7 @@ namespace Yamui.Framework.Forms {
                     m.Result = IntPtr.Zero;
                     return;
 
-                case WinApi.Messages.WM_ERASEBKGND:
+                case Window.Msg.WM_ERASEBKGND:
                     // https://msdn.microsoft.com/en-us/library/windows/desktop/ms648055(v=vs.85).aspx
                     m.Result = IntPtr.Zero;
                     return;
@@ -342,9 +318,7 @@ namespace Yamui.Framework.Forms {
         }
 
         private bool OnNcCalcSize_ModifyProposedRectangle(ref WinApi.RECT rect) {
-            var wp = GetWindowPlacement();
-            // would be cool to find a better way to know if we are maximized
-            if (wp.showCmd == (int) WinApi.ShowWindowStyle.SW_SHOWMAXIMIZED) {
+            if (IsMaximized) {
                 var s = Screen.FromHandle(Handle);
                 // the proposed rect is the maximized position/size that window suggest using the "out of screen" borders
                 // we change that here
@@ -365,33 +339,23 @@ namespace Yamui.Framework.Forms {
             int uCol = 1;
 
             // Determine if the point is at the top or bottom of the window
-            if (cursorLocation.Y >= 0 && cursorLocation.Y <= NonClientAreaPadding.Top) {
-                resizeBorder = cursorLocation.Y <= ResizeHitDetectionSize;
+            if (cursorLocation.Y >= 0 && cursorLocation.Y <= TitleBarHeight) {
+                resizeBorder = cursorLocation.Y <= NonClientAreaPadding.Top;
                 uRow = 0;
-            } else if (cursorLocation.Y <= Height && cursorLocation.Y >= Height - ResizeHitDetectionSize) {
+            } else if (cursorLocation.Y <= Height && cursorLocation.Y >= Height - NonClientAreaPadding.Bottom) {
                 uRow = 2;
             }
 
             // Determine if the point is at the left or right of the window
-            if (cursorLocation.X >= 0 && cursorLocation.X <= ResizeHitDetectionSize) {
+            if (cursorLocation.X >= 0 && cursorLocation.X <= NonClientAreaPadding.Left) {
                 uCol = 0;
-            } else if (cursorLocation.X <= Width && cursorLocation.X >= Width - ResizeHitDetectionSize) {
+            } else if (cursorLocation.X <= Width && cursorLocation.X >= Width - NonClientAreaPadding.Right) {
                 uCol = 2;
+            } else if (uRow == 0 && (!resizeBorder || WindowState == FormWindowState.Maximized)) {
+                return WinApi.HitTest.HTCAPTION;
             }
 
-            var hitTests = new[] {
-                new[] {
-                    WinApi.HitTest.HTTOPLEFT, resizeBorder && WindowState != FormWindowState.Maximized ? WinApi.HitTest.HTTOP : WinApi.HitTest.HTCAPTION, WinApi.HitTest.HTTOPRIGHT
-                },
-                new[] {
-                    WinApi.HitTest.HTLEFT, WinApi.HitTest.HTNOWHERE, WinApi.HitTest.HTRIGHT
-                },
-                new[] {
-                    WinApi.HitTest.HTBOTTOMLEFT, WinApi.HitTest.HTBOTTOM, WinApi.HitTest.HTBOTTOMRIGHT
-                },
-            };
-
-            return hitTests[uRow][uCol];
+            return _hitTests[uRow][uCol];
 
         }
 
@@ -518,7 +482,7 @@ namespace Yamui.Framework.Forms {
         /// <summary>
         /// Set/get current window exstyle
         /// </summary>
-        protected WinApi.WindowStylesEx WindowEStyle {
+        protected WinApi.WindowStylesEx WindowExStyle {
             get { return (WinApi.WindowStylesEx) unchecked((int) (long) WinApi.GetWindowLong(new HandleRef(this, Handle), WinApi.WindowLongParam.GWL_EXSTYLE)); }
             set { WinApi.SetWindowLong(new HandleRef(this, Handle), WinApi.WindowLongParam.GWL_EXSTYLE, new HandleRef(null, (IntPtr) (int) value)); }
         }
