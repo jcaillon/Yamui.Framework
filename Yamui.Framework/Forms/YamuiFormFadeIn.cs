@@ -37,6 +37,8 @@ namespace Yamui.Framework.Forms {
 
         #endregion
 
+        public YamuiFormFadeIn() : base(0) { }
+
         #region Field
 
         /// <summary>

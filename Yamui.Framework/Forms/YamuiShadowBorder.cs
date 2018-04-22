@@ -13,10 +13,10 @@ namespace Yamui.Framework.Forms {
     /// A SideGlow window is a layered window that
     /// renders the "glowing effect" on one of the sides
     /// </summary>
-    /// <remarks>https://msdn.microsoft.com/en-us/library/windows/desktop/ms633556(v=vs.85).aspx?f=255&MSPPError=-2147217396</remarks>
+    /// <remarks>https://msdn.microsoft.com/en-us/library/windows/desktop/ms633556(v=vs.85).aspx</remarks>
     /// <remarks>http://www.nuonsoft.com/blog/2009/05/27/how-to-use-updatelayeredwindow/</remarks>
     /// <remarks>http://simostro.synology.me/simone/2016/04/04/glow-window-effect/</remarks>
-    internal class YamuiShadowBorder : IDisposable, IWin32Window {
+    public class YamuiShadowBorder : IDisposable, IWin32Window {
         #region private
 
         private const int Thickness = 12;
@@ -31,7 +31,6 @@ namespace Yamui.Framework.Forms {
         private WinApi.WndProcHandler _wndProcDelegate;
         
         private readonly DockStyle _side;
-        private const WinApi.SetWindowPosFlags NoSizeNoMove = WinApi.SetWindowPosFlags.SWP_NOSIZE | WinApi.SetWindowPosFlags.SWP_NOMOVE;
 
         private bool _parentWindowIsFocused;
         private Color _activeColor;
@@ -40,14 +39,17 @@ namespace Yamui.Framework.Forms {
 
         private WinApi.WNDCLASS _windowClass;
         private bool _registeredClass;
-        private bool _suspendedRender;
         private bool _visible;
 
+        #endregion
+
+        #region Properties
+
         public Point Location { get; private set; }
+
         public Size Size { get; private set; }
         
-
-        internal Color InactiveColor {
+        public Color InactiveColor {
             get { return _inactiveColor; }
             set {
                 _inactiveColor = value;
@@ -55,7 +57,7 @@ namespace Yamui.Framework.Forms {
             }
         }
 
-        internal Color ActiveColor {
+        public Color ActiveColor {
             get { return _activeColor; }
             set {
                 _activeColor = value;
@@ -65,20 +67,20 @@ namespace Yamui.Framework.Forms {
 
         public IntPtr Handle { get; private set; }
 
-        internal bool ParentWindowIsFocused {
+        public bool ParentWindowIsFocused {
             set {
-                _parentWindowIsFocused = value;
-                Render();
+                if (_parentWindowIsFocused != value) {
+                    _parentWindowIsFocused = value;
+                    Render();
+                }
             }
         }
 
-        internal bool IsTopMost { get; set; }
-
-        internal void Show(bool show) {
-            if (_visible == show)
-                return;
-            _visible = show;
-            WinApi.ShowWindow(new HandleRef(this, Handle), show ? WinApi.ShowWindowStyle.SW_SHOWNOACTIVATE : WinApi.ShowWindowStyle.SW_HIDE);
+        public void Show(bool show) {
+            if (_visible != show) {
+                _visible = show;
+                WinApi.ShowWindow(new HandleRef(this, Handle), show ? WinApi.ShowWindowStyle.SW_SHOWNOACTIVATE : WinApi.ShowWindowStyle.SW_HIDE);
+            }
         }
 
         #endregion
@@ -96,73 +98,81 @@ namespace Yamui.Framework.Forms {
 
 
         #endregion
-
-        #region internal
-
-        public void SuspendRender() {
-            _suspendedRender = true;
-        }
-
-        public void ResumeRender(bool renderNow) {
-            _suspendedRender = false;
-            if (renderNow) {
-                Render();
-            }
-        }
         
-        public void SetSize(int width, int height) {
-            if (_side == DockStyle.Top || _side == DockStyle.Bottom) {
-                height = Thickness;
-                width = width + Thickness * 2;
-            } else {
-                width = Thickness;
-                height = height + Thickness * 2;
-            }
+        #region Dispose
 
-            Size = new Size(width, height);
-
-            if (!_suspendedRender) {
-                WinApi.SetWindowPos(Handle, WinApi.SpecialWindowHandles.HWND_NOTOPMOST, 0, 0, width, height, WinApi.SetWindowPosFlags.SWP_NOMOVE | WinApi.SetWindowPosFlags.SWP_NOACTIVATE);
-                Render();
-            }
+        public void Dispose() {
+            if (_disposed) 
+                return;
+            _disposed = true;
+            if (Handle == IntPtr.Zero) 
+                return;
+            WinApi.DestroyWindow(new HandleRef(this, Handle));
+            Handle = IntPtr.Zero;
+            GC.SuppressFinalize(this);
         }
 
-        public void SetLocation(WinApi.WINDOWPOS pos) {
-            int left = 0;
-            int top = 0;
+        #endregion
+
+        #region public
+
+        public void SetLocationAndSize(int left, int top, int width, int height) {
             switch (_side) {
                 case DockStyle.Top:
-                    left = pos.x - Thickness;
-                    top = pos.y - Thickness;
+                    left = left - Thickness;
+                    top = top - Thickness;
                     break;
                 case DockStyle.Bottom:
-                    left = pos.x - Thickness;
-                    top = pos.y + pos.cy;
+                    left = left - Thickness;
+                    top = top + height;
                     break;
                 case DockStyle.Left:
-                    left = pos.x - Thickness;
-                    top = pos.y - Thickness;
+                    left = left - Thickness;
+                    top = top - Thickness;
                     break;
                 case DockStyle.Right:
-                    left = pos.x + pos.cx;
-                    top = pos.y - Thickness;
+                    left = left + width;
+                    top = top - Thickness;
+                    break;
+            }
+            switch (_side) {
+                case DockStyle.Top:
+                case DockStyle.Bottom:
+                    height = Thickness;
+                    width = width + Thickness * 2;
+                    break;
+                default:
+                    width = Thickness;
+                    height = height + Thickness * 2;
                     break;
             }
 
-            Location = new Point(left, top);
+            var locationHasChanged = false;
+            if (left != Location.X || top != Location.Y) {
+                Location = new Point(left, top);
+                locationHasChanged = true;
+            }
 
-            //WinApi.SetWindowPos(Handle, !IsTopMost ? WinApi.SpecialWindowHandles.HWND_NOTOPMOST : WinApi.SpecialWindowHandles.HWND_TOPMOST, left, top, 0, 0, WinApi.SetWindowPosFlags.SWP_NOSIZE | WinApi.SetWindowPosFlags.SWP_NOACTIVATE);
-            if (!_suspendedRender) {
+            var sizeHasChanged = false;
+            if (width != Size.Width || height != Size.Height) {
+                Size = new Size(width, height);
+                sizeHasChanged = true;
+            }
+
+            if (locationHasChanged && sizeHasChanged) {
+                WinApi.SetWindowPos(Handle, _parentHandle, left, top, width, height, WinApi.SetWindowPosFlags.SWP_NOACTIVATE);
+            } else if (sizeHasChanged) {
+                WinApi.SetWindowPos(Handle, _parentHandle, 0, 0, width, height, WinApi.SetWindowPosFlags.SWP_NOMOVE | WinApi.SetWindowPosFlags.SWP_NOACTIVATE);
+            } else if (locationHasChanged) {
                 WinApi.SetWindowPos(Handle, _parentHandle, left, top, 0, 0, WinApi.SetWindowPosFlags.SWP_NOSIZE | WinApi.SetWindowPosFlags.SWP_NOACTIVATE);
+            }
+            
+            if (sizeHasChanged) {
+                Render();
             }
         }
 
-        internal void UpdateZOrder() {
-            //WinApi.SetWindowPos(Handle, !IsTopMost ? WinApi.SpecialWindowHandles.HWND_NOTOPMOST : WinApi.SpecialWindowHandles.HWND_TOPMOST, 0, 0, 0, 0, NoSizeNoMove | WinApi.SetWindowPosFlags.SWP_NOACTIVATE);
-            WinApi.SetWindowPos(Handle, _parentHandle, 0, 0, 0, 0, NoSizeNoMove | WinApi.SetWindowPosFlags.SWP_NOACTIVATE);
-        }
-        
-        internal void Close() {
+        public void Close() {
             WinApi.CloseWindow(Handle);
             if (Handle != IntPtr.Zero) {
                 WinApi.DestroyWindow(new HandleRef(this, Handle));
@@ -233,9 +243,6 @@ namespace Yamui.Framework.Forms {
         }
 
         private void Render() {
-            if (_suspendedRender)
-                return;
-
             var screenDc = WinApi.GetDC(WinApi.NullHandleRef);
             if (screenDc == IntPtr.Zero) {
                 return;
@@ -267,7 +274,7 @@ namespace Yamui.Framework.Forms {
             }
         }
 
-        public Bitmap GetWindowBitmap(int width, int height) {
+        private Bitmap GetWindowBitmap(int width, int height) {
             Bitmap bmp;
             switch (_side) {
                 case DockStyle.Top:
@@ -317,21 +324,6 @@ namespace Yamui.Framework.Forms {
         }
 
         
-        #endregion
-
-        #region Dispose
-
-        public void Dispose() {
-            if (_disposed) 
-                return;
-            _disposed = true;
-            if (Handle == IntPtr.Zero) 
-                return;
-            WinApi.DestroyWindow(new HandleRef(this, Handle));
-            Handle = IntPtr.Zero;
-            GC.SuppressFinalize(this);
-        }
-
         #endregion
 
     }

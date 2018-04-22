@@ -28,13 +28,14 @@ using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Yamui.Framework.Helper;
+using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Forms {
 
     /// <summary>
     /// Form class that implements interesting utilities + shadow + onpaint + movable borderless
     /// </summary>
-    public class YamuiFormShadow : YamuiForm {
+    public abstract class YamuiFormShadow : YamuiForm {
 
         private readonly List<YamuiShadowBorder> _glows = new List<YamuiShadowBorder>();
         private WinApi.WINDOWPOS _lastLocation;
@@ -45,17 +46,39 @@ namespace Yamui.Framework.Forms {
         public bool HasShadow { get; }
 
         [Browsable(false)]
-        public Color BorderActiveColor => Color.FromArgb(0, 122, 204);
+        public bool HasDropShadow { get; }
 
         [Browsable(false)]
-        public Color BorderInactiveColor => Color.FromArgb(66, 66, 69);
+        public Color BorderActiveColor => YamuiThemeManager.Current.AccentColor;
+
+        [Browsable(false)]
+        public Color BorderInactiveColor => YamuiThemeManager.Current.FormBorder;
 
         #endregion
 
         #region Life and death
 
-        public YamuiFormShadow(YamuiFormOption formOptions) {
+        protected override CreateParams CreateParams {
+            get {
+                var cp = base.CreateParams;
+
+                if (DesignMode)
+                    return cp;
+
+                if (HasDropShadow) {
+                    cp.ClassStyle = (int) WinApi.WindowClassStyles.DropShadow;
+                }
+
+                return cp;
+            }
+        }
+
+        protected YamuiFormShadow(YamuiFormOption formOptions) : base(formOptions) {
             HasShadow = formOptions.HasFlag(YamuiFormOption.WithShadow);
+            HasDropShadow = formOptions.HasFlag(YamuiFormOption.WithDropShadow);
+            if (HasDropShadow) {
+                HasShadow = false;
+            }
         }
 
         private bool _isDisposed;
@@ -82,8 +105,7 @@ namespace Yamui.Framework.Forms {
 
             switch ((Window.Msg) m.Msg) {
                 case Window.Msg.WM_SYSCOMMAND:
-                    var sc = (int) m.WParam;
-                    switch ((WinApi.SysCommands) sc) {
+                    switch ((WinApi.SysCommands) m.WParam) {
                         case WinApi.SysCommands.SC_RESTORE:
                         case WinApi.SysCommands.SC_RESTOREDBLCLICK:
                             // we have to handle this restore to not have the normal restore animation on the window
@@ -102,15 +124,6 @@ namespace Yamui.Framework.Forms {
                             break;
                     }
                     break;
-
-                case Window.Msg.WM_ENTERSIZEMOVE:
-                    // Useful if your window contents are dependent on window size but expensive to compute, as they give you a way to defer paints until the end of the resize action. We found WM_WINDOWPOSCHANGING/ED wasn’t reliable for that purpose.
-                    //Show(false);
-                    break;
-
-                case Window.Msg.WM_EXITSIZEMOVE:
-                    //Show(true);
-                    break;
                     
                 case Window.Msg.WM_ACTIVATEAPP:
                     UpdateFocus((int) m.WParam != 0);
@@ -121,12 +134,8 @@ namespace Yamui.Framework.Forms {
                     break;
 
                 case Window.Msg.WM_WINDOWPOSCHANGED:
-                    // the default From handler for this message messes up the restored height/width for non client area window
-                    // var newwindowpos = (WinApi.WINDOWPOS) Marshal.PtrToStructure(m.LParam, typeof(WinApi.WINDOWPOS));
                     _lastLocation = (WinApi.WINDOWPOS) Marshal.PtrToStructure(m.LParam, typeof(WinApi.WINDOWPOS));
-                    UpdateLocations(_lastLocation);
-                    UpdateSizes(_lastLocation.cx, _lastLocation.cy);
-                    // TODO hide on maximize
+                    UpdateLocationAndSize(_lastLocation);
                     break;
 
                 case Window.Msg.WM_CREATE:
@@ -138,16 +147,16 @@ namespace Yamui.Framework.Forms {
         }
 
         protected override void OnPaint(PaintEventArgs e) {
-            using (var b = new SolidBrush(Color.Black)) {
+            using (var b = new SolidBrush(YamuiThemeManager.Current.FormBack)) {
                 e.Graphics.FillRectangle(b, ClientRectangle);
             }
             // draw the border with Style color
             // var borderColor = YamuiThemeManager.Current.FormBorder;
-            var rect2 = new Rectangle(0, 0, ClientRectangle.Width - 1, ClientRectangle.Height - 1);
-            using (var pen2 = new Pen(IsActive ? BorderActiveColor : BorderInactiveColor, BorderWidth) {
+            var borderRect = new Rectangle(0, 0, ClientRectangle.Width - 1, ClientRectangle.Height - 1);
+            using (var p = new Pen(IsActive ? BorderActiveColor : BorderInactiveColor, BorderWidth) {
                 Alignment = PenAlignment.Inset
             }) {
-                e.Graphics.DrawRectangle(pen2, rect2);
+                e.Graphics.DrawRectangle(p, borderRect);
             }
         }
         
@@ -159,22 +168,6 @@ namespace Yamui.Framework.Forms {
             _glows.Add(new YamuiShadowBorder(DockStyle.Left, Handle, BorderActiveColor, BorderInactiveColor));
             _glows.Add(new YamuiShadowBorder(DockStyle.Bottom, Handle, BorderActiveColor, BorderInactiveColor));
             _glows.Add(new YamuiShadowBorder(DockStyle.Right, Handle, BorderActiveColor, BorderInactiveColor));
-
-            var pos = new WinApi.WINDOWPOS {
-                x = Left,
-                y = Top,
-                cx = Width,
-                cy = Height,
-                flags = WinApi.SetWindowPosFlags.SWP_SHOWWINDOW
-            };
-            foreach (var yamuiShadowBorder in _glows) {
-
-                yamuiShadowBorder.SuspendRender();
-                yamuiShadowBorder.SetLocation(pos);
-                yamuiShadowBorder.SetSize(Width, Height);
-                yamuiShadowBorder.ParentWindowIsFocused = IsActive;
-                yamuiShadowBorder.ResumeRender(false);
-            }
         }
         
         private void CloseGlows() {
@@ -191,35 +184,23 @@ namespace Yamui.Framework.Forms {
             }
         }
 
-        private void UpdateBordersZOrder() {
-            foreach (YamuiShadowBorder sideGlow in _glows) {
-                sideGlow.UpdateZOrder();
-            }
-        }
-
         private void UpdateFocus(bool isFocused) {
             foreach (YamuiShadowBorder sideGlow in _glows) {
                 sideGlow.ParentWindowIsFocused = isFocused;
             }
         }
-
-        private void UpdateSizes(int width, int height) {
+        
+        private void UpdateLocationAndSize(WinApi.WINDOWPOS pos) {
             var isMaximized = IsMaximized;
             foreach (YamuiShadowBorder sideGlow in _glows) {
-                sideGlow.Show(!isMaximized);
-                sideGlow.SetSize(width, height);
+                sideGlow.SetLocationAndSize(pos.x, pos.y, pos.cx, pos.cy);
             }
-        }
-
-        private void UpdateLocations(WinApi.WINDOWPOS location) {
-            foreach (YamuiShadowBorder sideGlow in _glows) {
-                sideGlow.SetLocation(location);
-            }
-            if (((int) location.flags & (int) WinApi.SetWindowPosFlags.SWP_HIDEWINDOW) != 0) {
+            if (((int) pos.flags & (int) WinApi.SetWindowPosFlags.SWP_HIDEWINDOW) != 0) {
                 Show(false);
-            } else if (((int) location.flags & (int) WinApi.SetWindowPosFlags.SWP_SHOWWINDOW) != 0) {
-                Show(true);
-                UpdateBordersZOrder();
+            } else if (((int) pos.flags & (int) WinApi.SetWindowPosFlags.SWP_SHOWWINDOW) != 0) {
+                Show(!isMaximized);
+            } else if (Visible) {
+                Show(!isMaximized);
             }
         }
     }

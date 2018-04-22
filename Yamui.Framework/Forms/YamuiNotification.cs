@@ -93,7 +93,7 @@ namespace Yamui.Framework.Forms {
         /// <summary>
         /// Create a new notification, to be displayed with Show() later
         /// </summary>
-        public YamuiNotification(string htmlTitle, string htmlMessage, int duration, Screen screenToUse = null, int formMinWidth = 0, int formMaxWidth = 0, int formMaxHeight = 0, EventHandler<HtmlLinkClickedEventArgs> onLinkClicked = null) {
+        public YamuiNotification(string htmlTitle, string htmlMessage, int duration, Screen screenToUse = null, int formMinWidth = 0, int formMaxWidth = 0, int formMaxHeight = 0, EventHandler<HtmlLinkClickedEventArgs> onLinkClicked = null) : base() {
 
             // close all notif button
             CloseAllBox = true;

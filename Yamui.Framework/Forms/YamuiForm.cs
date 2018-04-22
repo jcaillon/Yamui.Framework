@@ -87,6 +87,28 @@ namespace Yamui.Framework.Forms {
         [Browsable(false)]
         protected bool IsMaximized => GetWindowPlacement().showCmd == WinApi.ShowWindowStyle.SW_SHOWMAXIMIZED;
 
+        [Browsable(false)]
+        public bool AlwaysOnTop { get; }
+
+        [Browsable(false)]
+        public bool IsPopup { get; }
+
+        [Browsable(false)]
+        public bool DontShowInAltTab { get; }
+
+        [Browsable(false)]
+        public bool DontActivateOnShow { get; }
+
+        [Browsable(false)]
+        public bool Unselectable { get; }
+
+        /// <summary>
+        /// This indicates that the form should not take focus when shown
+        /// </summary>
+        protected override bool ShowWithoutActivation {
+            get { return DontActivateOnShow; }
+        }
+
         #endregion
 
         #region constructor
@@ -98,29 +120,50 @@ namespace Yamui.Framework.Forms {
                 if (DesignMode)
                     return cp;
 
-                // below is what makes the windows borderless but resizable
-                cp.Style = (int) (WinApi.WindowStyles.WS_CAPTION // enables aero minimize animation/transition
-                    | WinApi.WindowStyles.WS_CLIPCHILDREN
-                    | WinApi.WindowStyles.WS_CLIPSIBLINGS
-                    | WinApi.WindowStyles.WS_OVERLAPPED
-                    | WinApi.WindowStyles.WS_SYSMENU // enables the context menu with the move, close, maximize, minize... commands (shift + right-click on the task bar item)
-                    | WinApi.WindowStyles.WS_MINIMIZEBOX // need to be able to minimize from taskbar
-                    | WinApi.WindowStyles.WS_MAXIMIZEBOX // same for maximize
-                    | WinApi.WindowStyles.WS_THICKFRAME); // without this the window cannot be resized and so aero snap, de-maximizing and minimizing won't work
+                if (IsPopup) {
+                    cp.Style = (int) WinApi.WindowStyles.WS_POPUP;
+                    cp.ExStyle = (int) (WinApi.WindowStylesEx.WS_EX_COMPOSITED
+                        | WinApi.WindowStylesEx.WS_EX_LEFT
+                        | WinApi.WindowStylesEx.WS_EX_LTRREADING);
+                } else {
+                    // below is what makes the windows borderless but resizable
+                    cp.Style = (int) (WinApi.WindowStyles.WS_CAPTION // enables aero minimize animation/transition
+                        | WinApi.WindowStyles.WS_CLIPCHILDREN
+                        | WinApi.WindowStyles.WS_CLIPSIBLINGS
+                        | WinApi.WindowStyles.WS_OVERLAPPED
+                        | WinApi.WindowStyles.WS_SYSMENU // enables the context menu with the move, close, maximize, minize... commands (shift + right-click on the task bar item)
+                        | WinApi.WindowStyles.WS_MINIMIZEBOX // need to be able to minimize from taskbar
+                        | WinApi.WindowStyles.WS_MAXIMIZEBOX // same for maximize
+                        | WinApi.WindowStyles.WS_THICKFRAME); // without this the window cannot be resized and so aero snap, de-maximizing and minimizing won't work
 
-                cp.ExStyle = (int) (WinApi.WindowStylesEx.WS_EX_COMPOSITED
-                    | WinApi.WindowStylesEx.WS_EX_LEFT
-                    | WinApi.WindowStylesEx.WS_EX_LTRREADING
-                    | WinApi.WindowStylesEx.WS_EX_APPWINDOW
-                    | WinApi.WindowStylesEx.WS_EX_WINDOWEDGE);
-                    
+                    cp.ExStyle = (int) (WinApi.WindowStylesEx.WS_EX_COMPOSITED
+                        | WinApi.WindowStylesEx.WS_EX_LEFT
+                        | WinApi.WindowStylesEx.WS_EX_LTRREADING
+                        | WinApi.WindowStylesEx.WS_EX_APPWINDOW
+                        | WinApi.WindowStylesEx.WS_EX_WINDOWEDGE);
+                }
+
+                if (DontShowInAltTab) {
+                    cp.ExStyle = cp.ExStyle | (int) WinApi.WindowStylesEx.WS_EX_TOOLWINDOW;
+                }
+
+                if (AlwaysOnTop) {
+                    cp.ExStyle = cp.ExStyle | (int) WinApi.WindowStylesEx.WS_EX_TOPMOST;
+                }
+
+                if (Unselectable) {
+                    cp.ExStyle = cp.ExStyle | (int) WinApi.WindowStylesEx.WS_EX_TRANSPARENT;
+                    cp.ExStyle = cp.ExStyle | (int) WinApi.WindowStylesEx.WS_EX_NOACTIVATE;
+                    cp.Style = cp.Style | (int) WinApi.WindowStyles.WS_DISABLED;
+                }
+                
                 cp.ClassStyle = 0;
 
                 return cp;
             }
         }
 
-        protected YamuiForm() {
+        protected YamuiForm(YamuiFormOption formOptions) {
             // why those styles? check here: 
             // https://sites.google.com/site/craigandera/craigs-stuff/windows-forms/flicker-free-control-drawing
             SetStyle(
@@ -141,21 +184,36 @@ namespace Yamui.Framework.Forms {
                     WinApi.HitTest.HTTOPLEFT, WinApi.HitTest.HTTOP, WinApi.HitTest.HTTOPRIGHT
                 },
                 new[] {
-                    WinApi.HitTest.HTLEFT, WinApi.HitTest.HTNOWHERE, WinApi.HitTest.HTRIGHT
+                    WinApi.HitTest.HTLEFT, WinApi.HitTest.HTCLIENT, WinApi.HitTest.HTRIGHT
                 },
                 new[] {
                     WinApi.HitTest.HTBOTTOMLEFT, WinApi.HitTest.HTBOTTOM, WinApi.HitTest.HTBOTTOMRIGHT
                 },
             };
+
+            AlwaysOnTop = formOptions.HasFlag(YamuiFormOption.AlwaysOnTop);
+            IsPopup = formOptions.HasFlag(YamuiFormOption.IsPopup);
+            DontShowInAltTab = formOptions.HasFlag(YamuiFormOption.DontShowInAltTab);
+            DontActivateOnShow = formOptions.HasFlag(YamuiFormOption.DontActivateOnShow);
+            Unselectable = formOptions.HasFlag(YamuiFormOption.Unselectable);
         }
+
+        
 
         #endregion
 
         #region OnPaint
 
         protected override void OnPaint(PaintEventArgs e) {
-            var backColor = YamuiThemeManager.Current.FormBack;
-            e.Graphics.Clear(backColor);
+            using (var b = new SolidBrush(YamuiThemeManager.Current.FormBack)) {
+                e.Graphics.FillRectangle(b, ClientRectangle);
+            }
+            var borderRect = new Rectangle(0, 0, ClientRectangle.Width - 1, ClientRectangle.Height - 1);
+            using (var p = new Pen(YamuiThemeManager.Current.FormBorder, BorderWidth) {
+                Alignment = PenAlignment.Inset
+            }) {
+                e.Graphics.DrawRectangle(p, borderRect);
+            }
         }
 
         #endregion
@@ -171,8 +229,7 @@ namespace Yamui.Framework.Forms {
             switch ((Window.Msg) m.Msg) {
 
                 case Window.Msg.WM_SYSCOMMAND:
-                    var sc = (int) m.WParam;
-                    switch ((WinApi.SysCommands) sc) {
+                    switch ((WinApi.SysCommands) m.WParam) {
                         // prevent the window from moving
                         case WinApi.SysCommands.SC_MOVE:
                             if (!Movable)

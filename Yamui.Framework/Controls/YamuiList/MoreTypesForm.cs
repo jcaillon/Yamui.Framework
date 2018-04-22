@@ -55,7 +55,7 @@ namespace Yamui.Framework.Controls.YamuiList {
 
         #region Life and death
 
-        public MoreTypesForm() {
+        public MoreTypesForm() : base(0) {
             // init menu form
             SetStyle(
                 ControlStyles.OptimizedDoubleBuffer |

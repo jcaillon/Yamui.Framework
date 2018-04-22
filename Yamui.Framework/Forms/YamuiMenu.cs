@@ -139,7 +139,7 @@ namespace Yamui.Framework.Forms {
 
         #region Life and death
 
-        public YamuiMenu() {
+        public YamuiMenu() : base(0) {
             YamuiList = new YamuiFilteredTypeTreeListForMenuPopup();
             FilterBox = new YamuiFilterBox();
         }

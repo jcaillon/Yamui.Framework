@@ -105,7 +105,7 @@ namespace Yamui.Framework.Forms {
 
         #region Life and death
 
-        public YamuiWaterfallMenu(Point location, List<YamuiMenuItem> content, string htmlTitle = null, int minSize = 150) {
+        public YamuiWaterfallMenu(Point location, List<YamuiMenuItem> content, string htmlTitle = null, int minSize = 150) : base(0) {
             if (content == null || content.Count == 0)
                 content = new List<YamuiMenuItem> {new YamuiMenuItem {DisplayText = "Empty", IsDisabled = true}};
 
