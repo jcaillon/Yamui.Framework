@@ -1,4 +1,5 @@
 ﻿#region header
+
 // ========================================================================
 // Copyright (c) 2018 - Julien Caillon (julien.caillon@gmail.com)
 // This file (YamuiFormBaseFadeIn.cs) is part of YamuiFramework.
@@ -16,6 +17,7 @@
 // You should have received a copy of the GNU General Public License
 // along with YamuiFramework. If not, see <http://www.gnu.org/licenses/>.
 // ========================================================================
+
 #endregion
 
 using System;
@@ -27,8 +29,7 @@ namespace Yamui.Framework.Forms {
     /// <summary>
     /// Form class that adds a fade in/out animation on form show/close
     /// </summary>
-    public class YamuiFormFadeIn : YamuiForm {
-
+    public abstract class YamuiFormFadeIn : YamuiFormShadow {
         #region Private
 
         private bool _closingAnimationOnGoing;
@@ -37,7 +38,11 @@ namespace Yamui.Framework.Forms {
 
         #endregion
 
-        public YamuiFormFadeIn() : base(0) { }
+        #region Life and death
+
+        protected YamuiFormFadeIn(YamuiFormOption formOptions) : base(formOptions) { }
+
+        #endregion
 
         #region Field
 
@@ -55,15 +60,15 @@ namespace Yamui.Framework.Forms {
         public virtual double AnimationOpacity {
             get { return Opacity; }
             set {
-                if (value < 0) {
-                    try {
+                try {
+                    if (value < 0) {
                         Close();
-                    } catch (Exception) {
-                        // ignored
+                        return;
                     }
-                    return;
+                    Opacity = value;
+                } catch (Exception) {
+                    // ignored
                 }
-                Opacity = value;
             }
         }
 

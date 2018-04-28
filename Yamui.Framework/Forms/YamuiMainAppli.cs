@@ -58,9 +58,8 @@ namespace Yamui.Framework.Forms {
 
         #region Constructor / destructor
 
-        public YamuiMainAppli() {
+        public YamuiMainAppli() : base(YamuiFormOption.WithShadow) {
             StartPosition = FormStartPosition.CenterScreen;
-            TransparencyKey = Color.Fuchsia;
         }
 
         #endregion
@@ -293,7 +292,6 @@ namespace Yamui.Framework.Forms {
 
         #region Methods
 
-        [SecuritySafeCritical]
         public bool FocusMe() {
             return WinApi.SetForegroundWindow(Handle);
         }

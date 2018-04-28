@@ -75,7 +75,7 @@ namespace Yamui.Framework.Forms {
         /// <summary>
         /// Constructor, you should the method ShwDlg instead
         /// </summary>
-        private YamuiInput(string htmlTitle, string htmlMessage, List<string> buttonsList, object dataObject, int formMaxWidth, int formMaxHeight, int formMinWidth, EventHandler<HtmlLinkClickedEventArgs> onLinkClicked) {
+        private YamuiInput(string htmlTitle, string htmlMessage, List<string> buttonsList, object dataObject, int formMaxWidth, int formMaxHeight, int formMinWidth, EventHandler<HtmlLinkClickedEventArgs> onLinkClicked) : base(YamuiFormOption.WithShadow) {
             InitializeComponent();
 
             _tooltip = new HtmlToolTip();
@@ -442,7 +442,7 @@ namespace Yamui.Framework.Forms {
             // we either display a modal or a normal messagebox
             if (waitResponse) {
                 if (yamuiForm != null)
-                    yamuiForm.HasModalOpened = true;
+                    //yamuiForm.HasModalOpened = true;
 
                 msgBox.ShowDialog(new WindowWrapper(ownerHandle));
 
@@ -450,7 +450,7 @@ namespace Yamui.Framework.Forms {
                     data = msgBox.DataObject;
 
                 if (yamuiForm != null)
-                    yamuiForm.HasModalOpened = false;
+                    //yamuiForm.HasModalOpened = false;
 
                 msgBox.Dispose();
 

@@ -22,7 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Yamui.Framework.Helper;
 using Yamui.Framework.HtmlRenderer.WinForms;
@@ -33,7 +33,7 @@ namespace Yamui.Framework.Forms {
     /// <summary>
     /// Form class that adds the top right buttons + resize
     /// </summary>
-    public class YamuiFormButtons : YamuiFormFadeIn {
+    public abstract class YamuiFormButtons : YamuiFormFadeIn {
 
         #region constants
 
@@ -49,12 +49,16 @@ namespace Yamui.Framework.Forms {
         /// </summary>
         private HtmlToolTip _mainFormToolTip = new HtmlToolTip();
 
-        private Dictionary<WindowButtons, YamuiFormButton> _windowButtonList;
-        private int _captionBarHeight = FormButtonWidth + BorderWidth;
+        private Dictionary<WindowButtons, YamuiFormButton> _windowButtonList = new Dictionary<WindowButtons, YamuiFormButton>();
+
+        private YamuiFormResizeIcon _resizeIcon = new YamuiFormResizeIcon();
 
         #endregion
 
         #region Properties
+
+        [Browsable(false)]
+        public override int TitleBarHeight => 25;
 
         /// <summary>
         /// Set this to true to show the "close all notifications button",
@@ -69,37 +73,30 @@ namespace Yamui.Framework.Forms {
         /// Action to do when the user click the button
         /// </summary>
         [Browsable(false)]
-        public Action OnCloseAllNotif { get; set; }
-
-        /// <summary>
-        /// Height of the caption bar (what should be the title bar in a normal window)
-        /// the caption bar is sensitive to double click which maximize/reduce the window
-        /// </summary>
-        public int CaptionBarHeight {
-            get { return _captionBarHeight; }
-            set { _captionBarHeight = value; }
-        }
+        public EventHandler OnCloseAllNotif { get; set; }
 
         protected override Padding DefaultPadding {
             get { return new Padding(BorderWidth, 20, BorderWidth + ResizeIconSize, BorderWidth + ResizeIconSize); }
         }
-
+        
         #endregion
 
         #region Enum
 
-        private enum WindowButtons {
-            Minimize,
+        internal enum WindowButtons : byte {
+            Minimize = 0,
             Maximize,
+            CloseAllVisible,
             Close,
-            CloseAllVisible
+
+            Restore = 10,
         }
 
         #endregion
 
         #region Constructor
 
-        public YamuiFormButtons() {
+        protected YamuiFormButtons(YamuiFormOption options) : base(options) {
             _mainFormToolTip.ShowAlways = true;
         }
 
@@ -109,21 +106,22 @@ namespace Yamui.Framework.Forms {
 
         protected override void OnPaint(PaintEventArgs e) {
             base.OnPaint(e);
+            if (DesignMode) {
+                return;
+            }
 
             // draw the resize pixels icon on the bottom right
-            var foreColor = YamuiThemeManager.Current.FormFore;
             if (Resizable) {
-                using (var b = new SolidBrush(foreColor)) {
-                    var resizeHandleSize = new Size(2, 2);
-                    e.Graphics.FillRectangles(b, new[] {
-                        new Rectangle(new Point(ClientRectangle.Width - 6, ClientRectangle.Height - 6), resizeHandleSize),
-                        new Rectangle(new Point(ClientRectangle.Width - 10, ClientRectangle.Height - 10), resizeHandleSize),
-                        new Rectangle(new Point(ClientRectangle.Width - 10, ClientRectangle.Height - 6), resizeHandleSize),
-                        new Rectangle(new Point(ClientRectangle.Width - 6, ClientRectangle.Height - 10), resizeHandleSize),
-                        new Rectangle(new Point(ClientRectangle.Width - 14, ClientRectangle.Height - 6), resizeHandleSize),
-                        new Rectangle(new Point(ClientRectangle.Width - 6, ClientRectangle.Height - 14), resizeHandleSize)
-                    });
-                }
+                _resizeIcon.ClientRectangle = new Rectangle(ClientRectangle.Right - ResizeIconSize, ClientRectangle.Bottom - ResizeIconSize, ResizeIconSize, ResizeIconSize);
+                _resizeIcon.OnPaint(e);
+            }
+
+            if (ControlBox) {
+                int x = ClientRectangle.Width - 1 - FormButtonWidth;
+                DrawButton(ref x, WindowButtons.Close, e, true);
+                DrawButton(ref x, WindowButtons.CloseAllVisible, e, CloseAllBox);
+                DrawButton(ref x, WindowButtons.Maximize, e, MaximizeBox);
+                DrawButton(ref x, WindowButtons.Minimize, e, MinimizeBox);
             }
         }
 
@@ -137,41 +135,85 @@ namespace Yamui.Framework.Forms {
                 return;
             }
 
-            base.WndProc(ref m);
-
-            switch (m.Msg) {
-
-                case (int) Window.Msg.WM_SIZE:
-                    if (_windowButtonList != null) {
-                        YamuiFormButton btn;
-                        _windowButtonList.TryGetValue(WindowButtons.Maximize, out btn);
-                        if (WindowState == FormWindowState.Normal && btn != null)
-                            btn.Text = @"1";
-                        if (WindowState == FormWindowState.Maximized && btn != null)
-                            btn.Text = @"2";
+            switch ((Window.Msg) m.Msg) {
+                case Window.Msg.WM_SIZE:
+                    var state = (WinApi.WmSizeEnum) m.WParam;
+                    switch (state) {
+                        case WinApi.WmSizeEnum.SIZE_RESTORED:
+                            _windowButtonList[WindowButtons.Maximize].Type = WindowButtons.Maximize;
+                            break;
+                        case WinApi.WmSizeEnum.SIZE_MAXIMIZED:
+                        case WinApi.WmSizeEnum.SIZE_MAXSHOW:
+                            _windowButtonList[WindowButtons.Maximize].Type = WindowButtons.Restore;
+                            break;
                     }
                     break;
+
+                case Window.Msg.WM_NCLBUTTONDOWN:
+                    foreach (var formButton in _windowButtonList.Values) {
+                        if (formButton.IsHovered) {
+                            formButton.IsPressed = true;
+                        }
+                    }
+                    break;
+
+                case Window.Msg.WM_NCLBUTTONUP:
+                case Window.Msg.WM_LBUTTONUP:
+                    foreach (var formButton in _windowButtonList.Values) {
+                        if (formButton.IsHovered && formButton.IsPressed) {
+                            OnWindowButtonClick(formButton.Type);
+                        }
+                        formButton.IsPressed = false;
+                    }
+                    break;
+
+                case Window.Msg.WM_NCMOUSELEAVE:
+                    foreach (var formButton in _windowButtonList.Values) {
+                        formButton.IsHovered = false;
+                        formButton.IsPressed = false;
+                    }
+                    break;
+
             }
-        }
-        
-        // test in which part of the form the cursor is in (we return the caption bar if
-        // it's on the top of the window or the resizebottomright when it's on the bottom right), 
-        // allow to be able to maximize the window by double clicking the "title bar" for instance
-        protected override WinApi.HitTest HitTestNca(IntPtr lparam) {
-            var output = base.HitTestNca(lparam);
-            if (output != WinApi.HitTest.HTCLIENT)
-                return output;
 
-            var vPoint = new Point((short) lparam, (short) ((int) lparam >> 16));
-            if (RectangleToScreen(new Rectangle(0, 0, ClientRectangle.Width, CaptionBarHeight)).Contains(vPoint))
-                return WinApi.HitTest.HTCAPTION;
-
-            return WinApi.HitTest.HTCLIENT;
+            base.WndProc(ref m);
         }
 
         #endregion
 
         #region Events
+        
+        /// <remarks>my first idea was to return the correct hittest to let windows handle the click, but it shows the ugly default buttons</remarks>
+        protected override WinApi.HitTest HitTestNca(IntPtr lparam) {
+            var result = base.HitTestNca(lparam);
+
+            if (result == WinApi.HitTest.HTCAPTION) {
+                var cursorLocation = PointToClient(new Point(lparam.ToInt32()));
+                foreach (var yamuiFormButton in _windowButtonList.Values) {
+                    if (cursorLocation.X >= yamuiFormButton.ClientRectangle.Left && cursorLocation.X <= yamuiFormButton.ClientRectangle.Right) {
+                        yamuiFormButton.IsHovered = true;
+                        result = WinApi.HitTest.HTBORDER;
+
+                        // track mouse leaving (otherwise the WM_NCMOUSELEAVE message would not fire)
+                        WinApi.TRACKMOUSEEVENT tme = new WinApi.TRACKMOUSEEVENT();
+                        tme.cbSize = (uint) Marshal.SizeOf(tme);
+                        tme.dwFlags = (uint) (WinApi.TMEFlags.TME_LEAVE | WinApi.TMEFlags.TME_NONCLIENT);
+                        tme.hwndTrack = Handle;
+                        WinApi.TrackMouseEvent(tme);
+                    } else {
+                        yamuiFormButton.IsHovered = false;
+                        yamuiFormButton.IsPressed = false;
+                    }
+                }
+            } else if (result == WinApi.HitTest.HTCLIENT && Resizable) {
+                var cursorLocation2 = PointToClient(new Point(lparam.ToInt32()));
+                if (cursorLocation2.X >= _resizeIcon.ClientRectangle.Left && cursorLocation2.Y >= _resizeIcon.ClientRectangle.Top) {
+                    result = WinApi.HitTest.HTBOTTOMRIGHT;
+                }
+            }
+
+            return result;
+        }
 
         /// <summary>
         /// On load of the form
@@ -194,22 +236,10 @@ namespace Yamui.Framework.Forms {
                     break;
             }
 
-            // display windows buttons
-            if (ControlBox) {
-                AddWindowButton(WindowButtons.Close);
-                if (MaximizeBox)
-                    AddWindowButton(WindowButtons.Maximize);
-                if (MinimizeBox)
-                    AddWindowButton(WindowButtons.Minimize);
-                if (CloseAllBox)
-                    AddWindowButton(WindowButtons.CloseAllVisible);
-                UpdateWindowButtonPosition();
-            }
-        }
-
-        protected override void OnResizeEnd(EventArgs e) {
-            base.OnResizeEnd(e);
-            UpdateWindowButtonPosition();
+            AddWindowButton(WindowButtons.Close);
+            AddWindowButton(WindowButtons.CloseAllVisible);
+            AddWindowButton(WindowButtons.Maximize);  
+            AddWindowButton(WindowButtons.Minimize);
         }
 
         #endregion
@@ -220,52 +250,27 @@ namespace Yamui.Framework.Forms {
         /// Add a particular button on the right top of the form
         /// </summary>
         private void AddWindowButton(WindowButtons button) {
-            if (_windowButtonList == null)
-                _windowButtonList = new Dictionary<WindowButtons, YamuiFormButton>();
-
-            if (_windowButtonList.ContainsKey(button))
-                return;
-
-            var newButton = new YamuiFormButton();
-
-            switch (button) {
-                case WindowButtons.Close:
-                    newButton.Text = @"r";
-                    _mainFormToolTip.SetToolTip(newButton, "<b>Close</b> this window");
-                    break;
-                case WindowButtons.Minimize:
-                    newButton.Text = @"0";
-                    _mainFormToolTip.SetToolTip(newButton, "<b>Minimize</b> this window");
-                    break;
-                case WindowButtons.Maximize:
-                    newButton.Text = WindowState == FormWindowState.Normal ? @"1" : @"2";
-                    _mainFormToolTip.SetToolTip(newButton, "<b>" + (WindowState == FormWindowState.Normal ? "Maximize" : "Restore") + "</b> this window");
-                    break;
-                case WindowButtons.CloseAllVisible:
-                    newButton.Text = ((char) (126)).ToString();
-                    _mainFormToolTip.SetToolTip(newButton, "<b>Close all</b> notification windows");
-                    break;
-            }
-
-            newButton.Tag = button;
-            newButton.Size = new Size(25, 20);
-            newButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            newButton.TabStop = false; //remove the form controls from the tab stop
-            newButton.Click += OnWindowButtonClick;
-            Controls.Add(newButton);
-
+            var newButton = new YamuiFormButton(this) {
+                Type = button,
+            };
             _windowButtonList.Add(button, newButton);
         }
-
+        
+        private void DrawButton(ref int x, WindowButtons buttonType, PaintEventArgs e, bool show) {
+            var button = _windowButtonList[buttonType];
+            button.Show = show;
+            if (show) {
+                button.ClientRectangle = new Rectangle(x, 1, FormButtonWidth, FormButtonWidth - 1);
+                button.OnPaint(e);
+                x -= FormButtonWidth;
+            }
+        }
+        
         /// <summary>
         /// Triggered when a button is clicked
         /// </summary>
-        private void OnWindowButtonClick(object sender, EventArgs e) {
-            var btn = sender as YamuiFormButton;
-            if (btn == null) return;
-            if (((MouseEventArgs) e).Button != MouseButtons.Left) return;
-            var btnFlag = (WindowButtons) btn.Tag;
-            switch (btnFlag) {
+        private void OnWindowButtonClick(WindowButtons type) {
+            switch (type) {
                 case WindowButtons.Close:
                     Close();
                     break;
@@ -273,110 +278,164 @@ namespace Yamui.Framework.Forms {
                     WindowState = FormWindowState.Minimized;
                     break;
                 case WindowButtons.Maximize:
-                    WindowState = WindowState == FormWindowState.Normal ? FormWindowState.Maximized : FormWindowState.Normal;
-                    btn.Text = WindowState == FormWindowState.Normal ? @"1" : @"2";
-                    _mainFormToolTip.SetToolTip(btn, "<b>" + (WindowState == FormWindowState.Normal ? "Maximize" : "Restore") + "</b> this window");
+                    WindowState = FormWindowState.Maximized;
+                    break;
+                case WindowButtons.Restore:
+                    WindowState = FormWindowState.Normal;
                     break;
                 case WindowButtons.CloseAllVisible:
-                    if (OnCloseAllNotif != null)
-                        OnCloseAllNotif();
+                    OnCloseAllNotif?.Invoke(this, null);
                     break;
             }
         }
 
-        /// <summary>
-        /// Update buttons position
-        /// </summary>
-        private void UpdateWindowButtonPosition() {
-            if (!ControlBox) return;
+        #region YamuiFormResizeIcon
 
-            var priorityOrder = new Dictionary<int, WindowButtons>(3) {{0, WindowButtons.Close}, {1, WindowButtons.Maximize}, {2, WindowButtons.Minimize}};
+        private class YamuiFormResizeIcon {
 
-            var buttonsWidth = 0;
+            public Rectangle ClientRectangle { get; set; }
 
-            foreach (var button in priorityOrder.Where(button => _windowButtonList.ContainsKey(button.Value))) {
-                buttonsWidth += _windowButtonList[button.Value].Width;
-                _windowButtonList[button.Value].Location = new Point(ClientRectangle.Width - BorderWidth - buttonsWidth, BorderWidth);
+            public void OnPaint(PaintEventArgs e) {
+                var foreColor = YamuiThemeManager.Current.FormFore;
+                using (var b = new SolidBrush(foreColor)) {
+                    var resizeHandleSize = new Size(2, 2);
+                    e.Graphics.FillRectangles(b, new[] {
+                        new Rectangle(new Point(ClientRectangle.Right - 4, ClientRectangle.Bottom - 4), resizeHandleSize),
+                        new Rectangle(new Point(ClientRectangle.Right - 8, ClientRectangle.Bottom - 8), resizeHandleSize),
+                        new Rectangle(new Point(ClientRectangle.Right - 8, ClientRectangle.Bottom - 4), resizeHandleSize),
+                        new Rectangle(new Point(ClientRectangle.Right - 4, ClientRectangle.Bottom - 8), resizeHandleSize),
+                        new Rectangle(new Point(ClientRectangle.Right - 12, ClientRectangle.Bottom - 4), resizeHandleSize),
+                        new Rectangle(new Point(ClientRectangle.Right - 4, ClientRectangle.Bottom - 12), resizeHandleSize)
+                    });
+                }
             }
 
-            if (_windowButtonList.ContainsKey(WindowButtons.CloseAllVisible)) {
-                _windowButtonList[WindowButtons.CloseAllVisible].Location = new Point(ClientRectangle.Width - BorderWidth - 25, BorderWidth + 25);
-            }
-
-            Refresh();
         }
 
-        public class YamuiFormButton : Label {
-            #region Constructor
+        #endregion
 
-            public YamuiFormButton() {
-                SetStyle(
-                    ControlStyles.AllPaintingInWmPaint |
-                    ControlStyles.OptimizedDoubleBuffer |
-                    ControlStyles.ResizeRedraw |
-                    ControlStyles.UserPaint,
-                    true);
+        #region YamuiFormButton
+
+        private class YamuiFormButton {
+                        
+            private readonly YamuiFormButtons _parent;
+            private bool _isHovered;
+            private bool _isPressed;
+            
+            public WindowButtons Type { get; set; }
+            public Rectangle ClientRectangle { get; set; }
+
+
+            public bool IsHovered {
+                get { return _isHovered; }
+                set {
+                    if (_isHovered != value) {
+                        _isHovered = value;
+                        if (Show)
+                            _parent.Invalidate(false);
+                    }
+                }
+            }
+            public bool IsPressed {
+                get { return _isPressed; }
+                set {
+                    if (_isPressed != value) {
+                        _isPressed = value;
+                        if (Show)
+                            _parent.Invalidate(false);
+                    }
+                }
             }
 
-            #endregion
+            public bool Show { get; set; }
 
-            #region Paint Methods
 
-            protected override void OnPaint(PaintEventArgs e) {
-                if (_isPressed)
-                    e.Graphics.Clear(YamuiThemeManager.Current.AccentColor);
-                else if (_isHovered)
-                    e.Graphics.Clear(YamuiThemeManager.Current.ButtonHoverBack);
-                else
-                    e.Graphics.Clear(YamuiThemeManager.Current.FormBack);
+            public YamuiFormButton(YamuiFormButtons parent) {
+                _parent = parent;
+            }
+            
+            public void OnPaint(PaintEventArgs e) {
+                using (var b = new SolidBrush(BackColor)) {
+                    e.Graphics.FillRectangle(b, ClientRectangle);
+                }
 
-                Color foreColor = YamuiThemeManager.Current.ButtonFg(ForeColor, false, false, _isHovered, _isPressed, Enabled);
+                Color foreColor = YamuiThemeManager.Current.ButtonFg(YamuiThemeManager.Current.FormFore, false, false, IsHovered, IsPressed, _parent.Enabled);
+
                 using (var font = new Font("Webdings", 9.25f)) {
                     TextRenderer.DrawText(e.Graphics, Text, font, ClientRectangle, foreColor, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
                 }
             }
-
-            #endregion
-
-            #region Fields
-
-            private bool _isHovered;
-            private bool _isPressed;
-
-            #endregion
-
-            #region Mouse Methods
-
-            protected override void OnMouseDown(MouseEventArgs e) {
-                if (e.Button == MouseButtons.Left) {
-                    _isPressed = true;
-                    Invalidate();
+            
+            public string TooltipText {
+                get {
+                    switch (Type) {
+                        case WindowButtons.Close:
+                            return "<b>Close</b> this window";
+                        case WindowButtons.Minimize:
+                            return "<b>Minimize</b> this window";
+                        case WindowButtons.Maximize:
+                            return "<b>Maximize</b> this window";
+                        case WindowButtons.Restore:
+                            return "<b>Restore</b> this window";
+                        case WindowButtons.CloseAllVisible:
+                            return "<b>Close all</b> notification windows";
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
                 }
-                base.OnMouseDown(e);
             }
 
-            protected override void OnMouseUp(MouseEventArgs e) {
-                _isPressed = false;
-                Invalidate();
-
-                base.OnMouseUp(e);
+            public string Text {
+                get {
+                    switch (Type) {
+                        case WindowButtons.Minimize:
+                            return @"0";
+                        case WindowButtons.Restore:
+                            return @"2";
+                        case WindowButtons.Maximize:
+                            return @"1";
+                        case WindowButtons.CloseAllVisible:
+                            return ((char) (126)).ToString();
+                        case WindowButtons.Close:
+                            return @"r";
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                }
             }
 
-            protected override void OnMouseEnter(EventArgs e) {
-                _isHovered = true;
-                Invalidate();
-                base.OnMouseEnter(e);
+            public Color BackColor {
+                get {
+                    if (IsPressed)
+                        return Color.Red;// YamuiThemeManager.Current.AccentColor;
+                    if (IsHovered)
+                        return YamuiThemeManager.Current.ButtonHoverBack;
+                    return YamuiThemeManager.Current.FormBack;
+                }
             }
 
-            protected override void OnMouseLeave(EventArgs e) {
-                _isHovered = false;
-                Invalidate();
-
-                base.OnMouseLeave(e);
+            public WinApi.HitTest HitTest {
+                get {
+                    switch (Type) {
+                        case WindowButtons.Minimize:
+                            return WinApi.HitTest.HTMINBUTTON;
+                        case WindowButtons.Restore:
+                        case WindowButtons.Maximize:
+                            return WinApi.HitTest.HTMAXBUTTON;
+                        case WindowButtons.CloseAllVisible:
+                            return WinApi.HitTest.HTZOOM;
+                        case WindowButtons.Close:
+                            return WinApi.HitTest.HTCLOSE;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                }
             }
 
-            #endregion
+
         }
+
+        #endregion
 
         #endregion
     }

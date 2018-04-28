@@ -31,24 +31,7 @@ using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Forms {
 
-    public sealed partial class YamuiNotification : YamuiFormToolWindow {
-
-        /// <summary>
-        /// This indicates that the form should not take focus when shown
-        /// However, if you specify TopMost = true, then this doesn't work anymore, hence why we
-        /// specify it through the CreateParams
-        /// </summary>
-        protected override bool ShowWithoutActivation {
-            get { return true; }
-        }
-
-        protected override CreateParams CreateParams {
-            get {
-                CreateParams createParams = base.CreateParams;
-                createParams.ExStyle |= (int) WinApi.WindowStylesEx.WS_EX_TOPMOST;
-                return createParams;
-            }
-        }
+    public sealed partial class YamuiNotification : YamuiFormButtons {
 
         #region Static
 
@@ -70,7 +53,7 @@ namespace Yamui.Framework.Forms {
         /// <summary>
         /// The user clicked on the button to close all visible notifications
         /// </summary>
-        private static void CloseAllNotif() {
+        private static void CloseAllNotif(object sender, EventArgs eventArgs) {
             _openNotifications.ToList().ForEach(notifications => {
                 notifications.Close();
                 notifications.Dispose();
@@ -93,7 +76,7 @@ namespace Yamui.Framework.Forms {
         /// <summary>
         /// Create a new notification, to be displayed with Show() later
         /// </summary>
-        public YamuiNotification(string htmlTitle, string htmlMessage, int duration, Screen screenToUse = null, int formMinWidth = 0, int formMaxWidth = 0, int formMaxHeight = 0, EventHandler<HtmlLinkClickedEventArgs> onLinkClicked = null) : base() {
+        public YamuiNotification(string htmlTitle, string htmlMessage, int duration, Screen screenToUse = null, int formMinWidth = 0, int formMaxWidth = 0, int formMaxHeight = 0, EventHandler<HtmlLinkClickedEventArgs> onLinkClicked = null) : base(YamuiFormOption.WithShadow | YamuiFormOption.AlwaysOnTop | YamuiFormOption.DontShowInAltTab | YamuiFormOption.DontActivateOnShow) {
 
             // close all notif button
             CloseAllBox = true;

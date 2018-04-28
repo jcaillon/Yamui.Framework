@@ -165,14 +165,11 @@
     </Compile>
     <Compile Include="Fonts\FontManager.cs" />
     <Compile Include="Forms\SideGlowNative.cs" />
-    <Compile Include="Forms\YamuiShadowBorder.cs" />
     <Compile Include="Forms\YamuiFormOption.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\YamuiShadowBorder.cs" />
     <Compile Include="Forms\YamuiFormShadow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\YamuiFormToolWindow.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\YamuiFormFadeIn.cs">

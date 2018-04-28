@@ -48,9 +48,11 @@ namespace Yamui.Framework.Controls {
         public int ScrollBarWidth {
             get { return _scrollBarWidth; }
             set {
-                _scrollBarWidth = value;
-                VerticalScroll.BarThickness = _scrollBarWidth;
-                HorizontalScroll.BarThickness = _scrollBarWidth;
+                if (_scrollBarWidth != value) {
+                    _scrollBarWidth = value;
+                    VerticalScroll.BarThickness = _scrollBarWidth;
+                    HorizontalScroll.BarThickness = _scrollBarWidth;
+                }
             }
         }
 
@@ -67,9 +69,11 @@ namespace Yamui.Framework.Controls {
         public bool HScroll {
             get { return _hScroll; }
             set {
-                _hScroll = value;
-                HorizontalScroll.Enabled = _hScroll;
-                PerformLayout();
+                if (_hScroll != value) {
+                    _hScroll = value;
+                    HorizontalScroll.Enabled = _hScroll;
+                    PerformLayout();
+                }
             }
         }
 
@@ -80,9 +84,11 @@ namespace Yamui.Framework.Controls {
         public bool VScroll {
             get { return _vScroll; }
             set {
-                _vScroll = value;
-                VerticalScroll.Enabled = _vScroll;
-                PerformLayout();
+                if (_vScroll != value) {
+                    _vScroll = value;
+                    VerticalScroll.Enabled = _vScroll;
+                    PerformLayout();
+                }
             }
         }
 
@@ -114,7 +120,7 @@ namespace Yamui.Framework.Controls {
         private Size _preferedSize;
         private Rectangle _leftoverBar;
         private bool _needBothScroll;
-        private int _scrollBarWidth = 15;
+        private int _scrollBarWidth = 12;
         private FormWindowState? _lastWindowState;
 
         #endregion
@@ -244,8 +250,10 @@ namespace Yamui.Framework.Controls {
         }
 
         private void OnRedrawScrollBars(object sender, EventArgs eventArgs) {
-            Invalidate(); // help against flickering
-            PaintScrollBars(sender as YamuiScrollHandler);
+            if (HasScroll) {
+                Invalidate(); // help against flickering
+                PaintScrollBars(sender as YamuiScrollHandler);
+            }
         }
 
         #endregion
@@ -274,21 +282,20 @@ namespace Yamui.Framework.Controls {
                 return;
             }
 
-            switch (m.Msg) {
-                case (int) Window.Msg.WM_NCCALCSIZE:
-                    // Here we reduce the size of the client area with the scrollbar width
-                    var formRect = new Rectangle();
-                    WinApi.GetWindowRect(m.HWnd, ref formRect);
+            switch ((Window.Msg) m.Msg) {
+                case Window.Msg.WM_NCCALCSIZE:
 
                     // Check WPARAM
                     if (m.WParam != IntPtr.Zero) {
                         // When TRUE, LPARAM Points to a NCCALCSIZE_PARAMS structure
                         var nccsp = (WinApi.NCCALCSIZE_PARAMS) Marshal.PtrToStructure(m.LParam, typeof(WinApi.NCCALCSIZE_PARAMS));
+                        ApplyPreferedSize(_preferedSize, nccsp.rectProposed.Size);
                         AdjustClientArea(ref nccsp.rectProposed);
                         Marshal.StructureToPtr(nccsp, m.LParam, true);
                     } else {
                         // When FALSE, LPARAM Points to a RECT structure
                         var clnRect = (WinApi.RECT) Marshal.PtrToStructure(m.LParam, typeof(WinApi.RECT));
+                        ApplyPreferedSize(_preferedSize, clnRect.Size);
                         AdjustClientArea(ref clnRect);
                         Marshal.StructureToPtr(clnRect, m.LParam, true);
                     }
@@ -297,13 +304,13 @@ namespace Yamui.Framework.Controls {
                     m.Result = IntPtr.Zero;
                     break;
 
-                case (int) Window.Msg.WM_NCPAINT:
+                case Window.Msg.WM_NCPAINT:
                     PaintScrollBars(null);
                     // we handled everything
                     m.Result = IntPtr.Zero;
                     break;
 
-                case (int) Window.Msg.WM_NCHITTEST:
+                case Window.Msg.WM_NCHITTEST:
                     // we need to correctly handle this if we want the non client area events (WM_NC*) to fire properly!
                     var point = PointToClient(new Point(m.LParam.ToInt32()));
                     if (!ClientRectangle.Contains(point)) {
@@ -314,7 +321,7 @@ namespace Yamui.Framework.Controls {
 
                     break;
 
-                case (int) Window.Msg.WM_MOUSEWHEEL:
+                case Window.Msg.WM_MOUSEWHEEL:
                     if (HasScroll) {
                         // delta negative when scrolling up
                         var delta = (short) (m.WParam.ToInt64() >> 16);
@@ -331,7 +338,7 @@ namespace Yamui.Framework.Controls {
 
                     break;
 
-                case (int) Window.Msg.WM_KEYDOWN:
+                case Window.Msg.WM_KEYDOWN:
                     // needto override OnPreviewKeyDown or IsInputKey to receive this
                     var key = (Keys) (m.WParam.ToInt64());
                     long context = m.LParam.ToInt64();
@@ -346,7 +353,7 @@ namespace Yamui.Framework.Controls {
 
                     break;
 
-                case (int) Window.Msg.WM_MOUSEMOVE:
+                case Window.Msg.WM_MOUSEMOVE:
                     if (VerticalScroll.IsThumbPressed)
                         VerticalScroll.HandleMouseMove(null, null);
                     if (HorizontalScroll.IsThumbPressed)
@@ -354,7 +361,7 @@ namespace Yamui.Framework.Controls {
                     base.WndProc(ref m);
                     break;
 
-                case (int) Window.Msg.WM_NCMOUSEMOVE:
+                case Window.Msg.WM_NCMOUSEMOVE:
                     // track mouse leaving (otherwise the WM_NCMOUSELEAVE message would not fire)
                     WinApi.TRACKMOUSEEVENT tme = new WinApi.TRACKMOUSEEVENT();
                     tme.cbSize = (uint) Marshal.SizeOf(tme);
@@ -368,7 +375,7 @@ namespace Yamui.Framework.Controls {
                     base.WndProc(ref m);
                     break;
 
-                case (int) Window.Msg.WM_NCLBUTTONDOWN:
+                case Window.Msg.WM_NCLBUTTONDOWN:
                     VerticalScroll.HandleMouseDown(null, null);
                     HorizontalScroll.HandleMouseDown(null, null);
                     Focus();
@@ -378,8 +385,8 @@ namespace Yamui.Framework.Controls {
                     base.WndProc(ref m);
                     break;
 
-                case (int) Window.Msg.WM_NCLBUTTONUP:
-                case (int) Window.Msg.WM_LBUTTONUP:
+                case Window.Msg.WM_NCLBUTTONUP:
+                case Window.Msg.WM_LBUTTONUP:
                     VerticalScroll.HandleMouseUp(null, null);
                     HorizontalScroll.HandleMouseUp(null, null);
                     // here we forward this message to base WM_LBUTTONUP to release the internal focus on this control
@@ -387,7 +394,7 @@ namespace Yamui.Framework.Controls {
                     base.WndProc(ref m);
                     break;
 
-                case (int) Window.Msg.WM_NCMOUSELEAVE:
+                case Window.Msg.WM_NCMOUSELEAVE:
                     VerticalScroll.HandleMouseLeave(null, null);
                     HorizontalScroll.HandleMouseLeave(null, null);
                     base.WndProc(ref m);
@@ -416,17 +423,17 @@ namespace Yamui.Framework.Controls {
             }
         }
 
-        protected override void OnResize(EventArgs e) {
-            ApplyPreferedSize(_preferedSize);
-
-            // need to do the thing below to correctly recompute the client/non client areas when the windows is maximized/minimized
-            var newWindowState = FindForm()?.WindowState;
-            if (_lastWindowState != newWindowState) {
-                WinApi.SetWindowPos(Handle, IntPtr.Zero, 0, 0, 0, 0, WinApi.SetWindowPosFlags.SWP_FRAMECHANGED | WinApi.SetWindowPosFlags.SWP_NOACTIVATE | WinApi.SetWindowPosFlags.SWP_NOMOVE | WinApi.SetWindowPosFlags.SWP_NOSIZE | WinApi.SetWindowPosFlags.SWP_NOZORDER);
-            }
-            _lastWindowState = newWindowState;
-            base.OnResize(e);
-        }
+        //protected override void OnResize(EventArgs e) {
+        //    ApplyPreferedSize(_preferedSize);
+        //
+        //    // need to do the thing below to correctly recompute the client/non client areas when the windows is maximized/minimized
+        //    var newWindowState = FindForm()?.WindowState;
+        //    if (_lastWindowState != newWindowState) {
+        //        WinApi.SetWindowPos(Handle, IntPtr.Zero, 0, 0, 0, 0, WinApi.SetWindowPosFlags.SWP_FRAMECHANGED | //WinApi.SetWindowPosFlags.SWP_NOACTIVATE | WinApi.SetWindowPosFlags.SWP_NOMOVE | WinApi.SetWindowPosFlags.SWP_NOSIZE | //WinApi.SetWindowPosFlags.SWP_NOZORDER);
+        //    }
+        //    _lastWindowState = newWindowState;
+        //    base.OnResize(e);
+        //}
 
         /// <summary>
         /// Perform the layout of the control (call SuspendLayout/ResumeLayout to temporaly stop calling this method)
@@ -437,7 +444,7 @@ namespace Yamui.Framework.Controls {
                 if (levent.AffectedControl != null && levent.AffectedControl != this) {
                     // when a child item changes bounds
                     UpdatePreferedSizeIfNeeded(levent.AffectedControl);
-                    ApplyPreferedSize(_preferedSize);
+                    ApplyPreferedSize(_preferedSize, Size);
                 }
             }
         }
@@ -460,24 +467,24 @@ namespace Yamui.Framework.Controls {
         /// Override, called at the end of initializeComponent() in forms made with the designer
         /// </summary>
         public new void PerformLayout() {
-            ApplyPreferedSize(PreferedSize());
+            ApplyPreferedSize(PreferedSize(), Size);
             base.PerformLayout();
         }
 
-        private void ApplyPreferedSize(Size size) {
+        private void ApplyPreferedSize(Size preferedSize, Size panelSize) {
             _needBothScroll = false;
             var needHorizontalScroll = HorizontalScroll.HasScroll;
-            var needVerticalScroll = VerticalScroll.UpdateLength(size.Height, null, Height - (needHorizontalScroll ? HorizontalScroll.BarThickness : 0), Width);
-            HorizontalScroll.UpdateLength(size.Width, null, Width - (needVerticalScroll ? VerticalScroll.BarThickness : 0), Height);
+            var needVerticalScroll = VerticalScroll.UpdateLength(preferedSize.Height, null, panelSize.Height - (needHorizontalScroll ? HorizontalScroll.BarThickness : 0), panelSize.Width);
+            HorizontalScroll.UpdateLength(preferedSize.Width, null, panelSize.Width - (needVerticalScroll ? VerticalScroll.BarThickness : 0), panelSize.Height);
 
             if (needHorizontalScroll != HorizontalScroll.HasScroll) {
                 needHorizontalScroll = HorizontalScroll.HasScroll;
-                needVerticalScroll = VerticalScroll.UpdateLength(size.Height, null, Height - (needHorizontalScroll ? HorizontalScroll.BarThickness : 0), Width);
+                needVerticalScroll = VerticalScroll.UpdateLength(preferedSize.Height, null, panelSize.Height - (needHorizontalScroll ? HorizontalScroll.BarThickness : 0), panelSize.Width);
             }
 
             _needBothScroll = needVerticalScroll && needHorizontalScroll;
             if (_needBothScroll) {
-                _leftoverBar = new Rectangle(Width - VerticalScroll.BarThickness, Height - HorizontalScroll.BarThickness, VerticalScroll.BarThickness, HorizontalScroll.BarThickness);
+                _leftoverBar = new Rectangle(panelSize.Width - VerticalScroll.BarThickness, panelSize.Height - HorizontalScroll.BarThickness, VerticalScroll.BarThickness, HorizontalScroll.BarThickness);
             }
         }
 

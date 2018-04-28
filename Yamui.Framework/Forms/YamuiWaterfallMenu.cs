@@ -47,9 +47,7 @@ namespace Yamui.Framework.Forms {
         #endregion
 
         #region public fields
-
-        public new bool UseClassicDropShadow => true;
-
+        
         public bool IamMain = true;
 
         public float SubTextOpacity = 0.3f;
@@ -90,22 +88,10 @@ namespace Yamui.Framework.Forms {
         private int _selectedIndex;
 
         #endregion
-
-        #region Don't show in ATL+TAB
-
-        protected override CreateParams CreateParams {
-            get {
-                var Params = base.CreateParams;
-                Params.ExStyle |= (int) WinApi.WindowStylesEx.WS_EX_TOOLWINDOW;
-                return Params;
-            }
-        }
-
-        #endregion
-
+        
         #region Life and death
 
-        public YamuiWaterfallMenu(Point location, List<YamuiMenuItem> content, string htmlTitle = null, int minSize = 150) : base(0) {
+        public YamuiWaterfallMenu(Point location, List<YamuiMenuItem> content, string htmlTitle = null, int minSize = 150) : base(YamuiFormOption.WithDropShadow | YamuiFormOption.IsPopup | YamuiFormOption.DontShowInAltTab |YamuiFormOption.AlwaysOnTop) {
             if (content == null || content.Count == 0)
                 content = new List<YamuiMenuItem> {new YamuiMenuItem {DisplayText = "Empty", IsDisabled = true}};
 

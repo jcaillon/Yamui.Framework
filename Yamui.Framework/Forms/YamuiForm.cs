@@ -50,6 +50,7 @@ namespace Yamui.Framework.Forms {
         private WinApi.MINMAXINFO _lastMinMaxInfo;
         private bool _isActive;
         private WinApi.HitTest[][] _hitTests;
+        private bool _needRedraw;
 
         #endregion
 
@@ -102,11 +103,28 @@ namespace Yamui.Framework.Forms {
         [Browsable(false)]
         public bool Unselectable { get; }
 
+        [Browsable(false)]
+        public override Color BackColor {
+            get { return YamuiThemeManager.Current.FormBack; }
+            set { base.BackColor = value; }
+        }
+
+        [Browsable(false)]
+        public override Color ForeColor {
+            get { return YamuiThemeManager.Current.FormFore; }
+            set { base.ForeColor = value; }
+        }
+
         /// <summary>
         /// This indicates that the form should not take focus when shown
         /// </summary>
         protected override bool ShowWithoutActivation {
             get { return DontActivateOnShow; }
+        }
+
+        public new FormWindowState WindowState {
+            get { return IsMaximized ? FormWindowState.Maximized : base.WindowState; }
+            set { base.WindowState = value; }
         }
 
         #endregion
@@ -205,7 +223,7 @@ namespace Yamui.Framework.Forms {
         #region OnPaint
 
         protected override void OnPaint(PaintEventArgs e) {
-            using (var b = new SolidBrush(YamuiThemeManager.Current.FormBack)) {
+            using (var b = new SolidBrush(BackColor)) {
                 e.Graphics.FillRectangle(b, ClientRectangle);
             }
             var borderRect = new Rectangle(0, 0, ClientRectangle.Width - 1, ClientRectangle.Height - 1);
@@ -287,8 +305,21 @@ namespace Yamui.Framework.Forms {
                     Moving = true;
                     break;
 
+
+                case Window.Msg.WM_MBUTTONDOWN:
+                    //var state = (WinApi.WmSizeEnum) m.WParam;
+                    //if (state == WinApi.WmSizeEnum.SIZE_MAXIMIZED || state == WinApi.WmSizeEnum.SIZE_MAXSHOW) {
+                        Refresh();
+                    //}
+                    // var wid = m.LParam.LoWord();
+                    // var h = m.LParam.HiWord();
+                    break;
+
                 case Window.Msg.WM_SIZE:
-                    // var state = (WinApi.WmSizeEnum) m.WParam;
+                    var state = (WinApi.WmSizeEnum) m.WParam;
+                    if (state == WinApi.WmSizeEnum.SIZE_MAXIMIZED || state == WinApi.WmSizeEnum.SIZE_MAXSHOW || state == WinApi.WmSizeEnum.SIZE_RESTORED) {
+                        _needRedraw = true;
+                    }
                     // var wid = m.LParam.LoWord();
                     // var h = m.LParam.HiWord();
                     break;
@@ -340,6 +371,11 @@ namespace Yamui.Framework.Forms {
                 case Window.Msg.WM_ERASEBKGND:
                     // https://msdn.microsoft.com/en-us/library/windows/desktop/ms648055(v=vs.85).aspx
                     m.Result = IntPtr.Zero;
+                    // hack thing to correctly redraw th window after maximizing it
+                    if (_needRedraw) {
+                        _needRedraw = false;
+                        WinApi.RedrawWindow(new HandleRef(this, Handle), IntPtr.Zero, IntPtr.Zero, WinApi.RedrawWindowFlags.Invalidate);
+                    }
                     return;
             }
 
@@ -397,7 +433,7 @@ namespace Yamui.Framework.Forms {
 
             // Determine if the point is at the top or bottom of the window
             if (cursorLocation.Y >= 0 && cursorLocation.Y <= TitleBarHeight) {
-                resizeBorder = cursorLocation.Y <= NonClientAreaPadding.Top;
+                resizeBorder = cursorLocation.Y <= NonClientAreaPadding.Top && WindowState != FormWindowState.Maximized;
                 uRow = 0;
             } else if (cursorLocation.Y <= Height && cursorLocation.Y >= Height - NonClientAreaPadding.Bottom) {
                 uRow = 2;
@@ -408,7 +444,7 @@ namespace Yamui.Framework.Forms {
                 uCol = 0;
             } else if (cursorLocation.X <= Width && cursorLocation.X >= Width - NonClientAreaPadding.Right) {
                 uCol = 2;
-            } else if (uRow == 0 && (!resizeBorder || WindowState == FormWindowState.Maximized)) {
+            } else if (uRow == 0 && !resizeBorder) {
                 return WinApi.HitTest.HTCAPTION;
             }
 

@@ -32,7 +32,8 @@ using Yamui.Framework.HtmlRenderer.WinForms;
 using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Forms {
-    public class YamuiMenu : YamuiForm {
+    public class YamuiMenu : YamuiFormShadow {
+
         #region Private
 
         private Action<YamuiMenuItem> _clickItemWrapper;
@@ -121,25 +122,10 @@ namespace Yamui.Framework.Forms {
 
         #endregion
 
-        #region Don't show in ATL+TAB + topmost
-
-        /// <summary>
-        /// The form should also set ShowInTaskbar = false; for this to work
-        /// </summary>
-        protected override CreateParams CreateParams {
-            get {
-                var createParams = base.CreateParams;
-                createParams.ExStyle |= (int) WinApi.WindowStylesEx.WS_EX_TOOLWINDOW;
-                createParams.ExStyle |= (int) WinApi.WindowStylesEx.WS_EX_TOPMOST;
-                return createParams;
-            }
-        }
-
-        #endregion
 
         #region Life and death
 
-        public YamuiMenu() : base(0) {
+        public YamuiMenu() : base(YamuiFormOption.WithDropShadow | YamuiFormOption.IsPopup | YamuiFormOption.DontShowInAltTab |YamuiFormOption.AlwaysOnTop) {
             YamuiList = new YamuiFilteredTypeTreeListForMenuPopup();
             FilterBox = new YamuiFilterBox();
         }

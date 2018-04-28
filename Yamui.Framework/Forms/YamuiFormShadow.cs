@@ -98,32 +98,32 @@ namespace Yamui.Framework.Forms {
         #endregion
 
         protected override void WndProc(ref Message m) {
-            if (!HasShadow) {
+            if (!HasShadow || DesignMode) {
                 base.WndProc(ref m);
                 return;
             }
 
             switch ((Window.Msg) m.Msg) {
-                case Window.Msg.WM_SYSCOMMAND:
-                    switch ((WinApi.SysCommands) m.WParam) {
-                        case WinApi.SysCommands.SC_RESTORE:
-                        case WinApi.SysCommands.SC_RESTOREDBLCLICK:
-                            // we have to handle this restore to not have the normal restore animation on the window
-                            // otherwise the borders are displayed at the restored location BEFORE the window finishes its animation
-                            var hdlRef = new HandleRef(null, m.HWnd);
-                            WinApi.WINDOWPLACEMENT wp = new WinApi.WINDOWPLACEMENT {
-                                length = Marshal.SizeOf(typeof(WinApi.WINDOWPLACEMENT))
-                            };
-                            WinApi.GetWindowPlacement(hdlRef, ref wp);
-                            if (wp.showCmd == WinApi.ShowWindowStyle.SW_SHOWMINIMIZED) {
-                                wp.showCmd = WinApi.ShowWindowStyle.SW_RESTORE;
-                                WinApi.SetWindowPlacement(hdlRef, ref wp);
-                                m.Result = IntPtr.Zero;
-                                return;
-                            }
-                            break;
-                    }
-                    break;
+                //case Window.Msg.WM_SYSCOMMAND:
+                //    switch ((WinApi.SysCommands) m.WParam) {
+                //        case WinApi.SysCommands.SC_RESTORE:
+                //        case WinApi.SysCommands.SC_RESTOREDBLCLICK:
+                //            // we have to handle this restore to not have the normal restore animation on the window
+                //            // otherwise the borders are displayed at the restored location BEFORE the window finishes its animation
+                //            var hdlRef = new HandleRef(null, m.HWnd);
+                //            WinApi.WINDOWPLACEMENT wp = new WinApi.WINDOWPLACEMENT {
+                //                length = Marshal.SizeOf(typeof(WinApi.WINDOWPLACEMENT))
+                //            };
+                //            WinApi.GetWindowPlacement(hdlRef, ref wp);
+                //            if (wp.showCmd == WinApi.ShowWindowStyle.SW_SHOWMINIMIZED) {
+                //                wp.showCmd = WinApi.ShowWindowStyle.SW_RESTORE;
+                //                WinApi.SetWindowPlacement(hdlRef, ref wp);
+                //                m.Result = IntPtr.Zero;
+                //                return;
+                //            }
+                //            break;
+                //    }
+                //    break;
                     
                 case Window.Msg.WM_ACTIVATEAPP:
                     UpdateFocus((int) m.WParam != 0);
@@ -150,8 +150,6 @@ namespace Yamui.Framework.Forms {
             using (var b = new SolidBrush(YamuiThemeManager.Current.FormBack)) {
                 e.Graphics.FillRectangle(b, ClientRectangle);
             }
-            // draw the border with Style color
-            // var borderColor = YamuiThemeManager.Current.FormBorder;
             var borderRect = new Rectangle(0, 0, ClientRectangle.Width - 1, ClientRectangle.Height - 1);
             using (var p = new Pen(IsActive ? BorderActiveColor : BorderInactiveColor, BorderWidth) {
                 Alignment = PenAlignment.Inset
@@ -159,7 +157,12 @@ namespace Yamui.Framework.Forms {
                 e.Graphics.DrawRectangle(p, borderRect);
             }
         }
-        
+
+        protected override void OnClosed(EventArgs e) {
+            CloseGlows();
+            base.OnClosed(e);
+        }
+
         private void InitBorders() {
             if (!HasShadow)
                 return;
@@ -181,6 +184,12 @@ namespace Yamui.Framework.Forms {
         private void Show(bool show) {
             foreach (YamuiShadowBorder sideGlow in _glows) {
                 sideGlow.Show(show);
+            }
+        }
+
+        private void UpdateColors() {
+            foreach (YamuiShadowBorder sideGlow in _glows) {
+                sideGlow.SetColors(BorderActiveColor, BorderInactiveColor);
             }
         }
 

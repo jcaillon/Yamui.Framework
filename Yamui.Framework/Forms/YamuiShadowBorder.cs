@@ -49,22 +49,6 @@ namespace Yamui.Framework.Forms {
 
         public Size Size { get; private set; }
         
-        public Color InactiveColor {
-            get { return _inactiveColor; }
-            set {
-                _inactiveColor = value;
-                Render();
-            }
-        }
-
-        public Color ActiveColor {
-            get { return _activeColor; }
-            set {
-                _activeColor = value;
-                Render();
-            }
-        }
-
         public IntPtr Handle { get; private set; }
 
         public bool ParentWindowIsFocused {
@@ -115,6 +99,12 @@ namespace Yamui.Framework.Forms {
         #endregion
 
         #region public
+
+        public void SetColors(Color active, Color inactive) {
+            _activeColor = active;
+            _inactiveColor = inactive;
+            Render();
+        }
 
         public void SetLocationAndSize(int left, int top, int width, int height) {
             switch (_side) {
