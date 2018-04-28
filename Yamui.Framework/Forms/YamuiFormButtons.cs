@@ -407,7 +407,7 @@ namespace Yamui.Framework.Forms {
             public Color BackColor {
                 get {
                     if (IsPressed)
-                        return Color.Red;// YamuiThemeManager.Current.AccentColor;
+                        return YamuiThemeManager.Current.AccentColor;
                     if (IsHovered)
                         return YamuiThemeManager.Current.ButtonHoverBack;
                     return YamuiThemeManager.Current.FormBack;

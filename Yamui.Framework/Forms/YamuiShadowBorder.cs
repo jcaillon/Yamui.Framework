@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Windows.Forms;
 using Yamui.Framework.Helper;
+using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Forms {
 
@@ -33,13 +34,14 @@ namespace Yamui.Framework.Forms {
         private readonly DockStyle _side;
 
         private bool _parentWindowIsFocused;
-        private Color _activeColor;
-        private Color _inactiveColor;
         private WinApi.BLENDFUNCTION _blend;
 
         private WinApi.WNDCLASS _windowClass;
         private bool _registeredClass;
         private bool _visible;
+
+        public Color ActiveColor => YamuiThemeManager.Current.AccentColor;
+        public Color InactiveColor => YamuiThemeManager.Current.FormBorder;
 
         #endregion
 
@@ -55,6 +57,7 @@ namespace Yamui.Framework.Forms {
             set {
                 if (_parentWindowIsFocused != value) {
                     _parentWindowIsFocused = value;
+                    WinApi.SetWindowPos(Handle, _parentHandle, 0, 0, 0, 0,  WinApi.SetWindowPosFlags.SWP_NOMOVE | WinApi.SetWindowPosFlags.SWP_NOSIZE | WinApi.SetWindowPosFlags.SWP_NOACTIVATE);
                     Render();
                 }
             }
@@ -71,12 +74,10 @@ namespace Yamui.Framework.Forms {
 
         #region constuctor
 
-        internal YamuiShadowBorder(DockStyle side, IntPtr parent, Color activeColor, Color inactiveColor) {
+        internal YamuiShadowBorder(DockStyle side, IntPtr parent) {
             _side = side;
             _parentHandle = parent;
             _blend = new WinApi.BLENDFUNCTION(255);
-            _activeColor = activeColor;
-            _inactiveColor = inactiveColor;
             CreateWindow();
         }
 
@@ -99,12 +100,6 @@ namespace Yamui.Framework.Forms {
         #endregion
 
         #region public
-
-        public void SetColors(Color active, Color inactive) {
-            _activeColor = active;
-            _inactiveColor = inactive;
-            Render();
-        }
 
         public void SetLocationAndSize(int left, int top, int width, int height) {
             switch (_side) {
@@ -221,7 +216,8 @@ namespace Yamui.Framework.Forms {
                 0,
                 0,
                 0,
-                new HandleRef(this, _parentHandle),
+                //new HandleRef(this, _parentHandle),
+                WinApi.NullHandleRef,
                 WinApi.NullHandleRef,
                 WinApi.NullHandleRef,
                 IntPtr.Zero
@@ -279,7 +275,7 @@ namespace Yamui.Framework.Forms {
                     throw new ArgumentOutOfRangeException();
             }
             using (Graphics g = Graphics.FromImage(bmp)) {
-                Color gradientColor = _parentWindowIsFocused ? _activeColor : _inactiveColor;
+                Color gradientColor = _parentWindowIsFocused ? ActiveColor : InactiveColor;
                 for (int i = 0; i < Thickness; i++) {
                     var color = Color.FromArgb(_alphas[i], gradientColor.R, gradientColor.G, gradientColor.B);
                     using (Pen pen = new Pen(color, 1f)) {
