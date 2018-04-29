@@ -54,10 +54,7 @@ namespace Yamui.Framework.Forms {
         /// The user clicked on the button to close all visible notifications
         /// </summary>
         private static void CloseAllNotif(object sender, EventArgs eventArgs) {
-            _openNotifications.ToList().ForEach(notifications => {
-                notifications.Close();
-                notifications.Dispose();
-            });
+            CloseEverything();
         }
 
         #endregion
@@ -72,11 +69,11 @@ namespace Yamui.Framework.Forms {
         #endregion
 
         #region Constructor
-
+        
         /// <summary>
         /// Create a new notification, to be displayed with Show() later
         /// </summary>
-        public YamuiNotification(string htmlTitle, string htmlMessage, int duration, Screen screenToUse = null, int formMinWidth = 0, int formMaxWidth = 0, int formMaxHeight = 0, EventHandler<HtmlLinkClickedEventArgs> onLinkClicked = null) : base(YamuiFormOption.WithShadow | YamuiFormOption.AlwaysOnTop | YamuiFormOption.DontShowInAltTab | YamuiFormOption.DontActivateOnShow) {
+        public YamuiNotification(string htmlTitle, string htmlMessage, int duration, Screen screenToUse = null, int formMinWidth = 0, int formMaxWidth = 0, int formMaxHeight = 0, EventHandler<HtmlLinkClickedEventArgs> onLinkClicked = null) : base(YamuiFormOption.IsPopup | YamuiFormOption.WithShadow | YamuiFormOption.AlwaysOnTop | YamuiFormOption.DontShowInAltTab | YamuiFormOption.DontActivateOnShow) {
 
             // close all notif button
             CloseAllBox = true;
@@ -132,6 +129,10 @@ namespace Yamui.Framework.Forms {
                 _duration = duration*1000;
             } else
                 _duration = 0;
+
+            _closingTransition = new Transition(new TransitionType_Linear(_duration));
+            _closingTransition.add(_progressSimplePanel, "Width", 0);
+            _closingTransition.TransitionCompletedEvent += (o, args) => { Close(); };
         }
 
         #endregion
@@ -157,9 +158,6 @@ namespace Yamui.Framework.Forms {
         protected override void OnShown(EventArgs e) {
             // Start the timer animation on the bottom of the notif
             if (_duration > 0) {
-                _closingTransition = new Transition(new TransitionType_Linear(_duration));
-                _closingTransition.add(_progressSimplePanel, "Width", 0);
-                _closingTransition.TransitionCompletedEvent += (o, args) => { Close(); };
                 _closingTransition.run();
             }
             base.OnShown(e);

@@ -23,25 +23,20 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 using System.Timers;
 using System.Windows.Forms;
 using Yamui.Framework.Helper;
-using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Forms {
-
     /// <summary>
     /// Form class that implements interesting utilities + shadow + onpaint + movable borderless
     /// </summary>
     public abstract class YamuiFormShadow : YamuiForm {
-
-        private readonly List<YamuiShadowBorder> _glows = new List<YamuiShadowBorder>();
-        private WinApi.WINDOWPOS _lastLocation;
-        private System.Timers.Timer _timer;
+        private readonly List<YamuiShadowBorder> _shadows = new List<YamuiShadowBorder>();
         private bool _bordersVisible;
+        private WinApi.WINDOWPOS _lastLocation;
+        private System.Timers.Timer _restoreAnimationTimer;
 
         #region Constructor
 
@@ -50,12 +45,6 @@ namespace Yamui.Framework.Forms {
 
         [Browsable(false)]
         public bool HasDropShadow { get; }
-
-        [Browsable(false)]
-        public Color BorderActiveColor => YamuiThemeManager.Current.AccentColor;
-
-        [Browsable(false)]
-        public Color BorderInactiveColor => YamuiThemeManager.Current.FormBorder;
 
         #endregion
 
@@ -95,6 +84,7 @@ namespace Yamui.Framework.Forms {
                 CloseShadows();
                 GC.SuppressFinalize(this);
             }
+
             base.Dispose();
         }
 
@@ -112,7 +102,7 @@ namespace Yamui.Framework.Forms {
                     break;
 
                 case Window.Msg.WM_ACTIVATE:
-                    UpdateFocus(((int) WinApi.WAFlags.WA_ACTIVE == (int)m.WParam || (int)WinApi.WAFlags.WA_CLICKACTIVE == (int)m.WParam));
+                    UpdateFocus(((int) WinApi.WAFlags.WA_ACTIVE == (int) m.WParam || (int) WinApi.WAFlags.WA_CLICKACTIVE == (int) m.WParam));
                     break;
 
                 case Window.Msg.WM_WINDOWPOSCHANGED:
@@ -120,67 +110,47 @@ namespace Yamui.Framework.Forms {
                     UpdateLocationAndSize(_lastLocation);
 
                     if (((int) _lastLocation.flags & (int) WinApi.SetWindowPosFlags.SWP_HIDEWINDOW) != 0) {
-                        Show(false);
+                        ShowShadows(false, true);
                     } else if (((int) _lastLocation.flags & (int) WinApi.SetWindowPosFlags.SWP_SHOWWINDOW) != 0) {
-                        Show(!IsMaximized, true);
+                        ShowShadows(!IsMaximized, true);
                     }
+
                     break;
 
-                
                 case Window.Msg.WM_SHOWWINDOW:
-                    Show(m.WParam != IntPtr.Zero, true);
+                    ShowShadows(m.WParam != IntPtr.Zero, true);
                     break;
 
                 case Window.Msg.WM_CREATE:
-                    InitBorders();
+                    InitShadows();
                     break;
-                   /* 
-                case Window.Msg.WM_MOVE:
-                    var pos = GetWindowInfo().rcWindow;
-                    var pos3 = new Point(m.LParam.LoWord(), m.LParam.HiWord());
-                    foreach (YamuiShadowBorder sideGlow in _glows) {
-                        sideGlow.SetLocationAndSize(pos.left, pos.top, pos.right - pos.left, pos.bottom - pos.top);
-                    }
-                    break;
-                    */
+
                 case Window.Msg.WM_SIZE:
-                    /*
-                    var pos2 = GetWindowInfo().rcWindow;
-                    var newSize = new Size(m.LParam.LoWord(), m.LParam.HiWord());
-                    foreach (YamuiShadowBorder sideGlow in _glows) {
-                        sideGlow.SetLocationAndSize(pos2.left, pos2.top, pos2.right - pos2.left, pos2.bottom - pos2.top);
-                    }
-                    */
                     var state = (WinApi.WmSizeEnum) m.WParam;
                     switch (state) {
                         case WinApi.WmSizeEnum.SIZE_RESTORED:
-                            Show(true);
+                            ShowShadows(true, false);
                             break;
                         case WinApi.WmSizeEnum.SIZE_MINIMIZED:
                         case WinApi.WmSizeEnum.SIZE_MAXHIDE:
                         case WinApi.WmSizeEnum.SIZE_MAXIMIZED:
                         case WinApi.WmSizeEnum.SIZE_MAXSHOW:
-                            Show(false);
+                            ShowShadows(false, true);
                             break;
                     }
+
                     break;
-                    
+
+                //case Window.Msg.WM_MOVE:
+                //var pos = GetWindowInfo().rcWindow;
+                //var pos3 = new Point(m.LParam.LoWord(), m.LParam.HiWord());
+                //foreach (YamuiShadowBorder sideGlow in _glows) {
+                //    sideGlow.SetLocationAndSize(pos.left, pos.top, pos.right - pos.left, pos.bottom - pos.top);
+                //}
+                //break;
             }
+
             base.WndProc(ref m);
-        }
-
-
-
-        protected override void OnPaint(PaintEventArgs e) {
-            using (var b = new SolidBrush(YamuiThemeManager.Current.FormBack)) {
-                e.Graphics.FillRectangle(b, ClientRectangle);
-            }
-            var borderRect = new Rectangle(0, 0, ClientRectangle.Width - 1, ClientRectangle.Height - 1);
-            using (var p = new Pen(IsActive ? BorderActiveColor : BorderInactiveColor, BorderWidth) {
-                Alignment = PenAlignment.Inset
-            }) {
-                e.Graphics.DrawRectangle(p, borderRect);
-            }
         }
 
         protected override void OnClosed(EventArgs e) {
@@ -188,62 +158,64 @@ namespace Yamui.Framework.Forms {
             base.OnClosed(e);
         }
 
-        private void InitBorders() {
+        private void InitShadows() {
             if (!HasShadow)
                 return;
 
             _bordersVisible = false;
-            _timer = new System.Timers.Timer {
+            _restoreAnimationTimer = new System.Timers.Timer {
                 AutoReset = false,
                 Interval = 200
             };
-            _timer.Elapsed += TimerOnElapsed;
+            _restoreAnimationTimer.Elapsed += RestoreAnimationTimerOnElapsed;
 
-            _glows.Add(new YamuiShadowBorder(DockStyle.Top, Handle));
-            _glows.Add(new YamuiShadowBorder(DockStyle.Left, Handle));
-            _glows.Add(new YamuiShadowBorder(DockStyle.Bottom, Handle));
-            _glows.Add(new YamuiShadowBorder(DockStyle.Right, Handle));
+            _shadows.Add(new YamuiShadowBorder(DockStyle.Top, Handle));
+            _shadows.Add(new YamuiShadowBorder(DockStyle.Left, Handle));
+            _shadows.Add(new YamuiShadowBorder(DockStyle.Bottom, Handle));
+            _shadows.Add(new YamuiShadowBorder(DockStyle.Right, Handle));
         }
 
         private void CloseShadows() {
-            _timer?.Stop();
-            _timer?.Dispose();
-            foreach (var sideGlow in _glows) {
-                sideGlow.Close();
-                sideGlow.Dispose();
+            _restoreAnimationTimer?.Stop();
+            _restoreAnimationTimer?.Dispose();
+            foreach (var shadowBorder in _shadows) {
+                shadowBorder.Close();
+                shadowBorder.Dispose();
             }
-            _glows.Clear();
+
+            _shadows.Clear();
         }
 
-        private void Show(bool show, bool immediaty = false) {
+        private void ShowShadows(bool show, bool immediaty) {
             if (_bordersVisible == show)
                 return;
 
-            _timer?.Stop();
-           if (immediaty || !show) {
-                foreach (YamuiShadowBorder sideGlow in _glows) {
+            _restoreAnimationTimer?.Stop();
+            if (immediaty || !show) {
+                foreach (YamuiShadowBorder sideGlow in _shadows) {
                     sideGlow.Show(show);
                 }
-               _bordersVisible = show;
+
+                _bordersVisible = show;
             } else {
-                _timer?.Start();
+                _restoreAnimationTimer?.Start();
             }
         }
 
-        private void TimerOnElapsed(object sender, ElapsedEventArgs e) {
-            _timer?.Stop();
-            Show(true, true);
+        private void RestoreAnimationTimerOnElapsed(object sender, ElapsedEventArgs e) {
+            _restoreAnimationTimer?.Stop();
+            ShowShadows(true, true);
         }
-        
+
         private void UpdateFocus(bool isFocused) {
-            foreach (YamuiShadowBorder sideGlow in _glows) {
-                sideGlow.ParentWindowIsFocused = isFocused;
+            foreach (YamuiShadowBorder shadowBorder in _shadows) {
+                shadowBorder.ParentWindowIsFocused = isFocused;
             }
         }
-        
+
         private void UpdateLocationAndSize(WinApi.WINDOWPOS pos) {
-            foreach (YamuiShadowBorder sideGlow in _glows) {
-                sideGlow.SetLocationAndSize(pos.x, pos.y, pos.cx, pos.cy);
+            foreach (YamuiShadowBorder shadowBorder in _shadows) {
+                shadowBorder.SetLocationAndSize(pos.x, pos.y, pos.cx, pos.cy);
             }
         }
     }

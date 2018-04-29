@@ -114,14 +114,22 @@ namespace Yamui.Framework.Forms {
             get { return YamuiThemeManager.Current.FormFore; }
             set { base.ForeColor = value; }
         }
+        
+        [Browsable(false)]
+        public virtual Color BorderActiveColor => YamuiThemeManager.Current.AccentColor;
+
+        [Browsable(false)]
+        public virtual Color BorderInactiveColor => YamuiThemeManager.Current.FormBorder;
 
         /// <summary>
         /// This indicates that the form should not take focus when shown
         /// </summary>
+        [Browsable(false)]
         protected override bool ShowWithoutActivation {
             get { return DontActivateOnShow; }
         }
 
+        [Browsable(false)]
         public new FormWindowState WindowState {
             get { return IsMaximized ? FormWindowState.Maximized : base.WindowState; }
             set { base.WindowState = value; }
@@ -214,6 +222,11 @@ namespace Yamui.Framework.Forms {
             DontShowInAltTab = formOptions.HasFlag(YamuiFormOption.DontShowInAltTab);
             DontActivateOnShow = formOptions.HasFlag(YamuiFormOption.DontActivateOnShow);
             Unselectable = formOptions.HasFlag(YamuiFormOption.Unselectable);
+
+            if (IsPopup) {
+                ShowInTaskbar = false;
+            }
+            SizeGripStyle = SizeGripStyle.Hide;
         }
 
         
@@ -227,7 +240,7 @@ namespace Yamui.Framework.Forms {
                 e.Graphics.FillRectangle(b, ClientRectangle);
             }
             var borderRect = new Rectangle(0, 0, ClientRectangle.Width - 1, ClientRectangle.Height - 1);
-            using (var p = new Pen(YamuiThemeManager.Current.FormBorder, BorderWidth) {
+            using (var p = new Pen(IsActive ? BorderActiveColor : BorderInactiveColor, BorderWidth) {
                 Alignment = PenAlignment.Inset
             }) {
                 e.Graphics.DrawRectangle(p, borderRect);
@@ -264,13 +277,13 @@ namespace Yamui.Framework.Forms {
                     if (!Movable && ht == WinApi.HitTest.HTCAPTION) {
                         ht = WinApi.HitTest.HTNOWHERE;
                     }
-                    if (!Resizable && ht != WinApi.HitTest.HTCAPTION) {
+                    if (!Resizable && (int)ht >= (int)WinApi.HitTest.HTRESIZESTARTNUMBER && (int)ht <= (int)WinApi.HitTest.HTRESIZEENDNUMBER) {
                         ht = WinApi.HitTest.HTNOWHERE;
                     }
                     m.Result = (IntPtr) ht;
                     return;
 
-                case Window.Msg.WM_WINDOWPOSCHANGING:
+                //case Window.Msg.WM_WINDOWPOSCHANGING:
                     // https://msdn.microsoft.com/fr-fr/library/windows/desktop/ms632653(v=vs.85).aspx?f=255&MSPPError=-2147217396
                     // https://blogs.msdn.microsoft.com/oldnewthing/20080116-00/?p=23803
                     // The WM_WINDOWPOSCHANGING message is sent early in the window state changing process, unlike WM_WINDOWPOSCHANGED, 
@@ -278,7 +291,7 @@ namespace Yamui.Framework.Forms {
                     // A crucial difference (aside from the timing) is that you can influence the state change by handling 
                     // the WM_WINDOWPOSCHANGING message and modifying the WINDOWPOS structure
                     // var windowpos = (WinApi.WINDOWPOS) Marshal.PtrToStructure(m.LParam, typeof(WinApi.WINDOWPOS));
-                    break;
+                    //break;
 
                 case Window.Msg.WM_ENTERSIZEMOVE:
                     // Useful if your window contents are dependent on window size but expensive to compute, as they give you a way to defer paints until the end of the resize action. We found WM_WINDOWPOSCHANGING/ED wasn’t reliable for that purpose.
@@ -304,7 +317,6 @@ namespace Yamui.Framework.Forms {
                 case Window.Msg.WM_MOVING:
                     Moving = true;
                     break;
-
 
                 case Window.Msg.WM_MBUTTONDOWN:
                     //var state = (WinApi.WmSizeEnum) m.WParam;

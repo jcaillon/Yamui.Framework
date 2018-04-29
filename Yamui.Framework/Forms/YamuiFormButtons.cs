@@ -98,6 +98,11 @@ namespace Yamui.Framework.Forms {
 
         protected YamuiFormButtons(YamuiFormOption options) : base(options) {
             _mainFormToolTip.ShowAlways = true;
+            
+            AddWindowButton(WindowButtons.Close);
+            AddWindowButton(WindowButtons.CloseAllVisible);
+            AddWindowButton(WindowButtons.Maximize);  
+            AddWindowButton(WindowButtons.Minimize);
         }
 
         #endregion
@@ -120,8 +125,8 @@ namespace Yamui.Framework.Forms {
                 int x = ClientRectangle.Width - 1 - FormButtonWidth;
                 DrawButton(ref x, WindowButtons.Close, e, true);
                 DrawButton(ref x, WindowButtons.CloseAllVisible, e, CloseAllBox);
-                DrawButton(ref x, WindowButtons.Maximize, e, MaximizeBox);
-                DrawButton(ref x, WindowButtons.Minimize, e, MinimizeBox);
+                DrawButton(ref x, WindowButtons.Maximize, e, MaximizeBox && Resizable);
+                DrawButton(ref x, WindowButtons.Minimize, e, MinimizeBox && ShowInTaskbar);
             }
         }
 
@@ -235,11 +240,6 @@ namespace Yamui.Framework.Forms {
                     }
                     break;
             }
-
-            AddWindowButton(WindowButtons.Close);
-            AddWindowButton(WindowButtons.CloseAllVisible);
-            AddWindowButton(WindowButtons.Maximize);  
-            AddWindowButton(WindowButtons.Minimize);
         }
 
         #endregion

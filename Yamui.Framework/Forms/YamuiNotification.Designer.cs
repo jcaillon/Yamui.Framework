@@ -31,10 +31,8 @@ namespace Yamui.Framework.Forms {
             this.components = new System.ComponentModel.Container();
             this.contentPanel = new YamuiScrollPanel();
             this.contentLabel = new HtmlLabel();
-            this._errorProvider = new System.Windows.Forms.ErrorProvider(this.components);
             this.titleLabel = new HtmlLabel();
             this.contentPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this._errorProvider)).BeginInit();
             this.SuspendLayout();
             // 
             // contentPanel
@@ -59,10 +57,6 @@ namespace Yamui.Framework.Forms {
             this.contentLabel.TabIndex = 4;
             this.contentLabel.TabStop = false;
             this.contentLabel.Text = "contentLabel";
-            // 
-            // _errorProvider
-            // 
-            this._errorProvider.ContainerControl = this;
             // 
             // titleLabel
             // 
@@ -99,7 +93,6 @@ namespace Yamui.Framework.Forms {
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "YamuiFormMessageBox";
             this.contentPanel.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this._errorProvider)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -108,7 +101,6 @@ namespace Yamui.Framework.Forms {
 
         private YamuiScrollPanel contentPanel;
         private HtmlLabel contentLabel;
-        private ErrorProvider _errorProvider;
         private HtmlLabel titleLabel;
 
 

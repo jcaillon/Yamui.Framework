@@ -746,6 +746,8 @@ namespace Yamui.Framework.Helper {
             HTHSCROLL = 6,
             HTMINBUTTON = 8,
             HTMAXBUTTON = 9,
+
+            HTRESIZESTARTNUMBER = HTLEFT,
             HTLEFT = 10,
             HTRIGHT = 11,
             HTTOP = 12,
@@ -754,6 +756,8 @@ namespace Yamui.Framework.Helper {
             HTBOTTOM = 15,
             HTBOTTOMLEFT = 16,
             HTBOTTOMRIGHT = 17,
+            HTRESIZEENDNUMBER = HTBOTTOMRIGHT,
+
             HTBORDER = 18,
             HTCLOSE = 20,
             HTHELP = 21,
