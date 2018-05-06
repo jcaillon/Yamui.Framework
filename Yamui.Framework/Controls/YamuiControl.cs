@@ -15,7 +15,7 @@ namespace Yamui.Framework.Controls {
         #region IYamuiControl
 
         public void UpdateBoundsPublic() {
-            // TODO : replace this by smething like that : 
+            // TODO : replace this by something like that?
             //FieldInfo field = typeof(Brush).GetField("nativeBrush",BindingFlags.NonPublic|BindingFlags.Instance);
             //hbrush = (IntPtr)field.GetValue(brush);
             UpdateBounds();
@@ -46,7 +46,7 @@ namespace Yamui.Framework.Controls {
                 graphics.Clear(YamuiThemeManager.Current.FormBack);
             }
         }
-
+        
         #endregion
 
         #region MeasureTextCache

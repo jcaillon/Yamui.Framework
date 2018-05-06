@@ -33,7 +33,7 @@ namespace Yamui.Framework.Controls {
 
         #region Properties
 
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public Image BackGrndImage {
             get { return _backGrndImage; }
             set {
@@ -43,7 +43,7 @@ namespace Yamui.Framework.Controls {
         }
 
         [DefaultValue(false)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public bool DrawBorder { get; set; }
 
         #endregion

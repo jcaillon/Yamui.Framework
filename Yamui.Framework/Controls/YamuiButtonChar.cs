@@ -34,13 +34,13 @@ namespace Yamui.Framework.Controls {
         public IconFontNameEnum IconFontName { get; set; }
 
         [DefaultValue("ç")]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public string ButtonChar { get; set; }
 
         private bool _fakeDisabled;
 
         [DefaultValue(false)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public bool FakeDisabled {
             get { return _fakeDisabled; }
             set {

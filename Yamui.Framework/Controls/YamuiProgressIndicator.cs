@@ -35,16 +35,16 @@ namespace Yamui.Framework.Controls {
         #region fields
 
         [DefaultValue(false)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public bool UseCustomBackColor { get; set; }
 
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public int AnimateInterval {
             get { return _tmrAnimate.Interval; }
             set { _tmrAnimate.Interval = value; }
         }
 
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public int CircleDiameter {
             get { return _circleDiam; }
             set {
@@ -53,7 +53,7 @@ namespace Yamui.Framework.Controls {
             }
         }
 
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public int CircleCount {
             get { return _circleCount; }
             set {

@@ -81,7 +81,7 @@ namespace Yamui.Framework.Controls {
         [Browsable(true)]
         [EditorBrowsable(EditorBrowsableState.Always)]
         [DefaultValue("")]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public string WaterMark {
             get { return _waterMark; }
             set {

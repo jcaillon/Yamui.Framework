@@ -36,7 +36,7 @@ namespace Yamui.Framework.Controls {
         #region Fields
 
         [DefaultValue(false)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public bool UseBorder { get; set; }
 
         private bool _isHovered;

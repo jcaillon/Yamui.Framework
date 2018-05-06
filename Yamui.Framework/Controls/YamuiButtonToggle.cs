@@ -34,7 +34,7 @@ namespace Yamui.Framework.Controls {
         private bool _checked;
 
         [DefaultValue(false)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public bool Checked {
             get { return _checked; }
             set {
@@ -44,7 +44,7 @@ namespace Yamui.Framework.Controls {
         }
 
         [DefaultValue(35)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public int ToggleSize { get; set; }
 
         #endregion

@@ -24,8 +24,10 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using Yamui.Framework.Controls;
 using Yamui.Framework.Helper;
 using Yamui.Framework.Themes;
 
@@ -56,10 +58,10 @@ namespace Yamui.Framework.Forms {
 
         #region Properties
 
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public bool Movable { get; set; } = true;
 
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public bool Resizable { get; set; } = true;
 
         [Browsable(false)]
@@ -148,9 +150,9 @@ namespace Yamui.Framework.Forms {
 
                 if (IsPopup) {
                     cp.Style = (int) WinApi.WindowStyles.WS_POPUP;
-                    cp.ExStyle = (int) (WinApi.WindowStylesEx.WS_EX_COMPOSITED
-                        | WinApi.WindowStylesEx.WS_EX_LEFT
-                        | WinApi.WindowStylesEx.WS_EX_LTRREADING);
+                    // i don't control the exstyle because i can't get it right and it throws an incorrect param
+                    // exception no matter what i put here
+                    cp.ExStyle = cp.ExStyle | (int) (WinApi.WindowStylesEx.WS_EX_OVERLAPPEDWINDOW);
                 } else {
                     // below is what makes the windows borderless but resizable
                     cp.Style = (int) (WinApi.WindowStyles.WS_CAPTION // enables aero minimize animation/transition
@@ -166,7 +168,9 @@ namespace Yamui.Framework.Forms {
                         | WinApi.WindowStylesEx.WS_EX_LEFT
                         | WinApi.WindowStylesEx.WS_EX_LTRREADING
                         | WinApi.WindowStylesEx.WS_EX_APPWINDOW
-                        | WinApi.WindowStylesEx.WS_EX_WINDOWEDGE);
+                        | WinApi.WindowStylesEx.WS_EX_WINDOWEDGE
+                        | WinApi.WindowStylesEx.WS_EX_OVERLAPPEDWINDOW
+                        | WinApi.WindowStylesEx.WS_EX_CONTROLPARENT);
                 }
 
                 if (DontShowInAltTab) {
@@ -477,7 +481,15 @@ namespace Yamui.Framework.Forms {
         #endregion
 
         #region Methods
-        
+
+        /// <summary>
+        /// invalidates client area, redraw the form and all its children
+        /// </summary>
+        public override void Refresh() {
+            base.Refresh();
+            this.GetAll(typeof(YamuiScrollPanel)).ToList().ForEach(control => control.Refresh());
+        }
+
         /// <summary>
         /// Returns the best position for a window centered in another one
         /// </summary>

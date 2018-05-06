@@ -30,7 +30,7 @@ namespace Yamui.Framework.Controls {
     public class YamuiTableLayoutPanel : TableLayoutPanel, IScrollableControl {
         #region Fields
 
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         [DefaultValue(false)]
         public bool DisableTransparentBackGround { get; set; }
 

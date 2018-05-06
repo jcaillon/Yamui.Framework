@@ -31,10 +31,10 @@ namespace Yamui.Framework.Controls {
         #region Fields
 
         [DefaultValue(false)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public bool UseCustomBackColor { get; set; }
 
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         [DefaultValue(false)]
         public bool DontUseTransparentBackGround { get; set; }
 

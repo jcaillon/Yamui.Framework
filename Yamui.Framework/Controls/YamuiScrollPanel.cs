@@ -25,7 +25,6 @@ using System.Collections;
 using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Security.Permissions;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 using Yamui.Framework.Helper;
@@ -40,11 +39,11 @@ namespace Yamui.Framework.Controls {
         #region fields
 
         [DefaultValue(false)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public bool DisableBackgroundImage { get; set; }
 
         [DefaultValue(15)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public int ScrollBarWidth {
             get { return _scrollBarWidth; }
             set {
@@ -121,13 +120,13 @@ namespace Yamui.Framework.Controls {
         private Rectangle _leftoverBar;
         private bool _needBothScroll;
         private int _scrollBarWidth = 12;
-        private FormWindowState? _lastWindowState;
 
         #endregion
 
         #region constructor
 
         public YamuiScrollPanel() {
+            TabStop = false;
             SetStyle(
                 ControlStyles.UserMouse |
                 ControlStyles.OptimizedDoubleBuffer |
@@ -135,7 +134,6 @@ namespace Yamui.Framework.Controls {
                 ControlStyles.UserPaint |
                 ControlStyles.AllPaintingInWmPaint |
                 ControlStyles.DoubleBuffer |
-                ControlStyles.Selectable |
                 ControlStyles.Opaque, true);
 
             VerticalScroll = new YamuiScrollHandler(true, this) {
@@ -162,11 +160,12 @@ namespace Yamui.Framework.Controls {
         }
 
         protected override CreateParams CreateParams {
-            [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
             get {
                 CreateParams cp = base.CreateParams;
                 /* The window itself contains child windows that should take part in dialog box navigation. If this style is specified, the dialog manager recurses into children of this window when performing navigation operations such as handling the TAB key, an arrow key, or a keyboard mnemonic. */
+                // to handle TAB correctly, it also needs the TabStop = false
                 cp.ExStyle |= (int) WinApi.WindowStylesEx.WS_EX_CONTROLPARENT;
+                cp.ExStyle |= (int) WinApi.WindowStylesEx.WS_EX_OVERLAPPEDWINDOW;
                 return cp;
             }
         }

@@ -34,7 +34,7 @@ namespace Yamui.Framework.Controls {
         private int _trackerValue = 50;
 
         [DefaultValue(50)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public int Value {
             get { return _trackerValue; }
             set {
@@ -49,7 +49,7 @@ namespace Yamui.Framework.Controls {
         private int _barMinimum;
 
         [DefaultValue(0)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public int Minimum {
             get { return _barMinimum; }
             set {
@@ -67,7 +67,7 @@ namespace Yamui.Framework.Controls {
         private int _barMaximum = 100;
 
         [DefaultValue(100)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public int Maximum {
             get { return _barMaximum; }
             set {
@@ -85,7 +85,7 @@ namespace Yamui.Framework.Controls {
         private int _smallChange = 1;
 
         [DefaultValue(1)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public int SmallChange {
             get { return _smallChange; }
             set { _smallChange = value; }
@@ -94,7 +94,7 @@ namespace Yamui.Framework.Controls {
         private int _largeChange = 5;
 
         [DefaultValue(5)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public int LargeChange {
             get { return _largeChange; }
             set { _largeChange = value; }
@@ -103,7 +103,7 @@ namespace Yamui.Framework.Controls {
         private int _mouseWheelBarPartitions = 10;
 
         [DefaultValue(10)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public int MouseWheelBarPartitions {
             get { return _mouseWheelBarPartitions; }
             set {

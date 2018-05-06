@@ -38,11 +38,11 @@ namespace Yamui.Framework.Controls {
         #region Fields
 
         [DefaultValue(false)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public bool UseCustomBackColor { get; set; }
 
         [DefaultValue(false)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public bool UseCustomForeColor { get; set; }
 
         private bool _isHovered;

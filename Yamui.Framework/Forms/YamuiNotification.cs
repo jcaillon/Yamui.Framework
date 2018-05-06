@@ -20,6 +20,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -27,11 +28,12 @@ using Yamui.Framework.Animations.Transitions;
 using Yamui.Framework.Controls;
 using Yamui.Framework.Helper;
 using Yamui.Framework.HtmlRenderer.Core.Core.Entities;
+using Yamui.Framework.HtmlRenderer.WinForms;
 using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Forms {
 
-    public sealed partial class YamuiNotification : YamuiFormButtons {
+    public sealed class YamuiNotification : YamuiFormButtons {
 
         #region Static
 
@@ -60,11 +62,27 @@ namespace Yamui.Framework.Forms {
         #endregion
 
         #region Private
+        
+        private const int SpaceBetweenNotifications = 5;
+        private const int PositionHorizontalMargin = 5;
+        private const int PositionVerticalMargin = 5;
 
         private int _duration;
         private YamuiSimplePanel _progressSimplePanel;
         private Transition _closingTransition;
         private Screen _screen;
+
+        private YamuiScrollPanel contentPanel;
+        private HtmlLabel contentLabel;
+        private HtmlLabel titleLabel;
+
+        #endregion
+
+        #region MyRegion
+
+        [Category(nameof(Yamui))]
+        [DefaultValue(NotificationPosition.BottomRight)]
+        public NotificationPosition OnScreenPosition { get; set; }
 
         #endregion
 
@@ -73,13 +91,15 @@ namespace Yamui.Framework.Forms {
         /// <summary>
         /// Create a new notification, to be displayed with Show() later
         /// </summary>
-        public YamuiNotification(string htmlTitle, string htmlMessage, int duration, Screen screenToUse = null, int formMinWidth = 0, int formMaxWidth = 0, int formMaxHeight = 0, EventHandler<HtmlLinkClickedEventArgs> onLinkClicked = null) : base(YamuiFormOption.IsPopup | YamuiFormOption.WithShadow | YamuiFormOption.AlwaysOnTop | YamuiFormOption.DontShowInAltTab | YamuiFormOption.DontActivateOnShow) {
+        public YamuiNotification(string htmlTitle, string htmlMessage, int duration, Screen screenToUse = null, int formMinWidth = 0, int formMaxWidth = 0, int formMaxHeight = 0, EventHandler<HtmlLinkClickedEventArgs> onLinkClicked = null) : base(YamuiFormOption.IsPopup | YamuiFormOption.WithDropShadow | YamuiFormOption.AlwaysOnTop | YamuiFormOption.DontShowInAltTab | YamuiFormOption.DontActivateOnShow) {
 
             // close all notif button
             CloseAllBox = true;
             OnCloseAllNotif = CloseAllNotif;
             Movable = false;
             Resizable = false;
+            ShowIcon = false;
+            ShowInTaskbar = false;
 
             InitializeComponent();
 
@@ -127,15 +147,83 @@ namespace Yamui.Framework.Forms {
                 };
                 Controls.Add(_progressSimplePanel);
                 _duration = duration*1000;
+                
+                _closingTransition = new Transition(new TransitionType_Linear(_duration));
+                _closingTransition.add(_progressSimplePanel, "Width", 0);
+                _closingTransition.TransitionCompletedEvent += (o, args) => { Close(); };
             } else
                 _duration = 0;
 
-            _closingTransition = new Transition(new TransitionType_Linear(_duration));
-            _closingTransition.add(_progressSimplePanel, "Width", 0);
-            _closingTransition.TransitionCompletedEvent += (o, args) => { Close(); };
+        }
+
+        private void InitializeComponent() {
+            contentPanel = new YamuiScrollPanel();
+            contentLabel = new HtmlLabel();
+            titleLabel = new HtmlLabel();
+            contentPanel.SuspendLayout();
+            SuspendLayout();
+
+            contentPanel.Controls.Add(contentLabel);
+            contentPanel.Dock = DockStyle.Fill;
+            contentPanel.Location = new Point(5, 50);
+            contentPanel.Name = "contentPanel";
+            contentPanel.DisableBackgroundImage = true;
+            contentPanel.Size = new Size(290, 270);
+            contentPanel.TabIndex = 4;
+
+            contentLabel.AutoSize = false;
+            contentLabel.AutoSizeHeightOnly = true;
+            contentLabel.BackColor = Color.Transparent;
+            contentLabel.BaseStylesheet = null;
+            contentLabel.Location = new Point(0, 0);
+            contentLabel.Name = "contentLabel";
+            contentLabel.Size = new Size(245, 15);
+            contentLabel.TabIndex = 4;
+            contentLabel.TabStop = false;
+            contentLabel.Text = "contentLabel";
+
+            titleLabel.AutoSize = false;
+            titleLabel.AutoSizeHeightOnly = true;
+            titleLabel.BackColor = Color.Transparent;
+            titleLabel.BaseStylesheet = null;
+            titleLabel.CausesValidation = false;
+            titleLabel.Enabled = false;
+            titleLabel.IsContextMenuEnabled = false;
+            titleLabel.IsSelectionEnabled = false;
+            titleLabel.Location = new Point(5, 5);
+            titleLabel.Name = "titleLabel";
+            titleLabel.Size = new Size(243, 15);
+            titleLabel.TabIndex = 6;
+            titleLabel.TabStop = false;
+            titleLabel.Text = "titleLabel";
+
+            Controls.Add(titleLabel);
+            Controls.Add(contentPanel);
+            Padding = new Padding(5, 50, 5, 5);
+            contentPanel.ResumeLayout(false);
+            ResumeLayout(false);
         }
 
         #endregion
+
+        private Point GetSpawnLocation() {
+            Point output;
+            switch (OnScreenPosition) {
+                case NotificationPosition.TopLeft:
+                    output = new Point(_screen.WorkingArea.X + PositionHorizontalMargin, _screen.WorkingArea.Y + PositionVerticalMargin);
+                    break;
+                case NotificationPosition.BottomLeft:
+                    output = new Point(_screen.WorkingArea.X + PositionHorizontalMargin, _screen.WorkingArea.Y + _screen.WorkingArea.Height - Height - PositionVerticalMargin);
+                    break;
+                case NotificationPosition.TopRight:
+                    output = new Point(_screen.WorkingArea.X + _screen.WorkingArea.Width - Width - PositionHorizontalMargin, _screen.WorkingArea.Y + PositionVerticalMargin);
+                    break;
+                default:
+                    output = new Point(_screen.WorkingArea.X + _screen.WorkingArea.Width - Width - PositionHorizontalMargin, _screen.WorkingArea.Y + _screen.WorkingArea.Height - Height - PositionVerticalMargin);
+                    break;
+            }
+            return output;
+        }
 
         #region override
 
@@ -157,25 +245,10 @@ namespace Yamui.Framework.Forms {
         // get activated window
         protected override void OnShown(EventArgs e) {
             // Start the timer animation on the bottom of the notif
-            if (_duration > 0) {
-                _closingTransition.run();
-            }
+            _closingTransition?.run();
             base.OnShown(e);
         }
-
-        protected override void OnLoad(EventArgs e) {
-            // Display the form just above the system tray.
-            Location = new Point(_screen.WorkingArea.X + _screen.WorkingArea.Width - Width - 5, _screen.WorkingArea.Y + _screen.WorkingArea.Height - Height - 5);
-
-            // Move each open form upwards to make room for this one
-            foreach (YamuiNotification openForm in _openNotifications) {
-                openForm.Top -= Height + 5;
-            }
-
-            _openNotifications.Add(this);
-            base.OnLoad(e);
-        }
-
+        
         protected override void OnActivated(EventArgs e) {
             // when the form is activated (i.e. when it's clicked on), remove the bottom animation
             if (_closingTransition != null) {
@@ -187,6 +260,22 @@ namespace Yamui.Framework.Forms {
             base.OnActivated(e);
         }
 
+        protected override void OnLoad(EventArgs e) {
+            // Display the form just above the system tray.
+            Location = GetSpawnLocation();
+
+            // Move each open form upwards to make room for this one
+            foreach (YamuiNotification openForm in _openNotifications) {
+                if (OnScreenPosition == NotificationPosition.TopLeft || OnScreenPosition == NotificationPosition.TopRight) {
+                    openForm.Top += Height + SpaceBetweenNotifications;
+                } else {
+                    openForm.Top -= Height + SpaceBetweenNotifications;
+                }
+            }
+            _openNotifications.Add(this);
+            base.OnLoad(e);
+        }
+
         protected override void OnClosed(EventArgs e) {
             // Move down any open forms above this one
             foreach (YamuiNotification openForm in _openNotifications) {
@@ -194,12 +283,23 @@ namespace Yamui.Framework.Forms {
                     // Remaining forms are below this one
                     break;
                 }
-                openForm.Top += Height + 5;
+                if (OnScreenPosition == NotificationPosition.TopLeft || OnScreenPosition == NotificationPosition.TopRight) {
+                    openForm.Top -= Height + SpaceBetweenNotifications;
+                } else {
+                    openForm.Top += Height + SpaceBetweenNotifications;
+                }
             }
             _openNotifications.Remove(this);
             base.OnClosed(e);
         }
 
         #endregion
+    }
+
+    public enum NotificationPosition {
+        TopLeft,
+        BottomLeft,
+        TopRight,
+        BottomRight
     }
 }

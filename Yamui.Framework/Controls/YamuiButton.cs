@@ -42,34 +42,34 @@ namespace Yamui.Framework.Controls {
         /// Set to true if you wish to use the BackColor property
         /// </summary>
         [DefaultValue(false)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public bool UseCustomBackColor { get; set; }
 
         /// <summary>
         /// Set to true if you wish to use the ForeColor property
         /// </summary>
         [DefaultValue(false)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public bool UseCustomForeColor { get; set; }
 
         /// <summary>
         /// Highlight this button by giving it a thicker border
         /// </summary>
         [DefaultValue(false)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public bool Highlight { get; set; }
 
         /// <summary>
         /// Allows the ButtonPressed event to also be activated by a right/middle click on the button
         /// </summary>
         [DefaultValue(false)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public virtual bool AcceptsAnyClick { get; set; }
 
         /// <summary>
         /// Set the image to use for this button
         /// </summary>
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public Image BackGrndImage {
             get { return _backGrndImage; }
             set {
@@ -84,14 +84,14 @@ namespace Yamui.Framework.Controls {
         /// Set the image size to visualize the image position in the designer mode
         /// </summary>
         [DefaultValue(false)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public Size SetImgSize { get; set; }
 
         /// <summary>
         /// Set to true to use grey scale only for the image (happens by default if the button is disabled)
         /// </summary>
         [DefaultValue(false)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public bool UseGreyScale {
             get { return _useGreyScale; }
             set {
@@ -145,7 +145,7 @@ namespace Yamui.Framework.Controls {
         /// The EventArgs can be casted to KeyEventArgs or MouseEventArgs depending on how this was triggered
         /// You can analyse the MouseEventArgs.Clicks number to know if it's a simple or double click
         /// </summary>
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public event EventHandler<EventArgs> ButtonPressed;
 
         #endregion

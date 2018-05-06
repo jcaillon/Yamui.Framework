@@ -44,14 +44,14 @@ namespace Yamui.Framework.Controls {
         /// Designed to be used with CustomBackColor
         /// </summary>
         [DefaultValue(false)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public bool UseCustomBackColor { get; set; }
 
         /// <summary>
         /// set UseCustomBackColor to true or it won't do anything
         /// </summary>
         [DefaultValue(false)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public Color CustomBackColor {
             get { return _customBackColor; }
             set {
@@ -66,14 +66,14 @@ namespace Yamui.Framework.Controls {
         /// Designed to be used with CustomForeColor
         /// </summary>
         [DefaultValue(false)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public bool UseCustomForeColor { get; set; }
 
         /// <summary>
         /// Set UseCustomForeColor to true or it won't do anything
         /// </summary>
         [DefaultValue(false)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public Color CustomForeColor {
             get { return _customForeColor; }
             set {
@@ -87,7 +87,7 @@ namespace Yamui.Framework.Controls {
         [Browsable(true)]
         [EditorBrowsable(EditorBrowsableState.Always)]
         [DefaultValue("")]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public string WaterMark { get; set; }
 
         private bool _isHovered;
@@ -97,7 +97,7 @@ namespace Yamui.Framework.Controls {
         /// Use this propety instead of the multiLine property!
         /// </summary>
         [DefaultValue(false)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         [Browsable(true)]
         public new bool Multiline {
             get { return _multiline; }

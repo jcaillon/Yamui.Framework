@@ -29,14 +29,16 @@ using System.Windows.Forms;
 using Yamui.Framework.Helper;
 
 namespace Yamui.Framework.Forms {
-    /// <summary>
-    /// Form class that implements interesting utilities + shadow + onpaint + movable borderless
-    /// </summary>
+
     public abstract class YamuiFormShadow : YamuiForm {
+
         private readonly List<YamuiShadowBorder> _shadows = new List<YamuiShadowBorder>();
         private bool _bordersVisible;
         private WinApi.WINDOWPOS _lastLocation;
         private System.Timers.Timer _restoreAnimationTimer;
+        
+        private bool _isDisposed;
+        private bool _isInitialized;
 
         #region Constructor
 
@@ -72,9 +74,7 @@ namespace Yamui.Framework.Forms {
                 HasShadow = false;
             }
         }
-
-        private bool _isDisposed;
-
+        
         /// <summary>
         /// Standard Dispose
         /// </summary>
@@ -122,7 +122,10 @@ namespace Yamui.Framework.Forms {
                     break;
 
                 case Window.Msg.WM_CREATE:
-                    InitShadows();
+                    if (!_isInitialized) {
+                        InitShadows();
+                        _isInitialized = true;
+                    }
                     break;
 
                 case Window.Msg.WM_SIZE:
@@ -189,6 +192,9 @@ namespace Yamui.Framework.Forms {
         private void ShowShadows(bool show, bool immediaty) {
             if (_bordersVisible == show)
                 return;
+
+            // why this animation? Because of the restore animation in windows : the borders would be shown at the restored location
+            // before the parent finishes its animation
 
             _restoreAnimationTimer?.Stop();
             if (immediaty || !show) {

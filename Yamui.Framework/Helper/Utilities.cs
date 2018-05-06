@@ -286,7 +286,7 @@ namespace Yamui.Framework.Helper {
         /// <param name="control"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static IEnumerable<Control> GetAll(Control control, Type type) {
+        public static IEnumerable<Control> GetAll(this Control control, Type type) {
             try {
                 var controls = control.Controls.Cast<Control>();
                 var enumerable = controls as IList<Control> ?? controls.ToList();
@@ -302,7 +302,7 @@ namespace Yamui.Framework.Helper {
         /// <param name="control"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static Control GetFirst(Control control, Type type) {
+        public static Control GetFirst(this Control control, Type type) {
             try {
                 return control.Controls.Cast<object>().Where(control1 => control1.GetType() == type).Cast<Control>().FirstOrDefault();
             } catch (Exception) {

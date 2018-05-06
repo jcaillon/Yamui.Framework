@@ -331,8 +331,9 @@ namespace Yamui.Framework.Forms {
                 set {
                     if (_isHovered != value) {
                         _isHovered = value;
-                        if (Show)
-                            _parent.Invalidate(false);
+                        if (Show) {
+                            _parent.Invalidate(ClientRectangle, false);
+                        }
                     }
                 }
             }
@@ -341,8 +342,9 @@ namespace Yamui.Framework.Forms {
                 set {
                     if (_isPressed != value) {
                         _isPressed = value;
-                        if (Show)
-                            _parent.Invalidate(false);
+                        if (Show) {
+                            _parent.Invalidate(ClientRectangle, false);
+                        }
                     }
                 }
             }

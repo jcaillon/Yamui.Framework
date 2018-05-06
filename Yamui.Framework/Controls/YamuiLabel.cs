@@ -37,17 +37,17 @@ namespace Yamui.Framework.Controls {
         #region Fields
 
         [DefaultValue(false)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public bool UseCustomBackColor { get; set; }
 
         [DefaultValue(false)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public bool UseCustomForeColor { get; set; }
 
         private FontFunction _function = FontFunction.Normal;
 
         [DefaultValue(FontFunction.Normal)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public FontFunction Function {
             get { return _function; }
             set {
@@ -60,7 +60,7 @@ namespace Yamui.Framework.Controls {
         private bool _fakeDisabled;
 
         [DefaultValue(false)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public bool FakeDisabled {
             get { return _fakeDisabled; }
             set {
@@ -72,7 +72,7 @@ namespace Yamui.Framework.Controls {
         private bool _wrapToLine;
 
         [DefaultValue(false)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public bool WrapToLine {
             get { return _wrapToLine; }
             set {
@@ -106,7 +106,7 @@ namespace Yamui.Framework.Controls {
         }
 
         [DefaultValue(ContentAlignment.TopLeft)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public ContentAlignment TextAlign { get; set; } = ContentAlignment.TopLeft;
 
         #endregion

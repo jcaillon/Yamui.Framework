@@ -33,7 +33,7 @@ namespace Yamui.Framework.Controls {
         private FontFunction _function = FontFunction.Link;
 
         [DefaultValue(FontFunction.Normal)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public FontFunction Function {
             get { return _function; }
             set { _function = value; }

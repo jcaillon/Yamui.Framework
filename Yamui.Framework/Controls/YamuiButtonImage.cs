@@ -31,11 +31,11 @@ namespace Yamui.Framework.Controls {
         #region Fields
 
         [DefaultValue(false)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public bool DrawBorder { get; set; }
 
         [DefaultValue(false)]
-        [Category("Yamui")]
+        [Category(nameof(Yamui))]
         public bool HideFocusedIndicator { get; set; }
 
         #endregion
