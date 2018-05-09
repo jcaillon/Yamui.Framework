@@ -42,7 +42,6 @@ namespace Yamui.Framework.Controls {
         [Category(nameof(Yamui))]
         public bool DisableBackgroundImage { get; set; }
 
-        [DefaultValue(15)]
         [Category(nameof(Yamui))]
         public int ScrollBarWidth {
             get { return _scrollBarWidth; }
@@ -64,7 +63,6 @@ namespace Yamui.Framework.Controls {
         /// <summary>
         /// Can this control have vertical scroll?
         /// </summary>
-        [DefaultValue(true)]
         public bool HScroll {
             get { return _hScroll; }
             set {
@@ -79,7 +77,6 @@ namespace Yamui.Framework.Controls {
         /// <summary>
         /// Can this control have vertical scroll?
         /// </summary>
-        [DefaultValue(true)]
         public bool VScroll {
             get { return _vScroll; }
             set {
@@ -108,6 +105,7 @@ namespace Yamui.Framework.Controls {
             set {
                 HorizontalScroll.LengthToRepresentMinSize = value.Width;
                 VerticalScroll.LengthToRepresentMinSize = value.Height;
+                ApplyPreferedSize(_preferedSize, Size);
             }
         }
 
@@ -127,14 +125,8 @@ namespace Yamui.Framework.Controls {
 
         public YamuiScrollPanel() {
             TabStop = false;
-            SetStyle(
-                ControlStyles.UserMouse |
-                ControlStyles.OptimizedDoubleBuffer |
-                ControlStyles.ResizeRedraw |
-                ControlStyles.UserPaint |
-                ControlStyles.AllPaintingInWmPaint |
-                ControlStyles.DoubleBuffer |
-                ControlStyles.Opaque, true);
+            SetStyle(ControlStyles.Selectable, false);
+            SetStyle(ControlStyles.UserMouse, true);
 
             VerticalScroll = new YamuiScrollHandler(true, this) {
                 SmallChange = 70,
@@ -146,17 +138,17 @@ namespace Yamui.Framework.Controls {
                 LargeChange = 400,
                 BarThickness = ScrollBarWidth
             };
-            VerticalScroll.OnValueChange += ScrollOnOnValueChange;
-            VerticalScroll.OnRedrawScrollBars += OnRedrawScrollBars;
-            HorizontalScroll.OnValueChange += ScrollOnOnValueChange;
-            HorizontalScroll.OnRedrawScrollBars += OnRedrawScrollBars;
+            VerticalScroll.OnValueChanged += ScrollOnOnValueChanged;
+            VerticalScroll.OnScrollbarsRedrawNeeded += OnScrollbarsRedrawNeeded;
+            HorizontalScroll.OnValueChanged += ScrollOnOnValueChanged;
+            HorizontalScroll.OnScrollbarsRedrawNeeded += OnScrollbarsRedrawNeeded;
         }
 
         ~YamuiScrollPanel() {
-            VerticalScroll.OnValueChange -= ScrollOnOnValueChange;
-            VerticalScroll.OnRedrawScrollBars -= OnRedrawScrollBars;
-            HorizontalScroll.OnValueChange -= ScrollOnOnValueChange;
-            HorizontalScroll.OnRedrawScrollBars -= OnRedrawScrollBars;
+            VerticalScroll.OnValueChanged -= ScrollOnOnValueChanged;
+            VerticalScroll.OnScrollbarsRedrawNeeded -= OnScrollbarsRedrawNeeded;
+            HorizontalScroll.OnValueChanged -= ScrollOnOnValueChanged;
+            HorizontalScroll.OnScrollbarsRedrawNeeded -= OnScrollbarsRedrawNeeded;
         }
 
         protected override CreateParams CreateParams {
@@ -165,7 +157,7 @@ namespace Yamui.Framework.Controls {
                 /* The window itself contains child windows that should take part in dialog box navigation. If this style is specified, the dialog manager recurses into children of this window when performing navigation operations such as handling the TAB key, an arrow key, or a keyboard mnemonic. */
                 // to handle TAB correctly, it also needs the TabStop = false
                 cp.ExStyle |= (int) WinApi.WindowStylesEx.WS_EX_CONTROLPARENT;
-                cp.ExStyle |= (int) WinApi.WindowStylesEx.WS_EX_OVERLAPPEDWINDOW;
+                //cp.ExStyle |= (int) WinApi.WindowStylesEx.WS_EX_OVERLAPPEDWINDOW;
                 return cp;
             }
         }
@@ -230,13 +222,23 @@ namespace Yamui.Framework.Controls {
         }
 
         protected void PaintOnRectangle(IntPtr winDc, ref Rectangle rect, Action<PaintEventArgs> paint) {
-            using (BufferedGraphics bg = BufferedGraphicsManager.Current.Allocate(winDc, rect)) {
-                Graphics g = bg.Graphics;
-                g.SetClip(rect);
-                using (PaintEventArgs e = new PaintEventArgs(g, rect)) {
-                    paint(e);
+            try {
+                using (BufferedGraphics bg = BufferedGraphicsManager.Current.Allocate(winDc, rect)) {
+                    Graphics g = bg.Graphics;
+                    g.SetClip(rect);
+                    using (PaintEventArgs e = new PaintEventArgs(g, rect)) {
+                        paint(e);
+                    }
+                    bg.Render();
                 }
-                bg.Render();
+            } catch (Exception) {
+                // draw directly on the hdc
+                using (Graphics g = Graphics.FromHdcInternal(winDc)) {
+                    g.SetClip(rect);
+                    using (PaintEventArgs e = new PaintEventArgs(g, rect)) {
+                        paint(e);
+                    }
+                }
             }
         }
 
@@ -244,11 +246,11 @@ namespace Yamui.Framework.Controls {
 
         #region ScrollHandler events
 
-        private void ScrollOnOnValueChange(object sender, YamuiScrollHandlerValueChangedEventArgs e) {
+        private void ScrollOnOnValueChanged(object sender, YamuiScrollHandlerValueChangedEventArgs e) {
             SetDisplayRectLocation(sender as YamuiScrollHandler, e.OldValue - e.NewValue);
         }
 
-        private void OnRedrawScrollBars(object sender, EventArgs eventArgs) {
+        private void OnScrollbarsRedrawNeeded(object sender, EventArgs eventArgs) {
             if (HasScroll) {
                 Invalidate(); // help against flickering
                 PaintScrollBars(sender as YamuiScrollHandler);
@@ -337,21 +339,6 @@ namespace Yamui.Framework.Controls {
 
                     break;
 
-                case Window.Msg.WM_KEYDOWN:
-                    // needto override OnPreviewKeyDown or IsInputKey to receive this
-                    var key = (Keys) (m.WParam.ToInt64());
-                    long context = m.LParam.ToInt64();
-
-                    // on key down
-                    if (!IsBitSet(context, 31)) {
-                        var e = new KeyEventArgs(key);
-                        e.Handled = PerformKeyDown(e);
-                        if (!e.Handled)
-                            base.WndProc(ref m);
-                    }
-
-                    break;
-
                 case Window.Msg.WM_MOUSEMOVE:
                     if (VerticalScroll.IsThumbPressed)
                         VerticalScroll.HandleMouseMove(null, null);
@@ -403,13 +390,6 @@ namespace Yamui.Framework.Controls {
                     base.WndProc(ref m);
                     break;
             }
-        }
-
-        /// <summary>
-        /// Returns true if the bit at the given position is set to true
-        /// </summary>
-        private static bool IsBitSet(long b, int pos) {
-            return (b & (1 << pos)) != 0;
         }
 
         private void AdjustClientArea(ref WinApi.RECT rect) {
@@ -534,7 +514,6 @@ namespace Yamui.Framework.Controls {
             foreach (Control control in Controls) {
                 UpdatePreferedSizeIfNeeded(control);
             }
-
             return _preferedSize;
         }
 
@@ -572,7 +551,7 @@ namespace Yamui.Framework.Controls {
         }
 
         public void ScrollControlIntoView(Control control) {
-            // TODO
+            throw new NotImplementedException();
         }
 
         #endregion
@@ -580,7 +559,9 @@ namespace Yamui.Framework.Controls {
 
     internal class YamuiScrollPanelDesigner : ScrollableControlDesigner {
         protected override void PreFilterProperties(IDictionary properties) {
+            properties.Remove("Cursor");
             properties.Remove("AutoScrollMargin");
+            properties.Remove("AutoScrollPosition");
             properties.Remove("AutoScrollMinSize");
             properties.Remove("Font");
             properties.Remove("ForeColor");

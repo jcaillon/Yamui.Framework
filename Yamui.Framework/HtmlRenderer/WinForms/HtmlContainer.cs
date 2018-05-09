@@ -233,16 +233,7 @@ namespace Yamui.Framework.HtmlRenderer.WinForms {
             get { return Utils.ConvertRound(_htmlContainerInt.ScrollOffset); }
             set { _htmlContainerInt.ScrollOffset = Utils.Convert(value); }
         }
-
-        /// <summary>
-        /// The top-left most location of the rendered html.<br/>
-        /// This will offset the top-left corner of the rendered html.
-        /// </summary>
-        public PointF Location {
-            get { return Utils.Convert(_htmlContainerInt.Location); }
-            set { _htmlContainerInt.Location = Utils.Convert(value); }
-        }
-
+        
         /// <summary>
         /// The max width and height of the rendered html.<br/>
         /// The max width will effect the html layout wrapping lines, resize images and tables where possible.<br/>

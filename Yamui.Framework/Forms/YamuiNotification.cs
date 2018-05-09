@@ -68,21 +68,31 @@ namespace Yamui.Framework.Forms {
         private const int PositionVerticalMargin = 5;
 
         private int _duration;
-        private YamuiSimplePanel _progressSimplePanel;
         private Transition _closingTransition;
         private Screen _screen;
 
-        private YamuiScrollPanel contentPanel;
         private HtmlLabel contentLabel;
         private HtmlLabel titleLabel;
+        private int _progressPercent;
 
         #endregion
 
-        #region MyRegion
+        #region Properties
 
         [Category(nameof(Yamui))]
         [DefaultValue(NotificationPosition.BottomRight)]
-        public NotificationPosition OnScreenPosition { get; set; }
+        public NotificationPosition OnScreenPosition { get; set; } = NotificationPosition.BottomRight;
+
+        [Browsable(false)]
+        public int ProgressPercent {
+            get { return _progressPercent; }
+            set {
+                if (value != _progressPercent) {
+                    _progressPercent = value;
+                    Invalidate();
+                }
+            }
+        }
 
         #endregion
 
@@ -130,77 +140,50 @@ namespace Yamui.Framework.Forms {
 
             // set form size
             Size = new Size(contentLabel.Width + space, (Padding.Top + Padding.Bottom + contentLabel.Height).ClampMax(formMaxHeight));
-            if (contentPanel.VerticalScroll.HasScroll)
-                Width += 10;
             MinimumSize = Size;
+
 
             // do we need to animate a panel on the bottom to visualise time left?
             if (duration > 0) {
-                _progressSimplePanel = new YamuiSimplePanel {
-                    BackColor = YamuiThemeManager.Current.AccentColor,
-                    AutoScroll = false,
-                    Location = new Point(1, Height - 9),
-                    Name = "progressPanel",
-                    Size = new Size(Width - 2, 8),
-                    TabStop = false,
-                    UseCustomBackColor = true
-                };
-                Controls.Add(_progressSimplePanel);
                 _duration = duration*1000;
-                
+                ProgressPercent = 100;
                 _closingTransition = new Transition(new TransitionType_Linear(_duration));
-                _closingTransition.add(_progressSimplePanel, "Width", 0);
+                _closingTransition.add(this, "ProgressPercent", 0);
                 _closingTransition.TransitionCompletedEvent += (o, args) => { Close(); };
             } else
                 _duration = 0;
 
         }
 
+        protected override void OnPaint(PaintEventArgs e) {
+            base.OnPaint(e);
+            using (var b = new SolidBrush(YamuiThemeManager.Current.AccentColor)) {
+                e.Graphics.FillRectangle(b, new Rectangle(1, Height - 9, Width * ProgressPercent / 100 - 2, 8));
+            }
+        }
+
         private void InitializeComponent() {
-            contentPanel = new YamuiScrollPanel();
-            contentLabel = new HtmlLabel();
-            titleLabel = new HtmlLabel();
-            contentPanel.SuspendLayout();
+            
             SuspendLayout();
 
-            contentPanel.Controls.Add(contentLabel);
-            contentPanel.Dock = DockStyle.Fill;
-            contentPanel.Location = new Point(5, 50);
-            contentPanel.Name = "contentPanel";
-            contentPanel.DisableBackgroundImage = true;
-            contentPanel.Size = new Size(290, 270);
-            contentPanel.TabIndex = 4;
-
-            contentLabel.AutoSize = false;
+            contentLabel = new HtmlLabel();
             contentLabel.AutoSizeHeightOnly = true;
-            contentLabel.BackColor = Color.Transparent;
-            contentLabel.BaseStylesheet = null;
-            contentLabel.Location = new Point(0, 0);
-            contentLabel.Name = "contentLabel";
-            contentLabel.Size = new Size(245, 15);
-            contentLabel.TabIndex = 4;
+            contentLabel.BackColor = YamuiThemeManager.Current.FormBack;
             contentLabel.TabStop = false;
-            contentLabel.Text = "contentLabel";
+            contentLabel.Location = new Point(1, 50);
 
-            titleLabel.AutoSize = false;
+            titleLabel = new HtmlLabel();
             titleLabel.AutoSizeHeightOnly = true;
-            titleLabel.BackColor = Color.Transparent;
-            titleLabel.BaseStylesheet = null;
-            titleLabel.CausesValidation = false;
+            titleLabel.BackColor = YamuiThemeManager.Current.FormBack;
             titleLabel.Enabled = false;
             titleLabel.IsContextMenuEnabled = false;
             titleLabel.IsSelectionEnabled = false;
-            titleLabel.Location = new Point(5, 5);
-            titleLabel.Name = "titleLabel";
-            titleLabel.Size = new Size(243, 15);
-            titleLabel.TabIndex = 6;
             titleLabel.TabStop = false;
-            titleLabel.Text = "titleLabel";
+            contentLabel.Location = new Point(5, 5);
 
             Controls.Add(titleLabel);
-            Controls.Add(contentPanel);
-            Padding = new Padding(5, 50, 5, 5);
-            contentPanel.ResumeLayout(false);
+            Controls.Add(contentLabel);
+
             ResumeLayout(false);
         }
 
@@ -254,13 +237,13 @@ namespace Yamui.Framework.Forms {
             if (_closingTransition != null) {
                 _closingTransition.removeProperty(_closingTransition.TransitionedProperties.FirstOrDefault());
                 _closingTransition = null;
-                Controls.Remove(_progressSimplePanel);
-                _progressSimplePanel.Dispose();
+                ProgressPercent = 0;
             }
             base.OnActivated(e);
         }
 
         protected override void OnLoad(EventArgs e) {
+            
             // Display the form just above the system tray.
             Location = GetSpawnLocation();
 

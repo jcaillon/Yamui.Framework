@@ -108,7 +108,14 @@ namespace Yamui.Framework.Helper {
         #endregion
 
         #region Simple math
-        
+
+        /// <summary>
+        /// Returns true if the bit at the given position is set to true
+        /// </summary>
+        public static bool IsBitSet(this long b, int pos) {
+            return (b & (1 << pos)) != 0;
+        }
+
         /// <summary>
         /// The return value is the high-order double word of the specified value.
         /// </summary>
@@ -229,7 +236,7 @@ namespace Yamui.Framework.Helper {
         /// </summary>
         public static string ConvertToStr(this object value) {
             if (value == null)
-                return string.Empty;
+                return String.Empty;
             return TypeDescriptor.GetConverter(value).ConvertToInvariantString(value);
         }
 
@@ -297,7 +304,7 @@ namespace Yamui.Framework.Helper {
                 var functionName = htmlColor.Substring(0, htmlColor.IndexOf("(", StringComparison.CurrentCultureIgnoreCase));
                 var splitValues = htmlColor.GetBetweenMostNested("(", ")").Split(',');
                 float ratio;
-                if (!float.TryParse(splitValues[1].Trim().Replace("%", ""), out ratio))
+                if (!Single.TryParse(splitValues[1].Trim().Replace("%", ""), out ratio))
                     ratio = 0;
 
                 // Apply the color function to the base color (in case this is another function embedded in this one)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using Yamui.Framework.Helper;
@@ -9,18 +10,20 @@ namespace Yamui.Framework.Controls {
     /// <summary>
     /// Store values needed to represent a scrollbar, also provides methods to handle user events and paint the scrollbar
     /// </summary>
+    [Designer(typeof(YamuiButtonDesigner))]
+    [ToolboxBitmap(typeof(Button))]
     public class YamuiScrollHandler {
 
         /// <summary>
         /// Action that will be triggered when the value of the scroll changes : this, oldValue, newValue
         /// You should change the view of your client area when this event happens (do not paint scrollbars now)
         /// </summary>
-        public event EventHandler<YamuiScrollHandlerValueChangedEventArgs> OnValueChange;
+        public event EventHandler<YamuiScrollHandlerValueChangedEventArgs> OnValueChanged;
 
         /// <summary>
         /// Action sent when the scroll bar needs to be redraw
         /// </summary>
-        public event EventHandler OnRedrawScrollBars;
+        public event EventHandler OnScrollbarsRedrawNeeded;
 
         /// <summary>
         /// Read-only, is the scrollbar vertical
@@ -152,7 +155,7 @@ namespace Yamui.Framework.Controls {
 
                 InvalidateScrollBar();
                 if (HasScroll)
-                    OnValueChange?.Invoke(this, new YamuiScrollHandlerValueChangedEventArgs(previousValue, _value));
+                    OnValueChanged?.Invoke(this, new YamuiScrollHandlerValueChangedEventArgs(previousValue, _value));
             }
         }
         
@@ -239,7 +242,7 @@ namespace Yamui.Framework.Controls {
 
         private const int BarOffset = 0;
 
-        public int MaximumValue { get; set; }
+        public int MaximumValue { get; private set; }
         private int BarOpposedOffset { get; set; }
         private int ThumbThickness { get; set; }
         private int BarLength { get; set; }
@@ -271,7 +274,7 @@ namespace Yamui.Framework.Controls {
         /// <summary>
         /// represents the bar rectangle (that will be painted)
         /// </summary>
-        public Rectangle BarRect { get; set; }
+        public Rectangle BarRect { get; private set; }
 
         /// <summary>
         /// represents the thumb rectangle (that will be painted)
@@ -279,7 +282,7 @@ namespace Yamui.Framework.Controls {
         protected Rectangle ThumbRect { get; set; }
 
         private int _value;
-        private Control _parent;
+        private readonly Control _parent;
         private bool _isThumbPressed;
         private bool _isThumbHovered;
         private int _mouseMoveInThumbPosition;
@@ -349,26 +352,22 @@ namespace Yamui.Framework.Controls {
             if (!HasScroll)
                 return;
 
-            OnRedrawScrollBars?.Invoke(this, null);
+            OnScrollbarsRedrawNeeded?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
         /// move the thumb
         /// </summary>
         private void MoveThumb(int newThumbPos) {
-            if (IsVertical) {
-                ValuePercent = (double) (newThumbPos - ThumbOffset) / BarScrollFreeSpace;
-            } else {
-                ValuePercent = (double) (newThumbPos - ThumbOffset) / BarScrollFreeSpace;
-            }
+            ValuePercent = (double) (newThumbPos - ThumbOffset) / BarScrollFreeSpace;
         }
         
         private void AnalyzeScrollNeeded() {
             // if the content is not too tall, no need to display the scroll bars
             if (MaximumValue <= 0 || !Enabled || LengthAvailable <= 0) {
+                Value = 0; // no more scrollbar? then reset the view to 0 first
                 HasScroll = false;
                 HasScrollButtons = false;
-                Value = 0;
             } else {
                 HasScroll = true;
                 HasScrollButtons = ScrollButtonEnabled && BarLength > 4 * ScrollButtonSize && BarThickness >= 15;

@@ -11,8 +11,7 @@ using Yamui.Framework.Themes;
 namespace Yamui.Framework.Forms {
 
     /// <summary>
-    /// A SideGlow window is a layered window that
-    /// renders the "glowing effect" on one of the sides
+    /// This is a layered window that renders the border "visual studio like"
     /// </summary>
     /// <remarks>https://msdn.microsoft.com/en-us/library/windows/desktop/ms633556(v=vs.85).aspx</remarks>
     /// <remarks>http://www.nuonsoft.com/blog/2009/05/27/how-to-use-updatelayeredwindow/</remarks>
@@ -175,7 +174,7 @@ namespace Yamui.Framework.Forms {
 
         private void RegisterClass() {
             _wndProcDelegate = CustomWndProc;
-            String appDomain = Convert.ToString(AppDomain.CurrentDomain.GetHashCode(), 16);
+            var appDomain = Convert.ToString(AppDomain.CurrentDomain.GetHashCode(), 16);
             _windowClass = new WinApi.WNDCLASS {
                 lpszClassName = $"{nameof(YamuiShadowBorder)}.{_side}_{_parentHandle}.{VersioningHelper.MakeVersionSafeName(appDomain, ResourceScope.Process, ResourceScope.AppDomain)}",
                 lpfnWndProc = Marshal.GetFunctionPointerForDelegate(_wndProcDelegate)

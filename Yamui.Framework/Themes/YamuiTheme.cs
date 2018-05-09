@@ -113,7 +113,7 @@ namespace Yamui.Framework.Themes {
 
         #region Accent color
 
-        private Color _accentColor;
+        private Color _accentColor = Color.Red;
 
         /// <summary>
         /// Accent color of the theme, can be set to Color.Empty in order to make it equal to the ThemeAccentColor

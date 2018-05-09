@@ -25,16 +25,16 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
-using Yamui.Framework.Controls;
 using Yamui.Framework.Helper;
 using Yamui.Framework.HtmlRenderer.Core.Adapters.Entities;
-using Yamui.Framework.HtmlRenderer.Core.Core;
 using Yamui.Framework.HtmlRenderer.Core.Core.Entities;
+using Yamui.Framework.HtmlRenderer.Core.Core.Utils;
+using Yamui.Framework.HtmlRenderer.WinForms;
 using Yamui.Framework.HtmlRenderer.WinForms.Adapters;
 using Yamui.Framework.HtmlRenderer.WinForms.Utilities;
 using Yamui.Framework.Themes;
 
-namespace Yamui.Framework.HtmlRenderer.WinForms {
+namespace Yamui.Framework.Controls {
 
     /// <summary>
     /// Provides HTML rendering using the text property.<br/>
@@ -81,7 +81,7 @@ namespace Yamui.Framework.HtmlRenderer.WinForms {
     /// </para>
     /// </summary>
     [Designer(typeof(YamuiHtmlLabelDesigner))]
-    public class HtmlLabel : YamuiControl {
+    public class YamuiHtml : YamuiScrollControl {
 
         #region Fields and Consts
 
@@ -92,9 +92,12 @@ namespace Yamui.Framework.HtmlRenderer.WinForms {
 
         protected bool _autoSizeHeight;
         protected bool _autoSize = true;
-        private bool _hasBorder;
-
-        public const int BorderWidth = 1;
+     
+        
+        /// <summary>
+        /// The last position of the scrollbars to know if it has changed to update mouse
+        /// </summary>
+        protected Point _lastScrollOffset;
 
         #endregion
 
@@ -134,7 +137,7 @@ namespace Yamui.Framework.HtmlRenderer.WinForms {
         /// <summary>
         /// Creates a new HTML Label
         /// </summary>
-        public HtmlLabel() {
+        public YamuiHtml() {
             SuspendLayout();
 
             _htmlContainer = new HtmlContainer {
@@ -146,6 +149,7 @@ namespace Yamui.Framework.HtmlRenderer.WinForms {
             _htmlContainer.Refresh += OnRefresh;
             _htmlContainer.StylesheetLoad += OnStylesheetLoad;
             _htmlContainer.ImageLoad += OnImageLoad;
+            _htmlContainer.ScrollChange += OnScrollChange;
 
             ResumeLayout(false);
 
@@ -154,10 +158,31 @@ namespace Yamui.Framework.HtmlRenderer.WinForms {
 
             // subscribe to an event called when the BaseCss sheet changes
             YamuiThemeManager.OnCssChanged += YamuiThemeManagerOnOnCssChanged;
+
+            _vScroll = true;
+            VerticalScroll.Enabled = true;
         }
 
         private void YamuiThemeManagerOnOnCssChanged() {
             Text = base.Text;
+        }
+
+        /// <summary>
+        /// Release the html container resources.
+        /// </summary>
+        protected override void Dispose(bool disposing) {
+            if (_htmlContainer != null) {
+                _htmlContainer.LinkClicked -= OnLinkClicked;
+                _htmlContainer.BoxClicked -= OnBoxClicked;
+                _htmlContainer.RenderError -= OnRenderError;
+                _htmlContainer.Refresh -= OnRefresh;
+                _htmlContainer.StylesheetLoad -= OnStylesheetLoad;
+                _htmlContainer.ImageLoad -= OnImageLoad;
+                _htmlContainer.ScrollChange -= OnScrollChange;
+                _htmlContainer.Dispose();
+                _htmlContainer = null;
+            }
+            base.Dispose(disposing);
         }
 
         /// <summary>
@@ -221,15 +246,6 @@ namespace Yamui.Framework.HtmlRenderer.WinForms {
             get { return _htmlContainer.IsContextMenuEnabled; }
             set { _htmlContainer.IsContextMenuEnabled = value; }
         }
-        
-        [Browsable(false)]
-        public override Color BackColor {
-            get { return YamuiThemeManager.Current.FormBack; }
-            set { base.BackColor = value; }
-        }
-        
-        [Browsable(false)]
-        public virtual Color BorderColor => YamuiThemeManager.Current.AccentColor;
 
         /// <summary>
         /// Gets or sets the min size the control get be set by <see cref="AutoSize"/> or <see cref="AutoSizeHeightOnly"/>.
@@ -249,11 +265,13 @@ namespace Yamui.Framework.HtmlRenderer.WinForms {
         public override Size MaximumSize {
             get { return base.MaximumSize; }
             set {
-                base.MaximumSize = value;
-                if (_htmlContainer != null) {
-                    _htmlContainer.MaxSize = value;
-                    PerformLayout();
-                    Invalidate();
+                if (base.MaximumSize != value) {
+                    base.MaximumSize = value;
+                    if (_htmlContainer != null) {
+                        _htmlContainer.MaxSize = value;
+                        PerformLayout();
+                        Invalidate();
+                    }
                 }
             }
         }
@@ -302,20 +320,6 @@ namespace Yamui.Framework.HtmlRenderer.WinForms {
             }
         }
 
-        [DefaultValue(false)]
-        [Browsable(false)]
-        public virtual bool HasBorder {
-            get { return _hasBorder; }
-            set {
-                if (_hasBorder != value) {
-                    _hasBorder = value;
-                    InternalPadding = _hasBorder ? new Padding(2) : new Padding(0);
-                    PerformLayout();
-                    Invalidate();
-                }
-            }
-        }
-
         /// <summary>
         /// Gets or sets the html of this control.
         /// </summary>
@@ -336,19 +340,21 @@ namespace Yamui.Framework.HtmlRenderer.WinForms {
         /// Get the currently selected text segment in the html.
         /// </summary>
         [Browsable(false)]
-        public virtual string SelectedText => _htmlContainer?.SelectedText;
+        public virtual string SelectedText => _htmlContainer.SelectedText;
 
         /// <summary>
         /// Copy the currently selected html segment with style.
         /// </summary>
         [Browsable(false)]
-        public virtual string SelectedHtml => _htmlContainer?.SelectedHtml;
+        public virtual string SelectedHtml => _htmlContainer.SelectedHtml;
 
         /// <summary>
         /// Get html from the current DOM tree with inline style.
         /// </summary>
         /// <returns>generated html</returns>
-        public virtual string GetHtml => _htmlContainer?.GetHtml();
+        public virtual string GetHtml => _htmlContainer.GetHtml();
+
+        private int BorderPadding => (HasBorder ? BorderWidth + 1 : 0);
 
         /// <summary>
         /// Get the rectangle of html element as calculated by html layout.<br/>
@@ -357,8 +363,8 @@ namespace Yamui.Framework.HtmlRenderer.WinForms {
         /// </summary>
         /// <param name="elementId">the id of the element to get its rectangle</param>
         /// <returns>the rectangle of the element or null if not found</returns>
-        public RectangleF? GetElementRectangle(string elementId) => _htmlContainer?.GetElementRectangle(elementId);
-
+        public RectangleF? GetElementRectangle(string elementId) => _htmlContainer.GetElementRectangle(elementId);
+        
         /// <summary>
         /// adapts width to content (the label needs to be in AutoSizeHeight only)
         /// </summary>
@@ -376,7 +382,7 @@ namespace Yamui.Framework.HtmlRenderer.WinForms {
              *
              */
 
-            Width = Helper.Utilities.MeasureHtmlPrefWidth(content, minWidth, maxWidth);
+            Width = Utilities.MeasureHtmlPrefWidth(content, minWidth, maxWidth);
             Text = content;
 
             // make it more square shaped if possible
@@ -389,14 +395,56 @@ namespace Yamui.Framework.HtmlRenderer.WinForms {
 
         #region Private methods
 
-        protected virtual Padding InternalPadding { get; set; } = new Padding(0);
-        
         /// <summary>
-        /// Perform the layout of the html in the control.
+        /// Adjust the scrollbar of the panel on html element by the given id.<br/>
+        /// The top of the html element rectangle will be at the top of the panel, if there
+        /// is not enough height to scroll to the top the scroll will be at maximum.<br/>
         /// </summary>
-        protected override void OnLayout(LayoutEventArgs levent) {
-            ClientSize = GetPreferredSize() ?? ClientSize;
-            base.OnLayout(levent);
+        /// <param name="elementId">the id of the element to scroll to</param>
+        public virtual void ScrollToElement(string elementId) {
+            ArgChecker.AssertArgNotNullOrEmpty(elementId, "elementId");
+
+            if (_htmlContainer != null) {
+                var rect = _htmlContainer.GetElementRectangle(elementId);
+                if (rect.HasValue) {
+                    AutoScrollPosition = Point.Round(rect.Value.Location);
+                    _htmlContainer.HandleMouseMove(this, new MouseEventArgs(MouseButtons, 0, MousePosition.X, MousePosition.Y, 0));
+                }
+            }
+        }
+        
+
+        /// <summary>
+        /// call mouse move to handle paint after scroll or html change affecting mouse cursor.
+        /// </summary>
+        protected virtual void InvokeMouseMove() {
+            var mp = PointToClient(MousePosition);
+            _htmlContainer.HandleMouseMove(this, new MouseEventArgs(MouseButtons.None, 0, mp.X, mp.Y, 0));
+        }
+        
+        ///// <summary>
+        ///// Perform the layout of the html in the control.
+        ///// </summary>
+        //protected override void OnLayout(LayoutEventArgs levent) {
+        //    ClientSize = GetPreferredSize() ?? ClientSize;
+        //    base.OnLayout(levent);
+        //}
+
+        /// <summary>
+        /// Override, called at the end of initializeComponent() in forms made with the designer
+        /// </summary>
+        public new void PerformLayout() {
+            var newSize = GetPreferredSize() ?? ClientSize;
+            if (ClientSize != newSize) {
+                ClientSize = newSize;
+            }
+
+            var initHasVerticalScroll = VerticalScroll.HasScroll;
+            OnSizeChanged(NaturalSize, Size);
+            if (initHasVerticalScroll != VerticalScroll.HasScroll) {
+                OnSizeChanged(NaturalSize, Size);
+            }
+            base.PerformLayout();
         }
         
         public override Size GetPreferredSize(Size proposedSize) {
@@ -404,45 +452,61 @@ namespace Yamui.Framework.HtmlRenderer.WinForms {
         }
 
         private Size? GetPreferredSize() {
-            if (_htmlContainer != null) {
-                using (Graphics g = CreateGraphics()) {
-                    using (var ig = new GraphicsAdapter(g, _htmlContainer.UseGdiPlusTextRendering)) {
-                        var newSize = HtmlRendererUtils.Layout(ig,
-                            _htmlContainer.HtmlContainerInt,
-                            new RSize(ClientSize.Width - InternalPadding.Horizontal - Padding.Horizontal, ClientSize.Height - InternalPadding.Vertical - Padding.Vertical),
-                            new RSize(MinimumSize.Width - InternalPadding.Horizontal - Padding.Horizontal, MinimumSize.Height - InternalPadding.Vertical - Padding.Vertical),
-                            new RSize(MaximumSize.Width - InternalPadding.Horizontal - Padding.Horizontal, MaximumSize.Height - InternalPadding.Vertical - Padding.Vertical),
-                            AutoSize,
-                            AutoSizeHeightOnly);
-                        return Utils.ConvertRound(new RSize(newSize.Width + InternalPadding.Horizontal + Padding.Horizontal, newSize.Height + InternalPadding.Vertical - Padding.Vertical));
-                    }
+            if (!AutoSize && !AutoSizeHeightOnly) {
+                return null;
+            }
+
+            var naturalSize = NaturalSize;
+            var output = new Size(naturalSize.Width + BorderPadding * 2 + Padding.Horizontal, naturalSize.Height + BorderPadding * 2 + Padding.Vertical);
+            if (MaximumSize.Width > 0) {
+                output.Width = output.Width.ClampMax(MaximumSize.Width);
+            }
+            if (MaximumSize.Height > 0) {
+                output.Height = output.Height.ClampMax(MaximumSize.Height);
+            }
+            if (MinimumSize.Width > 0) {
+                output.Width = output.Width.ClampMin(MinimumSize.Width);
+            }
+            if (MinimumSize.Height > 0) {
+                output.Height = output.Height.ClampMin(MinimumSize.Height);
+            }
+            if (AutoSizeHeightOnly) {
+                output.Width = output.Width.ClampMax(Width);
+            }
+            return output;
+        }
+
+        protected override Size GetNaturalSize() {
+            using (Graphics g = CreateGraphics()) {
+                using (var ga = new GraphicsAdapter(g, _htmlContainer.UseGdiPlusTextRendering)) {
+                    _htmlContainer.HtmlContainerInt.MaxSize = AutoSizeHeightOnly || !AutoSize ? new RSize(ClientSize.Width - (VerticalScroll.HasScroll ? VerticalScroll.BarThickness : 0) - BorderPadding * 2 - Padding.Horizontal, 0) : new RSize(0, 0);
+                    _htmlContainer.HtmlContainerInt.PerformLayout(ga);
+                    _naturalSize = Utils.ConvertRound(_htmlContainer.HtmlContainerInt.ActualSize);
                 }
             }
-            return null;
+            return _naturalSize;
+        }
+        
+        protected override void PaintContent(PaintEventArgs e) {
+            base.PaintContent(e);
+            if (_htmlContainer != null) {
+                _htmlContainer.ScrollOffset = new Point(BorderPadding + Padding.Left - HorizontalScroll.Value, BorderPadding + Padding.Top - VerticalScroll.Value);
+                e.Graphics.SetClip(ContentRectangle);
+                _htmlContainer.PerformPaint(e.Graphics);
+                e.Graphics.SetClip(e.ClipRectangle);
+
+                if (!_lastScrollOffset.Equals(_htmlContainer.ScrollOffset)) {
+                    _lastScrollOffset = _htmlContainer.ScrollOffset;
+                    InvokeMouseMove();
+                }
+            }
         }
 
         /// <summary>
-        /// Perform paint of the html in the control.
+        /// On html renderer scroll request adjust the scrolling of the panel to the requested location.
         /// </summary>
-        protected override void OnPaint(PaintEventArgs e) {
-            DrawBackground(e);
-
-            if (_htmlContainer != null) {
-                _htmlContainer.ScrollOffset = new Point(InternalPadding.Left + Padding.Left, InternalPadding.Top + Padding.Top);
-                _htmlContainer.PerformPaint(e.Graphics);
-            }
-        }
-
-        protected virtual void DrawBackground(PaintEventArgs e) {
-            e.Graphics.Clear(BackColor);
-            e.Graphics.Clear(Color.Yellow);
-
-            var borderRect = new Rectangle(0, 0, ClientRectangle.Width - 1, ClientRectangle.Height - 1);
-            using (var p = new Pen(BorderColor, BorderWidth) {
-                Alignment = PenAlignment.Inset
-            }) {
-                e.Graphics.DrawRectangle(p, borderRect);
-            }
+        protected virtual void OnScrollChange(HtmlScrollEventArgs e) {
+            AutoScrollPosition = new Point((int) e.X, (int) e.Y);
         }
 
         /// <summary>
@@ -532,23 +596,6 @@ namespace Yamui.Framework.HtmlRenderer.WinForms {
             BoxClicked?.Invoke(this, e);
         }
 
-        /// <summary>
-        /// Release the html container resources.
-        /// </summary>
-        protected override void Dispose(bool disposing) {
-            if (_htmlContainer != null) {
-                _htmlContainer.LinkClicked -= OnLinkClicked;
-                _htmlContainer.BoxClicked -= OnBoxClicked;
-                _htmlContainer.RenderError -= OnRenderError;
-                _htmlContainer.Refresh -= OnRefresh;
-                _htmlContainer.StylesheetLoad -= OnStylesheetLoad;
-                _htmlContainer.ImageLoad -= OnImageLoad;
-                _htmlContainer.Dispose();
-                _htmlContainer = null;
-            }
-            base.Dispose(disposing);
-        }
-
         #region Private event handlers
 
         private void OnLinkClicked(object sender, HtmlLinkClickedEventArgs e) {
@@ -581,10 +628,35 @@ namespace Yamui.Framework.HtmlRenderer.WinForms {
             OnBoxClicked(e);
         }
 
+        private void OnScrollChange(object sender, HtmlScrollEventArgs e) {
+            OnScrollChange(e);
+        }
+
         #endregion
 
         #endregion
     }
 
+    #region YamuiHtmlLabelDesigner
+
+    internal class YamuiHtmlLabelDesigner : ControlDesigner {
+        protected override void PreFilterProperties(IDictionary properties) {
+            properties.Remove("Font");
+            properties.Remove("ForeColor");
+            properties.Remove("BackColor");
+            properties.Remove("AllowDrop");
+            properties.Remove("RightToLeft");
+            properties.Remove("Cursor");
+            properties.Remove("UseWaitCursor");
+            properties.Remove("BackgroundImage");
+            properties.Remove("BackgroundImageLayout");
+            properties.Remove("CausesValidation");
+            properties.Remove("ContextMenuStrip");
+            properties.Remove("ImeMode");
+            base.PreFilterProperties(properties);
+        }
+    }
+
+    #endregion
 
 }

@@ -70,8 +70,14 @@
     <Compile Include="Animations\Transitions\TransitionType_ThrowAndCatch.cs" />
     <Compile Include="Animations\Transitions\TransitionType_UserDefined.cs" />
     <Compile Include="Animations\Transitions\Utility.cs" />
+    <Compile Include="Controls\YamuiHtml.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\IScrollableControl.cs" />
     <Compile Include="Controls\YamuiControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\YamuiScrollControl.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\YamuiScrollHandler.cs" />
@@ -164,7 +170,6 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Fonts\FontManager.cs" />
-    <Compile Include="Forms\SideGlowNative.cs" />
     <Compile Include="Forms\YamuiFormOption.cs">
       <SubType>Form</SubType>
     </Compile>

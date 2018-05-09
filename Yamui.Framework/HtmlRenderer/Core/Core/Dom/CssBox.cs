@@ -394,7 +394,6 @@ namespace Yamui.Framework.HtmlRenderer.Core.Core.Dom {
                         var rect = ContainingBlock.ClientRectangle;
                         rect.X -= 2;
                         rect.Width += 2;
-                        rect.Offset(new RPoint(-HtmlContainer.Location.X, -HtmlContainer.Location.Y));
                         rect.Offset(HtmlContainer.ScrollOffset);
                         clip.Intersect(rect);
 

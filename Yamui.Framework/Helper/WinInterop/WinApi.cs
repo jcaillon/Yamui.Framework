@@ -1552,6 +1552,13 @@ namespace Yamui.Framework.Helper {
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
         public static extern IntPtr GetModuleHandle(string modName);
 
+        [DllImport("user32.dll")]
+        static extern bool ValidateRect(IntPtr hWnd, ref RECT lpRect);
+
+        // If you don't want to pass a rect, you can use this overload passing IntPtr.Zero
+        [DllImport("user32.dll")]
+        static extern bool ValidateRect(IntPtr hWnd, IntPtr lpRect);
+
         #endregion
 
         #region GetCharFromKey
@@ -1630,7 +1637,7 @@ namespace Yamui.Framework.Helper {
 
         #endregion
 
-        #region Glow
+        #region Borders
 
         [DllImport("User32.dll", ExactSpelling=true, CharSet=CharSet.Auto, SetLastError=true)]
         [ResourceExposure(ResourceScope.None)]

@@ -78,6 +78,12 @@ namespace Yamui.Framework.Forms {
         protected override Padding DefaultPadding {
             get { return new Padding(BorderWidth, 20, BorderWidth + ResizeIconSize, BorderWidth + ResizeIconSize); }
         }
+
+        /// <summary>
+        /// The x position of the first (i.e. leftmost) button of this form
+        /// </summary>
+        [Browsable(false)]
+        public int FirstButtonPosition { get; private set; }
         
         #endregion
 
@@ -127,6 +133,7 @@ namespace Yamui.Framework.Forms {
                 DrawButton(ref x, WindowButtons.CloseAllVisible, e, CloseAllBox);
                 DrawButton(ref x, WindowButtons.Maximize, e, MaximizeBox && Resizable);
                 DrawButton(ref x, WindowButtons.Minimize, e, MinimizeBox && ShowInTaskbar);
+                FirstButtonPosition = x + FormButtonWidth;
             }
         }
 
@@ -416,23 +423,23 @@ namespace Yamui.Framework.Forms {
                 }
             }
 
-            public WinApi.HitTest HitTest {
-                get {
-                    switch (Type) {
-                        case WindowButtons.Minimize:
-                            return WinApi.HitTest.HTMINBUTTON;
-                        case WindowButtons.Restore:
-                        case WindowButtons.Maximize:
-                            return WinApi.HitTest.HTMAXBUTTON;
-                        case WindowButtons.CloseAllVisible:
-                            return WinApi.HitTest.HTZOOM;
-                        case WindowButtons.Close:
-                            return WinApi.HitTest.HTCLOSE;
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
-                }
-            }
+            //public WinApi.HitTest HitTest {
+            //    get {
+            //        switch (Type) {
+            //            case WindowButtons.Minimize:
+            //                return WinApi.HitTest.HTMINBUTTON;
+            //            case WindowButtons.Restore:
+            //            case WindowButtons.Maximize:
+            //                return WinApi.HitTest.HTMAXBUTTON;
+            //            case WindowButtons.CloseAllVisible:
+            //                return WinApi.HitTest.HTZOOM;
+            //            case WindowButtons.Close:
+            //                return WinApi.HitTest.HTCLOSE;
+            //            default:
+            //                throw new ArgumentOutOfRangeException();
+            //        }
+            //    }
+            //}
 
 
         }

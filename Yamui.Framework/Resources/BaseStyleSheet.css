@@ -3,6 +3,12 @@
     margin: 0;
     Font: 12px "Segoe UI";
     color: @FormFore;
+    /* background-color: @FormBack; */
+}
+
+body {
+    padding: 0;
+    margin: 0;
 }
 
 /* This is the class of the Html ToolTip */

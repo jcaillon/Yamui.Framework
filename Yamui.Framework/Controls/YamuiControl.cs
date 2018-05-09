@@ -10,7 +10,7 @@ using Yamui.Framework.Themes;
 namespace Yamui.Framework.Controls {
 
     [Designer(typeof(YamuiControlDesigner))]
-    public class YamuiControl : Control, IScrollableControl {
+    public abstract class YamuiControl : Control, IScrollableControl {
 
         #region IYamuiControl
 
@@ -22,6 +22,17 @@ namespace Yamui.Framework.Controls {
         }
 
         #endregion
+
+        protected YamuiControl() {
+            SetStyle(
+                ControlStyles.Selectable |
+                ControlStyles.OptimizedDoubleBuffer |
+                ControlStyles.ResizeRedraw |
+                ControlStyles.UserPaint |
+                ControlStyles.AllPaintingInWmPaint |
+                ControlStyles.DoubleBuffer |
+                ControlStyles.Opaque, true);
+        }
 
         #region Utilities
 
@@ -212,7 +223,7 @@ namespace Yamui.Framework.Controls {
             properties.Remove("Font");
             //properties.Remove("ForeColor");
             properties.Remove("RightToLeft");
-            properties.Remove("Text");
+            //properties.Remove("Text");
 
             base.PreFilterProperties(properties);
         }

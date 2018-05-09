@@ -52,7 +52,6 @@ namespace Yamui.Framework.Forms {
             this.contentLabel.AutoSize = false;
             this.contentLabel.AutoSizeHeightOnly = true;
             this.contentLabel.BackColor = System.Drawing.Color.Transparent;
-            this.contentLabel.BaseStylesheet = null;
             this.contentLabel.Location = new System.Drawing.Point(0, 0);
             this.contentLabel.Name = "contentLabel";
             this.contentLabel.Size = new System.Drawing.Size(245, 15);
@@ -69,7 +68,6 @@ namespace Yamui.Framework.Forms {
             this.titleLabel.AutoSize = false;
             this.titleLabel.AutoSizeHeightOnly = true;
             this.titleLabel.BackColor = System.Drawing.Color.Transparent;
-            this.titleLabel.BaseStylesheet = null;
             this.titleLabel.CausesValidation = false;
             this.titleLabel.Enabled = false;
             this.titleLabel.IsContextMenuEnabled = false;

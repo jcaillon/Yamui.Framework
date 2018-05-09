@@ -53,6 +53,7 @@ namespace Yamui.Framework.Forms {
         private bool _isActive;
         private WinApi.HitTest[][] _hitTests;
         private bool _needRedraw;
+        private HandleRef? _handleRef;
 
         #endregion
 
@@ -137,6 +138,9 @@ namespace Yamui.Framework.Forms {
             set { base.WindowState = value; }
         }
 
+        [Browsable(false)]
+        public HandleRef HandleRef => (HandleRef) (_handleRef ?? (_handleRef = new HandleRef(this, Handle)));
+
         #endregion
 
         #region constructor
@@ -149,7 +153,9 @@ namespace Yamui.Framework.Forms {
                     return cp;
 
                 if (IsPopup) {
-                    cp.Style = (int) WinApi.WindowStyles.WS_POPUP;
+                    cp.Style = (int) (WinApi.WindowStyles.WS_POPUP
+                        | WinApi.WindowStyles.WS_CLIPCHILDREN // allows to not send paint requests to children when this form is invalidated
+                        | WinApi.WindowStyles.WS_CLIPSIBLINGS);
                     // i don't control the exstyle because i can't get it right and it throws an incorrect param
                     // exception no matter what i put here
                     cp.ExStyle = cp.ExStyle | (int) (WinApi.WindowStylesEx.WS_EX_OVERLAPPEDWINDOW);
