@@ -167,8 +167,8 @@ namespace Yamui.Framework.Controls {
         protected Size _naturalSize;
         private Rectangle _leftoverBar;
         private bool _needBothScroll;
-        protected bool _vScroll;
-        protected bool _hScroll;
+        protected bool _vScroll = true;
+        protected bool _hScroll = true;
         private bool _hasBorder;
 
         #endregion
@@ -184,14 +184,12 @@ namespace Yamui.Framework.Controls {
             VerticalScroll = new YamuiScrollHandler(true, this) {
                 SmallChange = 70,
                 LargeChange = 400,
-                BarThickness = ScrollBarWidth,
-                Enabled = false
+                BarThickness = ScrollBarWidth
             };
             HorizontalScroll = new YamuiScrollHandler(false, this) {
                 SmallChange = 70,
                 LargeChange = 400,
-                BarThickness = ScrollBarWidth,
-                Enabled = false
+                BarThickness = ScrollBarWidth
             };
 
             VerticalScroll.OnValueChanged += OnScrollValueChanged;
@@ -408,12 +406,18 @@ namespace Yamui.Framework.Controls {
             HorizontalScroll.HandleMouseLeave(null, null);
         }
 
+        /// <summary>
+        /// Here you should return the size that your control would take if it has an unlimited space available to display itself
+        /// </summary>
+        /// <remarks>if you specify an empty, the scrollbars will not show since the available space will always be superior to the natural size of the content</remarks>
+        /// <returns></returns>
         protected virtual Size GetNaturalSize() {
             return new Size(0, 0);
         }
 
         /// <summary>
         /// Override, called at the end of initializeComponent() in forms made with the designer
+        /// Should be called when your content size (i.e. <see cref="NaturalSize"/>) changes
         /// </summary>
         public new void PerformLayout() {
             OnSizeChanged(NaturalSize, Size);
@@ -450,7 +454,7 @@ namespace Yamui.Framework.Controls {
             // compute the "left over" rectangle on the bottom right between the 2 scrolls
             _needBothScroll = needVerticalScroll && needHorizontalScroll;
             if (_needBothScroll) {
-                _leftoverBar = new Rectangle(NonBorderRectangle.Width - VerticalScroll.BarThickness, NonBorderRectangle.Height - HorizontalScroll.BarThickness, VerticalScroll.BarThickness, HorizontalScroll.BarThickness);
+                _leftoverBar = new Rectangle(NonBorderRectangle.X + NonBorderRectangle.Width - VerticalScroll.BarThickness, NonBorderRectangle.Y + NonBorderRectangle.Height - HorizontalScroll.BarThickness, VerticalScroll.BarThickness, HorizontalScroll.BarThickness);
             }
 
             ContentRectangle = new Rectangle(NonBorderRectangle.X, NonBorderRectangle.Y, NonBorderRectangle.Width - (needVerticalScroll ? VerticalScroll.BarThickness : 0), NonBorderRectangle.Height - (needHorizontalScroll ? HorizontalScroll.BarThickness : 0));

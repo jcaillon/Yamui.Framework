@@ -562,9 +562,9 @@ namespace Yamui.Framework.HtmlRenderer.Core.Core {
             try {
                 HandleBoxClicked(1, location);
 
-                if (_selectionHandler != null && IsMouseInContainer(location)) {
+                if (_selectionHandler != null) {
                     var ignore = _selectionHandler.HandleMouseUp(parent, e.LeftButton);
-                    if (!ignore && e.LeftButton) {
+                    if (!ignore && e.LeftButton && IsMouseInContainer(location)) {
                         var loc = OffsetByScroll(location);
                         var link = DomUtils.GetLinkBox(_root, loc);
                         if (link != null) {

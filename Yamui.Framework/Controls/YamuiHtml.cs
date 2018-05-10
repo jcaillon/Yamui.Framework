@@ -22,7 +22,6 @@ using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 using Yamui.Framework.Helper;
@@ -93,7 +92,6 @@ namespace Yamui.Framework.Controls {
         protected bool _autoSizeHeight;
         protected bool _autoSize = true;
      
-        
         /// <summary>
         /// The last position of the scrollbars to know if it has changed to update mouse
         /// </summary>
@@ -158,9 +156,6 @@ namespace Yamui.Framework.Controls {
 
             // subscribe to an event called when the BaseCss sheet changes
             YamuiThemeManager.OnCssChanged += YamuiThemeManagerOnOnCssChanged;
-
-            _vScroll = true;
-            VerticalScroll.Enabled = true;
         }
 
         private void YamuiThemeManagerOnOnCssChanged() {
@@ -191,7 +186,7 @@ namespace Yamui.Framework.Controls {
         [Category("Behavior")]
         [DefaultValue(false)]
         [Description("If anti-aliasing should be avoided for geometry like backgrounds and borders")]
-        public virtual bool AvoidGeometryAntialias {
+        public bool AvoidGeometryAntialias {
             get { return _htmlContainer.AvoidGeometryAntialias; }
             set { _htmlContainer.AvoidGeometryAntialias = value; }
         }
@@ -228,7 +223,7 @@ namespace Yamui.Framework.Controls {
         [EditorBrowsable(EditorBrowsableState.Always)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         [Description("Is content selection is enabled for the rendered html.")]
-        public virtual bool IsSelectionEnabled {
+        public bool IsSelectionEnabled {
             get { return _htmlContainer.IsSelectionEnabled; }
             set { _htmlContainer.IsSelectionEnabled = value; }
         }
@@ -242,7 +237,7 @@ namespace Yamui.Framework.Controls {
         [EditorBrowsable(EditorBrowsableState.Always)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         [Description("Is the build-in context menu enabled and will be shown on mouse right click.")]
-        public virtual bool IsContextMenuEnabled {
+        public bool IsContextMenuEnabled {
             get { return _htmlContainer.IsContextMenuEnabled; }
             set { _htmlContainer.IsContextMenuEnabled = value; }
         }
@@ -280,7 +275,6 @@ namespace Yamui.Framework.Controls {
         /// Automatically sets the size of the label by content size
         /// </summary>
         [Browsable(true)]
-        [DefaultValue(true)]
         [EditorBrowsable(EditorBrowsableState.Always)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         [Description("Automatically sets the size of the label by content size.")]
@@ -303,10 +297,9 @@ namespace Yamui.Framework.Controls {
         /// Automatically sets the height of the label by content height (width is not effected).
         /// </summary>
         [Browsable(true)]
-        [DefaultValue(false)]
         [Category("Layout")]
         [Description("Automatically sets the height of the label by content height (width is not effected)")]
-        public virtual bool AutoSizeHeightOnly {
+        public bool AutoSizeHeightOnly {
             get { return _autoSizeHeight; }
             set {
                 if (_autoSizeHeight != value) {
@@ -354,7 +347,8 @@ namespace Yamui.Framework.Controls {
         /// <returns>generated html</returns>
         public virtual string GetHtml => _htmlContainer.GetHtml();
 
-        private int BorderPadding => (HasBorder ? BorderWidth + 1 : 0);
+        private int BorderPadding => HasBorder ? BorderWidth + 1 : 0;
+        private int VerticalScrollThickness => VerticalScroll.HasScroll ? VerticalScroll.BarThickness : 0;
 
         /// <summary>
         /// Get the rectangle of html element as calculated by html layout.<br/>
@@ -401,7 +395,7 @@ namespace Yamui.Framework.Controls {
         /// is not enough height to scroll to the top the scroll will be at maximum.<br/>
         /// </summary>
         /// <param name="elementId">the id of the element to scroll to</param>
-        public virtual void ScrollToElement(string elementId) {
+        public void ScrollToElement(string elementId) {
             ArgChecker.AssertArgNotNullOrEmpty(elementId, "elementId");
 
             if (_htmlContainer != null) {
@@ -417,7 +411,7 @@ namespace Yamui.Framework.Controls {
         /// <summary>
         /// call mouse move to handle paint after scroll or html change affecting mouse cursor.
         /// </summary>
-        protected virtual void InvokeMouseMove() {
+        private void InvokeMouseMove() {
             var mp = PointToClient(MousePosition);
             _htmlContainer.HandleMouseMove(this, new MouseEventArgs(MouseButtons.None, 0, mp.X, mp.Y, 0));
         }
@@ -479,7 +473,7 @@ namespace Yamui.Framework.Controls {
         protected override Size GetNaturalSize() {
             using (Graphics g = CreateGraphics()) {
                 using (var ga = new GraphicsAdapter(g, _htmlContainer.UseGdiPlusTextRendering)) {
-                    _htmlContainer.HtmlContainerInt.MaxSize = AutoSizeHeightOnly || !AutoSize ? new RSize(ClientSize.Width - (VerticalScroll.HasScroll ? VerticalScroll.BarThickness : 0) - BorderPadding * 2 - Padding.Horizontal, 0) : new RSize(0, 0);
+                    _htmlContainer.HtmlContainerInt.MaxSize = AutoSizeHeightOnly || !AutoSize ? new RSize(ClientSize.Width - VerticalScrollThickness - BorderPadding * 2 - Padding.Horizontal, 0) : new RSize(0, 0);
                     _htmlContainer.HtmlContainerInt.PerformLayout(ga);
                     _naturalSize = Utils.ConvertRound(_htmlContainer.HtmlContainerInt.ActualSize);
                 }
@@ -514,7 +508,9 @@ namespace Yamui.Framework.Controls {
         /// </summary>
         protected override void OnMouseMove(MouseEventArgs e) {
             base.OnMouseMove(e);
-            _htmlContainer?.HandleMouseMove(this, e);
+            if (ContentRectangle.Contains(e.Location)) {
+                _htmlContainer?.HandleMouseMove(this, e);
+            }
         }
 
         /// <summary>
@@ -522,7 +518,9 @@ namespace Yamui.Framework.Controls {
         /// </summary>
         protected override void OnMouseDown(MouseEventArgs e) {
             base.OnMouseDown(e);
-            _htmlContainer?.HandleMouseDown(this, e);
+            if (ContentRectangle.Contains(e.Location)) {
+                _htmlContainer?.HandleMouseDown(this, e);
+            }
         }
 
         /// <summary>
@@ -537,8 +535,11 @@ namespace Yamui.Framework.Controls {
         /// Handle mouse up to handle selection and link click. 
         /// </summary>
         protected override void OnMouseUp(MouseEventArgs e) {
-            OnMouseClick(e);
+            if (ContentRectangle.Contains(e.Location)) {
+                OnMouseClick(e);
+            }
             _htmlContainer?.HandleMouseUp(this, e);
+            base.OnMouseUp(e);
         }
 
         /// <summary>
@@ -546,7 +547,9 @@ namespace Yamui.Framework.Controls {
         /// </summary>
         protected override void OnMouseDoubleClick(MouseEventArgs e) {
             base.OnMouseDoubleClick(e);
-            _htmlContainer?.HandleMouseDoubleClick(this, e);
+            if (ContentRectangle.Contains(e.Location)) {
+                _htmlContainer?.HandleMouseDoubleClick(this, e);
+            }
         }
 
         /// <summary>
@@ -586,7 +589,7 @@ namespace Yamui.Framework.Controls {
             if (e.Layout) {
                 PerformLayout();
             }
-            Invalidate();
+            Invalidate(ContentRectangle);
         }
 
         /// <summary>
