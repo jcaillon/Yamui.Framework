@@ -125,13 +125,16 @@ namespace Yamui.Framework.Controls {
             }
         }
 
-        [DefaultValue(false)]
         [Browsable(false)]
         public virtual bool HasBorder {
             get { return _hasBorder; }
             set {
                 if (_hasBorder != value) {
                     _hasBorder = value;
+                    // this will change the effective size available for this control
+                    OnSizeChanged(Size);
+                    VerticalScroll.ParentPadding = BorderPadding;
+                    HorizontalScroll.ParentPadding = BorderPadding;
                     PerformLayout();
                     Invalidate();
                 }
@@ -139,16 +142,20 @@ namespace Yamui.Framework.Controls {
         }
 
         /// <summary>
-        /// The rectangle that is really used to display the content
+        /// The rectangle that is really used to display the content (<see cref="EffectiveClientRectangle"/> minus the scrollbars)
         /// </summary>
         [Browsable(false)]
         public Rectangle ContentRectangle { get; private set; }
 
+        /// <summary>
+        /// The rectangle within the borders of this control (equals to the client area if there are no borders)
+        /// This is equivalent to the <see cref="ContentRectangle"/> if there are no scrollbars shown
+        /// </summary>
         [Browsable(false)]
-        public Rectangle BorderRectangle { get; private set; }
+        public Rectangle EffectiveClientRectangle { get; private set; }
 
         [Browsable(false)]
-        public Rectangle NonBorderRectangle { get; private set; }
+        public Rectangle BorderDrawPath { get; private set; }
 
         [Browsable(false)]
         public virtual Color BorderColor => YamuiThemeManager.Current.AccentColor;
@@ -162,7 +169,7 @@ namespace Yamui.Framework.Controls {
         
         #region Fields and Consts
         
-        public const int BorderWidth = 1;   
+        public const int BorderWidth = 3;   
         private int _scrollBarWidth = 12;
         protected Size _naturalSize;
         private Rectangle _leftoverBar;
@@ -179,8 +186,6 @@ namespace Yamui.Framework.Controls {
         /// Creates a new HtmlPanel and sets a basic css for it's styling.
         /// </summary>
         public YamuiScrollControl() {
-            TabStop = false;
-
             VerticalScroll = new YamuiScrollHandler(true, this) {
                 SmallChange = 70,
                 LargeChange = 400,
@@ -210,7 +215,7 @@ namespace Yamui.Framework.Controls {
         #region Paint
 
         protected override void OnPaint(PaintEventArgs e) {
-            if (HasBorder && e.ClipRectangle.Contains(BorderRectangle)) {
+            if (HasBorder && e.ClipRectangle.Contains(BorderDrawPath)) {
                 PaintBorder(e);
             }
             if (e.ClipRectangle.Contains(ContentRectangle)) {
@@ -223,7 +228,7 @@ namespace Yamui.Framework.Controls {
             using (var p = new Pen(BorderColor, BorderWidth) {
                 Alignment = PenAlignment.Inset
             }) {
-                e.Graphics.DrawRectangle(p, BorderRectangle);
+                e.Graphics.DrawRectangle(p, BorderDrawPath);
             }
         }
 
@@ -320,13 +325,19 @@ namespace Yamui.Framework.Controls {
                     if (m.WParam != IntPtr.Zero) {
                         // When TRUE, LPARAM Points to a NCCALCSIZE_PARAMS structure
                         var nccsp = (WinApi.NCCALCSIZE_PARAMS) Marshal.PtrToStructure(m.LParam, typeof(WinApi.NCCALCSIZE_PARAMS));
-                        OnSizeChanged(_naturalSize, nccsp.rectProposed.Size);
+                        if (!nccsp.rectProposed.Size.IsEmpty) {
+                            // we are not in this case when the form is minimized
+                            OnSizeChanged(nccsp.rectProposed.Size);
+                        }
                         AdjustClientArea(ref nccsp.rectProposed);
                         Marshal.StructureToPtr(nccsp, m.LParam, true);
                     } else {
                         // When FALSE, LPARAM Points to a RECT structure
                         var clnRect = (WinApi.RECT) Marshal.PtrToStructure(m.LParam, typeof(WinApi.RECT));
-                        OnSizeChanged(_naturalSize, clnRect.Size);
+                        if (!clnRect.Size.IsEmpty) {
+                            // we are not in this case when the form is minimized
+                            OnSizeChanged(clnRect.Size);
+                        }
                         AdjustClientArea(ref clnRect);
                         Marshal.StructureToPtr(clnRect, m.LParam, true);
                     }
@@ -392,6 +403,7 @@ namespace Yamui.Framework.Controls {
         }
 
         protected virtual void MouseLDownClientArea() {
+            Focus();
             VerticalScroll.HandleMouseDown(null, null);
             HorizontalScroll.HandleMouseDown(null, null);
         }
@@ -404,6 +416,17 @@ namespace Yamui.Framework.Controls {
         protected virtual void MouseLeaveClientArea() {
             VerticalScroll.HandleMouseLeave(null, null);
             HorizontalScroll.HandleMouseLeave(null, null);
+        }
+
+        /// <summary>
+        /// Should be called when the size of this control changes
+        /// </summary>
+        /// <param name="newSize"></param>
+        protected virtual void OnSizeChanged(Size newSize) {
+            // the (HasBorder && BorderWidth == 1 ? BorderWidth : 0) is there to compensate for an issue in dotnet that will never be fixed
+            BorderDrawPath = new Rectangle(0, 0, newSize.Width - (HasBorder && BorderWidth == 1 ? BorderWidth : 0), newSize.Height - (HasBorder && BorderWidth == 1 ? BorderWidth : 0));
+            EffectiveClientRectangle = new Rectangle(BorderPadding, BorderPadding, newSize.Width - 2*BorderPadding, newSize.Height - 2*BorderPadding);
+            ComputeScrollbars(_naturalSize, newSize);
         }
 
         /// <summary>
@@ -420,7 +443,7 @@ namespace Yamui.Framework.Controls {
         /// Should be called when your content size (i.e. <see cref="NaturalSize"/>) changes
         /// </summary>
         public new void PerformLayout() {
-            OnSizeChanged(NaturalSize, Size);
+            ComputeScrollbars(NaturalSize, Size);
             base.PerformLayout();
         }
         
@@ -432,15 +455,7 @@ namespace Yamui.Framework.Controls {
             return e.Handled;
         }
 
-        protected void OnSizeChanged(Size naturalSize, Size availableSize) {
-            if (availableSize.IsEmpty) {
-                // we are in this case when the form is minimized
-                return;
-            }
-            BorderRectangle = new Rectangle(0, 0, availableSize.Width - BorderPadding, availableSize.Height - BorderPadding);
-            NonBorderRectangle = new Rectangle(BorderPadding, BorderPadding, availableSize.Width - 2*BorderPadding, availableSize.Height - 2*BorderPadding);
-
-
+        protected void ComputeScrollbars(Size naturalSize, Size availableSize) {
             _needBothScroll = false;
             var needHorizontalScroll = HorizontalScroll.HasScroll;
             var needVerticalScroll = VerticalScroll.UpdateLength(naturalSize.Height, null, availableSize.Height - (needHorizontalScroll ? HorizontalScroll.BarThickness : 0), availableSize.Width);
@@ -454,10 +469,10 @@ namespace Yamui.Framework.Controls {
             // compute the "left over" rectangle on the bottom right between the 2 scrolls
             _needBothScroll = needVerticalScroll && needHorizontalScroll;
             if (_needBothScroll) {
-                _leftoverBar = new Rectangle(NonBorderRectangle.X + NonBorderRectangle.Width - VerticalScroll.BarThickness, NonBorderRectangle.Y + NonBorderRectangle.Height - HorizontalScroll.BarThickness, VerticalScroll.BarThickness, HorizontalScroll.BarThickness);
+                _leftoverBar = new Rectangle(EffectiveClientRectangle.X + EffectiveClientRectangle.Width - VerticalScroll.BarThickness, EffectiveClientRectangle.Y + EffectiveClientRectangle.Height - HorizontalScroll.BarThickness, VerticalScroll.BarThickness, HorizontalScroll.BarThickness);
             }
 
-            ContentRectangle = new Rectangle(NonBorderRectangle.X, NonBorderRectangle.Y, NonBorderRectangle.Width - (needVerticalScroll ? VerticalScroll.BarThickness : 0), NonBorderRectangle.Height - (needHorizontalScroll ? HorizontalScroll.BarThickness : 0));
+            ContentRectangle = new Rectangle(EffectiveClientRectangle.X, EffectiveClientRectangle.Y, EffectiveClientRectangle.Width - (needVerticalScroll ? VerticalScroll.BarThickness : 0), EffectiveClientRectangle.Height - (needHorizontalScroll ? HorizontalScroll.BarThickness : 0));
         }
 
         #endregion

@@ -37,14 +37,15 @@ namespace Yamui.Framework.Forms {
 
         private WinApi.WNDCLASS _windowClass;
         private bool _registeredClass;
-        private bool _visible;
-
+        
         public Color ActiveColor => YamuiThemeManager.Current.AccentColor;
         public Color InactiveColor => YamuiThemeManager.Current.FormBorder;
 
         #endregion
 
         #region Properties
+        
+        public bool Visible { get; private set; }
 
         public Point Location { get; private set; }
 
@@ -63,8 +64,8 @@ namespace Yamui.Framework.Forms {
         }
 
         public void Show(bool show) {
-            if (_visible != show) {
-                _visible = show;
+            if (Visible != show) {
+                Visible = show;
                 WinApi.ShowWindow(new HandleRef(this, Handle), show ? WinApi.ShowWindowStyle.SW_SHOWNOACTIVATE : WinApi.ShowWindowStyle.SW_HIDE);
             }
         }

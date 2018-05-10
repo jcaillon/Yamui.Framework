@@ -94,6 +94,11 @@ namespace Yamui.Framework.Forms {
             }
         }
 
+        /// <summary>
+        /// Milliseconds duration for the fade in/fade out animation
+        /// </summary>
+        public override int AnimationDuration { get; set; } = 200;
+
         #endregion
 
         #region Constructor

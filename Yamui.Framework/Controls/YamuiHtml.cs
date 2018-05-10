@@ -434,9 +434,9 @@ namespace Yamui.Framework.Controls {
             }
 
             var initHasVerticalScroll = VerticalScroll.HasScroll;
-            OnSizeChanged(NaturalSize, Size);
+            ComputeScrollbars(NaturalSize, Size);
             if (initHasVerticalScroll != VerticalScroll.HasScroll) {
-                OnSizeChanged(NaturalSize, Size);
+                ComputeScrollbars(NaturalSize, Size);
             }
             base.PerformLayout();
         }

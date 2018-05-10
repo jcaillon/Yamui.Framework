@@ -33,10 +33,10 @@ namespace Yamui.Framework.Forms {
     public abstract class YamuiFormShadow : YamuiForm {
 
         private readonly List<YamuiShadowBorder> _shadows = new List<YamuiShadowBorder>();
-        private bool _bordersVisible;
-        private WinApi.WINDOWPOS _lastLocation;
+        private volatile bool _bordersVisible;
         private System.Timers.Timer _restoreAnimationTimer;
         
+        private bool _shownOnce;
         private bool _isDisposed;
         private bool _isInitialized;
 
@@ -106,12 +106,12 @@ namespace Yamui.Framework.Forms {
                     break;
 
                 case Window.Msg.WM_WINDOWPOSCHANGED:
-                    _lastLocation = (WinApi.WINDOWPOS) Marshal.PtrToStructure(m.LParam, typeof(WinApi.WINDOWPOS));
-                    UpdateLocationAndSize(_lastLocation);
+                    var windowPos = (WinApi.WINDOWPOS) Marshal.PtrToStructure(m.LParam, typeof(WinApi.WINDOWPOS));
+                    UpdateLocationAndSize(windowPos);
 
-                    if (((int) _lastLocation.flags & (int) WinApi.SetWindowPosFlags.SWP_HIDEWINDOW) != 0) {
+                    if (((int) windowPos.flags & (int) WinApi.SetWindowPosFlags.SWP_HIDEWINDOW) != 0) {
                         ShowShadows(false, true);
-                    } else if (((int) _lastLocation.flags & (int) WinApi.SetWindowPosFlags.SWP_SHOWWINDOW) != 0) {
+                    } else if (((int) windowPos.flags & (int) WinApi.SetWindowPosFlags.SWP_SHOWWINDOW) != 0) {
                         ShowShadows(!IsMaximized, true);
                     }
 
@@ -161,6 +161,14 @@ namespace Yamui.Framework.Forms {
             base.OnClosed(e);
         }
 
+        protected override void OnShown(EventArgs e) {
+            _shownOnce = true;
+            if (Visible) {
+                ShowShadows(true, false);
+            }
+            base.OnShown(e);
+        }
+
         private void InitShadows() {
             if (!HasShadow)
                 return;
@@ -168,7 +176,7 @@ namespace Yamui.Framework.Forms {
             _bordersVisible = false;
             _restoreAnimationTimer = new System.Timers.Timer {
                 AutoReset = false,
-                Interval = 200
+                Interval = 500
             };
             _restoreAnimationTimer.Elapsed += RestoreAnimationTimerOnElapsed;
 
@@ -190,13 +198,16 @@ namespace Yamui.Framework.Forms {
         }
 
         private void ShowShadows(bool show, bool immediaty) {
+            _restoreAnimationTimer.Enabled = false;
+            
             if (_bordersVisible == show)
+                return;
+            if (!_shownOnce)
                 return;
 
             // why this animation? Because of the restore animation in windows : the borders would be shown at the restored location
             // before the parent finishes its animation
 
-            _restoreAnimationTimer?.Stop();
             if (immediaty || !show) {
                 foreach (YamuiShadowBorder sideGlow in _shadows) {
                     sideGlow.Show(show);

@@ -249,7 +249,12 @@ namespace Yamui.Framework.Forms {
             using (var b = new SolidBrush(BackColor)) {
                 e.Graphics.FillRectangle(b, ClientRectangle);
             }
-            var borderRect = new Rectangle(0, 0, ClientRectangle.Width - 1, ClientRectangle.Height - 1);
+
+            PaintBorder(e);
+        }
+
+        protected void PaintBorder(PaintEventArgs e) {
+            var borderRect = new Rectangle(0, 0, ClientRectangle.Width - (BorderWidth == 1 ? BorderWidth : 0), ClientRectangle.Height - (BorderWidth == 1 ? BorderWidth : 0));
             using (var p = new Pen(IsActive ? BorderActiveColor : BorderInactiveColor, BorderWidth) {
                 Alignment = PenAlignment.Inset
             }) {

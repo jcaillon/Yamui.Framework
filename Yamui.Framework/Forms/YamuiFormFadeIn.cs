@@ -34,13 +34,13 @@ namespace Yamui.Framework.Forms {
 
         private bool _closingAnimationOnGoing;
 
-        protected int _animationDuration = 200;
-
         #endregion
 
         #region Life and death
 
-        protected YamuiFormFadeIn(YamuiFormOption formOptions) : base(formOptions) { }
+        protected YamuiFormFadeIn(YamuiFormOption formOptions) : base(formOptions) {
+            
+        }
 
         #endregion
 
@@ -49,10 +49,7 @@ namespace Yamui.Framework.Forms {
         /// <summary>
         /// Milliseconds duration for the fade in/fade out animation
         /// </summary>
-        public int AnimationDuration {
-            get { return _animationDuration; }
-            set { _animationDuration = value; }
-        }
+        public virtual int AnimationDuration { get; set; }
 
         /// <summary>
         /// This field is used for the fade in/out animation, shouldn't be used by the user
@@ -96,7 +93,7 @@ namespace Yamui.Framework.Forms {
 
         #region Forceclose
 
-        public void ForceClose() {
+        public virtual void ForceClose() {
             _closingAnimationOnGoing = true;
             Close();
             Dispose();
