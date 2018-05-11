@@ -272,7 +272,7 @@ namespace Yamui.Framework.Controls {
 
         public const int MinimumValue = 0;
 
-        private const int MinimumBarThicknessNeededForButtons = 15;
+        private const int MinimumBarThicknessNeededForButtons = 8;
 
         private int _value;
         private readonly Control _parent;
@@ -308,29 +308,19 @@ namespace Yamui.Framework.Controls {
             Color barColor = YamuiThemeManager.Current.ScrollBarsBg(false, IsThumbHovered, IsThumbPressed, Enabled);
 
             if (barColor != Color.Transparent) {
-                using (var b = new SolidBrush(barColor)) {
-                    e.Graphics.FillRectangle(b, BarRect);
-                }
+                e.Graphics.PaintRectangle(BarRect, barColor);
             }
 
             if (CanDisplayThumb) {
-                using (var b = new SolidBrush(thumbColor)) {
-                    e.Graphics.FillRectangle(b, ThumbRect);
-                }
+                e.Graphics.PaintRectangle(ThumbRect, thumbColor);
             }
 
             if (HasScrollButtons) {
                 Color buttonColor = YamuiThemeManager.Current.ScrollBarsFg(false, IsButtonUpHovered, IsButtonUpPressed, Enabled);
-                // draw the down arrow
-                using (SolidBrush b = new SolidBrush(buttonColor)) {
-                    e.Graphics.FillPolygon(b, Utilities.GetArrowPolygon(ScrollButtonUp, IsVertical ? AnchorStyles.Top : AnchorStyles.Left));
-                }
+                e.Graphics.PaintCachedImage(ScrollButtonUp, IsVertical ? ImageDrawerType.ArrowUp : ImageDrawerType.ArrowLeft, new Size(ScrollButtonSize, ScrollButtonSize), buttonColor);
                 
                 buttonColor = YamuiThemeManager.Current.ScrollBarsFg(false, IsButtonDownHovered, IsButtonDownPressed, Enabled);
-                // draw the down arrow
-                using (SolidBrush b = new SolidBrush(buttonColor)) {
-                    e.Graphics.FillPolygon(b, Utilities.GetArrowPolygon(ScrollButtonDown, IsVertical ? AnchorStyles.Bottom : AnchorStyles.Right));
-                }
+                e.Graphics.PaintCachedImage(ScrollButtonDown, IsVertical ? ImageDrawerType.ArrowDown : ImageDrawerType.ArrowRight, new Size(ScrollButtonSize, ScrollButtonSize), buttonColor);
             }
         }
         

@@ -37,8 +37,9 @@ namespace Yamui.Framework.Forms {
 
         #region constants
 
-        protected const int FormButtonWidth = 25;
-        protected const int ResizeIconSize = 14;
+        protected const int FormButtonWidth = 30;
+        protected const int FormButtonHeight = 20;
+        protected const int ResizeIconSize = 8;
 
         #endregion
 
@@ -51,14 +52,18 @@ namespace Yamui.Framework.Forms {
 
         private Dictionary<WindowButtons, YamuiFormButton> _windowButtonList = new Dictionary<WindowButtons, YamuiFormButton>();
 
-        private YamuiFormResizeIcon _resizeIcon = new YamuiFormResizeIcon();
+        private Rectangle _resizeRectangle;
+        private bool _trackLeave;
 
         #endregion
 
         #region Properties
 
+        /// <summary>
+        /// The top part of the window that makes it dragable
+        /// </summary>
         [Browsable(false)]
-        public override int TitleBarHeight => 25;
+        public override int TitleBarHeight => FormButtonHeight + BorderWidth;
 
         /// <summary>
         /// Set this to true to show the "close all notifications button",
@@ -76,7 +81,7 @@ namespace Yamui.Framework.Forms {
         public EventHandler OnCloseAllNotif { get; set; }
 
         protected override Padding DefaultPadding {
-            get { return new Padding(BorderWidth, 20, BorderWidth + ResizeIconSize, BorderWidth + ResizeIconSize); }
+            get { return new Padding(BorderWidth, TitleBarHeight, BorderWidth + ResizeIconSize, BorderWidth + ResizeIconSize); }
         }
 
         /// <summary>
@@ -123,12 +128,13 @@ namespace Yamui.Framework.Forms {
 
             // draw the resize pixels icon on the bottom right
             if (Resizable) {
-                _resizeIcon.ClientRectangle = new Rectangle(ClientRectangle.Right - ResizeIconSize, ClientRectangle.Bottom - ResizeIconSize, ResizeIconSize, ResizeIconSize);
-                _resizeIcon.OnPaint(e);
+                Color foreColor = YamuiThemeManager.Current.ButtonFg(YamuiThemeManager.Current.FormFore, false, false, false, false, IsActive);
+                _resizeRectangle = new Rectangle(ClientRectangle.Right - ResizeIconSize - BorderWidth * 2, ClientRectangle.Bottom - ResizeIconSize - BorderWidth * 2, ResizeIconSize, ResizeIconSize);
+                e.Graphics.PaintCachedImage(_resizeRectangle, ImageDrawerType.WindowResizeIcon, new Size(ResizeIconSize, ResizeIconSize), foreColor);
             }
 
             if (ControlBox) {
-                int x = ClientRectangle.Width - 1 - FormButtonWidth;
+                int x = ClientRectangle.Width - BorderWidth - FormButtonWidth;
                 DrawButton(ref x, WindowButtons.Close, e, true);
                 DrawButton(ref x, WindowButtons.CloseAllVisible, e, CloseAllBox);
                 DrawButton(ref x, WindowButtons.Maximize, e, MaximizeBox && Resizable);
@@ -180,6 +186,7 @@ namespace Yamui.Framework.Forms {
                     break;
 
                 case Window.Msg.WM_NCMOUSELEAVE:
+                    _trackLeave = false;
                     foreach (var formButton in _windowButtonList.Values) {
                         formButton.IsHovered = false;
                         formButton.IsPressed = false;
@@ -199,7 +206,7 @@ namespace Yamui.Framework.Forms {
         protected override WinApi.HitTest HitTestNca(IntPtr lparam) {
             var result = base.HitTestNca(lparam);
 
-            if (result == WinApi.HitTest.HTCAPTION) {
+            if (result == WinApi.HitTest.HTCAPTION || result == WinApi.HitTest.HTTOP || result == WinApi.HitTest.HTTOPRIGHT) {
                 var cursorLocation = PointToClient(new Point(lparam.ToInt32()));
                 foreach (var yamuiFormButton in _windowButtonList.Values) {
                     if (cursorLocation.X >= yamuiFormButton.ClientRectangle.Left && cursorLocation.X <= yamuiFormButton.ClientRectangle.Right) {
@@ -207,11 +214,14 @@ namespace Yamui.Framework.Forms {
                         result = WinApi.HitTest.HTBORDER;
 
                         // track mouse leaving (otherwise the WM_NCMOUSELEAVE message would not fire)
-                        WinApi.TRACKMOUSEEVENT tme = new WinApi.TRACKMOUSEEVENT();
-                        tme.cbSize = (uint) Marshal.SizeOf(tme);
-                        tme.dwFlags = (uint) (WinApi.TMEFlags.TME_LEAVE | WinApi.TMEFlags.TME_NONCLIENT);
-                        tme.hwndTrack = Handle;
-                        WinApi.TrackMouseEvent(tme);
+                        if (!_trackLeave) {
+                            WinApi.TRACKMOUSEEVENT tme = new WinApi.TRACKMOUSEEVENT();
+                            tme.cbSize = (uint) Marshal.SizeOf(tme);
+                            tme.dwFlags = (uint) (WinApi.TMEFlags.TME_LEAVE | WinApi.TMEFlags.TME_NONCLIENT);
+                            tme.hwndTrack = Handle;
+                            WinApi.TrackMouseEvent(tme);
+                            _trackLeave = true;
+                        }
                     } else {
                         yamuiFormButton.IsHovered = false;
                         yamuiFormButton.IsPressed = false;
@@ -219,7 +229,7 @@ namespace Yamui.Framework.Forms {
                 }
             } else if (result == WinApi.HitTest.HTCLIENT && Resizable) {
                 var cursorLocation2 = PointToClient(new Point(lparam.ToInt32()));
-                if (cursorLocation2.X >= _resizeIcon.ClientRectangle.Left && cursorLocation2.Y >= _resizeIcon.ClientRectangle.Top) {
+                if (cursorLocation2.X >= _resizeRectangle.Left && cursorLocation2.Y >= _resizeRectangle.Top) {
                     result = WinApi.HitTest.HTBOTTOMRIGHT;
                 }
             }
@@ -267,9 +277,9 @@ namespace Yamui.Framework.Forms {
             var button = _windowButtonList[buttonType];
             button.Show = show;
             if (show) {
-                button.ClientRectangle = new Rectangle(x, 1, FormButtonWidth, FormButtonWidth - 1);
+                button.ClientRectangle = new Rectangle(x, BorderWidth, FormButtonWidth, FormButtonHeight);
                 button.OnPaint(e);
-                x -= FormButtonWidth;
+                x -= button.ClientRectangle.Width;
             }
         }
         
@@ -291,35 +301,10 @@ namespace Yamui.Framework.Forms {
                     WindowState = FormWindowState.Normal;
                     break;
                 case WindowButtons.CloseAllVisible:
-                    OnCloseAllNotif?.Invoke(this, null);
+                    OnCloseAllNotif?.Invoke(this, EventArgs.Empty);
                     break;
             }
         }
-
-        #region YamuiFormResizeIcon
-
-        private class YamuiFormResizeIcon {
-
-            public Rectangle ClientRectangle { get; set; }
-
-            public void OnPaint(PaintEventArgs e) {
-                var foreColor = YamuiThemeManager.Current.FormFore;
-                using (var b = new SolidBrush(foreColor)) {
-                    var resizeHandleSize = new Size(2, 2);
-                    e.Graphics.FillRectangles(b, new[] {
-                        new Rectangle(new Point(ClientRectangle.Right - 4, ClientRectangle.Bottom - 4), resizeHandleSize),
-                        new Rectangle(new Point(ClientRectangle.Right - 8, ClientRectangle.Bottom - 8), resizeHandleSize),
-                        new Rectangle(new Point(ClientRectangle.Right - 8, ClientRectangle.Bottom - 4), resizeHandleSize),
-                        new Rectangle(new Point(ClientRectangle.Right - 4, ClientRectangle.Bottom - 8), resizeHandleSize),
-                        new Rectangle(new Point(ClientRectangle.Right - 12, ClientRectangle.Bottom - 4), resizeHandleSize),
-                        new Rectangle(new Point(ClientRectangle.Right - 4, ClientRectangle.Bottom - 12), resizeHandleSize)
-                    });
-                }
-            }
-
-        }
-
-        #endregion
 
         #region YamuiFormButton
 
@@ -364,15 +349,14 @@ namespace Yamui.Framework.Forms {
             }
             
             public void OnPaint(PaintEventArgs e) {
-                using (var b = new SolidBrush(BackColor)) {
-                    e.Graphics.FillRectangle(b, ClientRectangle);
-                }
+                e.Graphics.PaintRectangle(ClientRectangle, BackColor);
 
-                Color foreColor = YamuiThemeManager.Current.ButtonFg(YamuiThemeManager.Current.FormFore, false, false, IsHovered, IsPressed, _parent.Enabled);
+                Color foreColor = YamuiThemeManager.Current.ButtonFg(YamuiThemeManager.Current.FormFore, false, false, IsHovered, IsPressed, _parent.IsActive);
 
-                using (var font = new Font("Webdings", 9.25f)) {
-                    TextRenderer.DrawText(e.Graphics, Text, font, ClientRectangle, foreColor, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
-                }
+                var imageSize = ClientRectangle.Height / 2;
+                imageSize = imageSize - (imageSize % 2); // ensure imageSize is pair
+                var imagRectangle = new Rectangle(ClientRectangle.X + ClientRectangle.Width / 2 - imageSize / 2, ClientRectangle.Y + ClientRectangle.Height / 2 - imageSize / 2, imageSize, imageSize);
+                e.Graphics.PaintCachedImage(imagRectangle, ImageType, new Size(imageSize, imageSize), foreColor);
             }
             
             public string TooltipText {
@@ -394,26 +378,26 @@ namespace Yamui.Framework.Forms {
                 }
             }
 
-            public string Text {
+            private ImageDrawerType ImageType {
                 get {
                     switch (Type) {
                         case WindowButtons.Minimize:
-                            return @"0";
+                            return ImageDrawerType.Minimize;
                         case WindowButtons.Restore:
-                            return @"2";
+                            return ImageDrawerType.Restore;
                         case WindowButtons.Maximize:
-                            return @"1";
+                            return ImageDrawerType.Maximize;
                         case WindowButtons.CloseAllVisible:
-                            return ((char) (126)).ToString();
+                            return ImageDrawerType.CloseAll;
                         case WindowButtons.Close:
-                            return @"r";
+                            return ImageDrawerType.Close;
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
                 }
             }
 
-            public Color BackColor {
+            private Color BackColor {
                 get {
                     if (IsPressed)
                         return YamuiThemeManager.Current.AccentColor;

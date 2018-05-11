@@ -25,7 +25,6 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using Yamui.Framework.Animations.Transitions;
-using Yamui.Framework.Controls;
 using Yamui.Framework.Helper;
 using Yamui.Framework.HtmlRenderer.Core.Core.Entities;
 using Yamui.Framework.HtmlRenderer.WinForms;

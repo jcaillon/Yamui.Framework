@@ -176,7 +176,7 @@ namespace Yamui.Framework.Forms {
             _bordersVisible = false;
             _restoreAnimationTimer = new System.Timers.Timer {
                 AutoReset = false,
-                Interval = 500
+                Interval = 200
             };
             _restoreAnimationTimer.Elapsed += RestoreAnimationTimerOnElapsed;
 

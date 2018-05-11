@@ -38,6 +38,7 @@ namespace Yamui.Framework.Helper {
     /// This class provides various utilies to use in YamuiFramework and outside
     /// </summary>
     public static class Utilities {
+
         #region Paint
 
         /// <summary>
@@ -46,23 +47,7 @@ namespace Yamui.Framework.Helper {
         /// <returns>A round cornered rectagle path</returns>   
         public static GraphicsPath GetRoundedRect(float x, float y, float width, float height, float diameter) {
             return new RectangleF(x, y, width, height).GetRoundedRect(diameter);
-        }
-
-        public static PointF[] GetArrowPolygon(Rectangle rect, AnchorStyles arrowDirection) {
-            float ratio = (float) Math.Min(rect.Width, rect.Height) / 21;
-            float arrowHeight = 6 * ratio;
-            float arrowBaseWidth = 10 * ratio;
-            switch (arrowDirection) {
-                case AnchorStyles.Bottom:
-                    return new[] {new PointF(rect.X + rect.Width / 2 - arrowBaseWidth / 2, rect.Y + rect.Height / 2 - arrowHeight / 3), new PointF(rect.X + rect.Width / 2 + arrowBaseWidth / 2, rect.Y + rect.Height / 2 - arrowHeight / 3), new PointF(rect.X + rect.Width / 2, rect.Y + rect.Height / 2 + arrowHeight * 2 / 3)};
-                case AnchorStyles.Top:
-                    return new[] {new PointF(rect.X + rect.Width / 2 - arrowBaseWidth / 2, rect.Y + rect.Height / 2 + arrowHeight / 3), new PointF(rect.X + rect.Width / 2 + arrowBaseWidth / 2, rect.Y + rect.Height / 2 + arrowHeight / 3), new PointF(rect.X + rect.Width / 2, rect.Y + rect.Height / 2 - arrowHeight * 2 / 3)};
-                case AnchorStyles.Left:
-                    return new[] {new PointF(rect.X + rect.Width / 2 + arrowHeight / 3, rect.Y + rect.Height / 2 - arrowBaseWidth / 2), new PointF(rect.X + rect.Width / 2 + arrowHeight / 3, rect.Y + rect.Height / 2 + arrowBaseWidth / 2), new PointF(rect.X + rect.Width / 2 - arrowHeight * 2 / 3, rect.Y + rect.Height / 2)};
-            }
-            return new[] {new PointF(rect.X + rect.Width / 2 - arrowHeight / 3, rect.Y + rect.Height / 2 - arrowBaseWidth / 2), new PointF(rect.X + rect.Width / 2 - arrowHeight / 3, rect.Y + rect.Height / 2 + arrowBaseWidth / 2), new PointF(rect.X + rect.Width / 2 + arrowHeight * 2 / 3, rect.Y + rect.Height / 2)};
-        }
-        
+        }        
 
         #endregion
 

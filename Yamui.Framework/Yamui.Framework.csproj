@@ -211,6 +211,7 @@
     <Compile Include="Helper\DrawHelper.cs" />
     <Compile Include="Helper\GenericThemeHolder.cs" />
     <Compile Include="Helper\ColorHelper.cs" />
+    <Compile Include="Helper\ImageStorer.cs" />
     <Compile Include="Helper\NativeTextRenderer.cs" />
     <Compile Include="Helper\PaintHelper.cs" />
     <Compile Include="Helper\TabOrderManager.cs" />
@@ -327,7 +328,9 @@
     <Compile Include="Themes\YamuiTheme.cs" />
     <Compile Include="Themes\YamuiThemeManager.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Widget\" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Forms\YamuiFormShadow.resx">
       <DependentUpon>YamuiFormShadow.cs</DependentUpon>

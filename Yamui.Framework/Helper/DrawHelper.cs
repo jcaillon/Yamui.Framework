@@ -1,11 +1,87 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 
 namespace Yamui.Framework.Helper {
-    public class DrawHelper {
+
+    /// <summary>
+    /// TODO : Use something like this when we have all the painting done at the same location (ie in the OnPaint of the form)
+    /// The idea is that the form asks each child to draw itself providing an abstraction to draw (children dont immediatly use
+    /// GDI/GDI+ methods but the methods of an interface that we provide)
+    /// We cache the GDI objects (like the brushes, pens etc...) at the form level (same for the ImageStorer, we can put it at a form level)
+    /// so they are disposed when the form closes (for brushes, pen, we dispose them right after painting the whole form, it is better not to cache them!)
+    /// </summary>
+    public class GraphicsPalette : IDisposable 
+    {
+        [ThreadStatic]
+        private static GraphicsPalette _current = null;
+        private readonly Dictionary<Color, SolidBrush> _solidBrushes = new Dictionary<Color, SolidBrush>();
+
+        public GraphicsPalette() 
+        {
+            if (_current == null)
+                _current = this;
+        }
+
+        public void Dispose() 
+        {
+            if (_current == this)
+                _current = null;
+
+            foreach (var solidBrush in _solidBrushes.Values)
+                solidBrush.Dispose();            
+        }
+
+        public static SolidBrush GetSolidBrush(Color color) 
+        {
+            if (!_current._solidBrushes.ContainsKey(color))
+                _current._solidBrushes[color] = new SolidBrush(color);
+
+            return _current._solidBrushes[color];
+        }
+    }
+
+    public static class DrawHelper {
+        
+        /// <summary>
+        /// Paint a border (an empty rectangle with the desired border width)
+        /// </summary>
+        public static void PaintBorder(this Graphics g, Rectangle borderRectangle, int thickness, Color color) {
+            g.PaintBorder(borderRectangle.X, borderRectangle.Y, borderRectangle.Width, borderRectangle.Height, thickness, color);
+        }
+        
+        /// <summary>
+        /// Paint a border (an empty rectangle with the desired border width)
+        /// </summary>
+        public static void PaintBorder(this Graphics g, int x, int y, int width, int height, int thickness, Color color) {
+            if (thickness == 1) {
+                // historical issue of dotnet that will never be fixed
+                width -= 1;
+                height -= 1;
+            }
+            using (var p = new Pen(color, thickness) {
+                Alignment = PenAlignment.Inset
+            }) {
+                g.DrawRectangle(p, x, y, width, height);
+            }
+        }
+
+        /// <summary>
+        /// Fill a rectangle with the given color
+        /// </summary>
+        public static void PaintRectangle(this Graphics g, Rectangle rectangle, Color color) {
+            using (var b = new SolidBrush(color)) {
+                g.FillRectangle(b, rectangle);
+            }
+        }
+
+        public static void PaintCachedImage(this Graphics g, Rectangle destinationRectangle, ImageDrawerType type, Size size, Color color) {
+            g.DrawImage(ImageStorer.Instance.WithDraw(type, size, color), destinationRectangle, 0, 0, size.Width, size.Height, GraphicsUnit.Pixel);
+        }
 
         public static void HandleWmPaint(ref Message m, Control control, Action<PaintEventArgs> paint) {
             var ps = new WinApi.PAINTSTRUCT();

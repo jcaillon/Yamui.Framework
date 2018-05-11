@@ -23,7 +23,6 @@
 using System;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -68,6 +67,9 @@ namespace Yamui.Framework.Forms {
         [Browsable(false)]
         public virtual Padding NonClientAreaPadding => _nonClientAreaPadding;
 
+        /// <summary>
+        /// The top part of the window that makes it dragable
+        /// </summary>
         [Browsable(false)]
         public virtual int TitleBarHeight => 20;
 
@@ -246,20 +248,12 @@ namespace Yamui.Framework.Forms {
         #region OnPaint
 
         protected override void OnPaint(PaintEventArgs e) {
-            using (var b = new SolidBrush(BackColor)) {
-                e.Graphics.FillRectangle(b, ClientRectangle);
-            }
-
+            e.Graphics.PaintRectangle(ClientRectangle, BackColor);
             PaintBorder(e);
         }
 
         protected void PaintBorder(PaintEventArgs e) {
-            var borderRect = new Rectangle(0, 0, ClientRectangle.Width - (BorderWidth == 1 ? BorderWidth : 0), ClientRectangle.Height - (BorderWidth == 1 ? BorderWidth : 0));
-            using (var p = new Pen(IsActive ? BorderActiveColor : BorderInactiveColor, BorderWidth) {
-                Alignment = PenAlignment.Inset
-            }) {
-                e.Graphics.DrawRectangle(p, borderRect);
-            }
+            e.Graphics.PaintBorder(ClientRectangle, BorderWidth, IsActive ? BorderActiveColor : BorderInactiveColor);
         }
 
         #endregion
@@ -336,7 +330,7 @@ namespace Yamui.Framework.Forms {
                 case Window.Msg.WM_MBUTTONDOWN:
                     //var state = (WinApi.WmSizeEnum) m.WParam;
                     //if (state == WinApi.WmSizeEnum.SIZE_MAXIMIZED || state == WinApi.WmSizeEnum.SIZE_MAXSHOW) {
-                        Refresh();
+                       // Refresh();
                     //}
                     // var wid = m.LParam.LoWord();
                     // var h = m.LParam.HiWord();
@@ -398,7 +392,8 @@ namespace Yamui.Framework.Forms {
                 case Window.Msg.WM_ERASEBKGND:
                     // https://msdn.microsoft.com/en-us/library/windows/desktop/ms648055(v=vs.85).aspx
                     m.Result = IntPtr.Zero;
-                    // hack thing to correctly redraw th window after maximizing it
+                    // BUG HACK thing to correctly redraw th window after maximizing it
+                    // will not be needed once we get rid of the nonclient scroll panel
                     if (_needRedraw) {
                         _needRedraw = false;
                         WinApi.RedrawWindow(new HandleRef(this, Handle), IntPtr.Zero, IntPtr.Zero, WinApi.RedrawWindowFlags.Invalidate);

@@ -510,6 +510,8 @@ namespace Yamui.Framework.Controls {
             base.OnMouseMove(e);
             if (ContentRectangle.Contains(e.Location)) {
                 _htmlContainer?.HandleMouseMove(this, e);
+            } else {
+                Cursor = DefaultCursor;
             }
         }
 

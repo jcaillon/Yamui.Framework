@@ -436,6 +436,8 @@ namespace Yamui.Framework.Controls {
             var borderColor = YamuiThemeManager.Current.ButtonBorder(IsFocused, IsHovered, IsPressed, Enabled && hasItems);
             var foreColor = YamuiThemeManager.Current.ButtonFg(ForeColor, UseCustomForeColor, IsFocused, IsHovered, IsPressed, Enabled && hasItems);
 
+            var borderWidth = 1;
+
             // background
             if (backColor != Color.Transparent)
                 e.Graphics.Clear(backColor);
@@ -444,7 +446,7 @@ namespace Yamui.Framework.Controls {
 
             // border?
             if (borderColor != Color.Transparent)
-                using (var p = new Pen(borderColor)) {
+                using (var p = new Pen(borderColor, borderWidth)) {
                     var borderRect = new Rectangle(0, 0, Width - 1, Height - 1);
                     e.Graphics.DrawRectangle(p, borderRect);
                 }
@@ -458,12 +460,10 @@ namespace Yamui.Framework.Controls {
             }
 
             // draw the down arrow
-            using (SolidBrush b = new SolidBrush(foreColor)) {
-                var arrowRectangle = ClientRectangle;
-                arrowRectangle.X = arrowRectangle.Width - 20;
-                arrowRectangle.Width = 20;
-                e.Graphics.FillPolygon(b, Utilities.GetArrowPolygon(arrowRectangle, AnchorStyles.Bottom));
-            }
+            var arrowRectangle = ClientRectangle;
+            arrowRectangle.Width = ClientRectangle.Height - borderWidth * 2;
+            arrowRectangle.X = ClientRectangle.Width - arrowRectangle.Width;
+            e.Graphics.PaintCachedImage(arrowRectangle, ImageDrawerType.ArrowDown, arrowRectangle.Size, foreColor);
 
             // text
             if (!IsFocused && string.IsNullOrEmpty(Text) && !string.IsNullOrEmpty(WaterMark) && Enabled) {

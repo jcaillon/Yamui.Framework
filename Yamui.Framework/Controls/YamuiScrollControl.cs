@@ -169,8 +169,8 @@ namespace Yamui.Framework.Controls {
         
         #region Fields and Consts
         
-        public const int BorderWidth = 3;   
-        private int _scrollBarWidth = 12;
+        public const int BorderWidth = 1;   
+        private int _scrollBarWidth = 20;
         protected Size _naturalSize;
         private Rectangle _leftoverBar;
         private bool _needBothScroll;
@@ -225,11 +225,7 @@ namespace Yamui.Framework.Controls {
         }
 
         protected virtual void PaintBorder(PaintEventArgs e) {
-            using (var p = new Pen(BorderColor, BorderWidth) {
-                Alignment = PenAlignment.Inset
-            }) {
-                e.Graphics.DrawRectangle(p, BorderDrawPath);
-            }
+            e.Graphics.PaintBorder(BorderDrawPath, BorderWidth, BorderColor);
         }
 
         protected virtual void PaintContent(PaintEventArgs e) {
@@ -424,7 +420,7 @@ namespace Yamui.Framework.Controls {
         /// <param name="newSize"></param>
         protected virtual void OnSizeChanged(Size newSize) {
             // the (HasBorder && BorderWidth == 1 ? BorderWidth : 0) is there to compensate for an issue in dotnet that will never be fixed
-            BorderDrawPath = new Rectangle(0, 0, newSize.Width - (HasBorder && BorderWidth == 1 ? BorderWidth : 0), newSize.Height - (HasBorder && BorderWidth == 1 ? BorderWidth : 0));
+            BorderDrawPath = new Rectangle(0, 0, newSize.Width, newSize.Height);
             EffectiveClientRectangle = new Rectangle(BorderPadding, BorderPadding, newSize.Width - 2*BorderPadding, newSize.Height - 2*BorderPadding);
             ComputeScrollbars(_naturalSize, newSize);
         }
