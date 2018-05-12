@@ -25,6 +25,7 @@ namespace Yamui.Framework.HtmlRenderer.Core.Core.Utils {
     /// Represents sub-string of a full string starting at specific location with a specific length.
     /// </summary>
     internal sealed class SubString {
+
         #region Fields and Consts
 
         /// <summary>

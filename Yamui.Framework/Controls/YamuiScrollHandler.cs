@@ -71,6 +71,7 @@ namespace Yamui.Framework.Controls {
             set {
                 _barThickness = value.ClampMin(5);
                 ComputeScrollFixedValues();
+                AnalyzeScrollNeeded();
                 InvalidateScrollBar();
             }
         }
@@ -104,7 +105,16 @@ namespace Yamui.Framework.Controls {
         /// <summary>
         /// Exposes the state of the scroll buttons, true if displayed
         /// </summary>
-        public bool HasScrollButtons { get; private set; }
+        public bool HasScrollButtons {
+            get { return _hasScrollButtons; }
+            private set {
+                if (_hasScrollButtons != value) {
+                    _hasScrollButtons = value;
+                    // this changes some values so we need to compute them again
+                    ComputeScrollFixedValues();
+                }
+            }
+        }
 
         /// <summary>
         /// Maximum length of this panel if we wanted to show it all w/o scrolls (set with <see cref="UpdateLength"/>)
@@ -289,6 +299,7 @@ namespace Yamui.Framework.Controls {
         private bool _isButtonDownHovered;
         private bool _isButtonUpPressed;
         private bool _isButtonDownPressed;
+        private bool _hasScrollButtons;
 
         public YamuiScrollHandler(bool isVertical, Control parent) {
             IsVertical = isVertical;

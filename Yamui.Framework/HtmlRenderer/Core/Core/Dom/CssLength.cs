@@ -31,6 +31,7 @@ namespace Yamui.Framework.HtmlRenderer.Core.Core.Dom {
     /// http://www.w3.org/TR/CSS21/syndata.html#length-units
     /// </remarks>
     internal sealed class CssLength {
+
         #region Fields
 
         private readonly double _number;

@@ -73,7 +73,9 @@ namespace Yamui.Framework.HtmlRenderer.Core.Core.Utils {
         public static void DrawImageLoadingIcon(RGraphics g, HtmlContainerInt htmlContainer, RRect r) {
             g.DrawRectangle(g.GetPen(RColor.LightGray), r.Left + 3, r.Top + 3, 13, 14);
             var image = htmlContainer.Adapter.GetLoadingImage();
-            g.DrawImage(image, new RRect(r.Left + 4, r.Top + 4, image.Width, image.Height));
+            if (image != null) {
+                g.DrawImage(image, new RRect(r.Left + 4, r.Top + 4, image.Width, image.Height));
+            }
         }
 
         /// <summary>
@@ -85,7 +87,9 @@ namespace Yamui.Framework.HtmlRenderer.Core.Core.Utils {
         public static void DrawImageErrorIcon(RGraphics g, HtmlContainerInt htmlContainer, RRect r) {
             g.DrawRectangle(g.GetPen(RColor.LightGray), r.Left + 2, r.Top + 2, 15, 15);
             var image = htmlContainer.Adapter.GetLoadingFailedImage();
-            g.DrawImage(image, new RRect(r.Left + 3, r.Top + 3, image.Width, image.Height));
+            if (image != null) {
+                g.DrawImage(image, new RRect(r.Left + 3, r.Top + 3, image.Width, image.Height));
+            }
         }
 
         /// <summary>

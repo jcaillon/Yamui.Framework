@@ -42,6 +42,7 @@ namespace Yamui.Framework.HtmlRenderer.Core.Adapters {
     /// This is because it holds caches of default CssData, Images, Fonts and Brushes.
     /// </remarks>
     public abstract class RAdapter {
+
         #region Fields/Consts
 
         /// <summary>
@@ -201,9 +202,7 @@ namespace Yamui.Framework.HtmlRenderer.Core.Adapters {
         /// </summary>
         public RImage GetLoadingImage() {
             if (_loadImage == null) {
-                var stream = typeof(HtmlRendererUtils).Assembly.GetManifestResourceStream("TheArtOfDev.HtmlRenderer.Core.Utils.ImageLoad.png");
-                if (stream != null)
-                    _loadImage = ImageFromStream(stream);
+                _loadImage = GetTheLoadingImage();
             }
             return _loadImage;
         }
@@ -213,12 +212,11 @@ namespace Yamui.Framework.HtmlRenderer.Core.Adapters {
         /// </summary>
         public RImage GetLoadingFailedImage() {
             if (_errorImage == null) {
-                var stream = typeof(HtmlRendererUtils).Assembly.GetManifestResourceStream("TheArtOfDev.HtmlRenderer.Core.Utils.ImageError.png");
-                if (stream != null)
-                    _errorImage = ImageFromStream(stream);
+                _errorImage = GetTheLoadingFailedImage();
             }
             return _errorImage;
         }
+
 
         /// <summary>
         /// Get data object for the given html and plain text data.<br />
@@ -305,6 +303,18 @@ namespace Yamui.Framework.HtmlRenderer.Core.Adapters {
         }
 
         #region Private/Protected methods
+
+        /// <summary>
+        /// Get the image to use while an html image is loading
+        /// </summary>
+        /// <returns></returns>
+        protected abstract RImage GetTheLoadingImage();
+        
+        /// <summary>
+        /// Get the image to use if an html image fails to load
+        /// </summary>
+        /// <returns></returns>
+        protected abstract RImage GetTheLoadingFailedImage();
 
         /// <summary>
         /// Resolve color value from given color name.

@@ -29,6 +29,7 @@ namespace Yamui.Framework.HtmlRenderer.Core.Core.Handlers {
     /// Utilities for fonts and fonts families handling.
     /// </summary>
     internal sealed class FontsHandler {
+
         #region Fields and Consts
 
         /// <summary>
@@ -172,5 +173,6 @@ namespace Yamui.Framework.HtmlRenderer.Core.Core.Handlers {
         }
 
         #endregion
+
     }
 }

@@ -233,7 +233,7 @@ namespace Yamui.Framework.HtmlRenderer.WinForms {
             get { return Utils.ConvertRound(_htmlContainerInt.ScrollOffset); }
             set { _htmlContainerInt.ScrollOffset = Utils.Convert(value); }
         }
-        
+
         /// <summary>
         /// The max width and height of the rendered html.<br/>
         /// The max width will effect the html layout wrapping lines, resize images and tables where possible.<br/>

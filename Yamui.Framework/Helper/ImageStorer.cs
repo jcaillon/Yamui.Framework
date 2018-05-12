@@ -225,6 +225,7 @@ namespace Yamui.Framework.Helper {
                     }
                     break;
                 case ImageDrawerType.LightningStrike:
+                case ImageDrawerType.LoadIcon: // TODO : draw a correct image for the loading icon
                     bitmap = new Bitmap(size.Width, size.Height);
                     var arrowBase = size.Height / 3;
                     using (Graphics g2 = Graphics.FromImage(bitmap)) {
@@ -271,6 +272,7 @@ namespace Yamui.Framework.Helper {
         ArrowDownFull,
         WindowResizeIcon,
         LightningStrike,
+        LoadIcon,
         CloseAll
     }
 }

@@ -29,6 +29,7 @@ namespace Yamui.Framework.HtmlRenderer.Core.Core.Utils {
     /// Utility method for handling CSS stuff.
     /// </summary>
     internal static class CssUtils {
+
         #region Fields and Consts
 
         /// <summary>

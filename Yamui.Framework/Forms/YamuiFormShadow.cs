@@ -162,9 +162,11 @@ namespace Yamui.Framework.Forms {
         }
 
         protected override void OnShown(EventArgs e) {
-            _shownOnce = true;
-            if (Visible) {
-                ShowShadows(true, false);
+            if (HasShadow && !DesignMode) {
+                _shownOnce = true;
+                if (Visible) {
+                    ShowShadows(true, false);
+                }
             }
             base.OnShown(e);
         }

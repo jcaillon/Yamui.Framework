@@ -162,7 +162,7 @@ namespace Yamui.Framework.HtmlRenderer.Core.Core.Utils {
         /// <summary>
         /// Default font size in points. Change this value to modify the default font size.
         /// </summary>
-        public const double FontSize = 11f;
+        public const double FontSize = 9f;
 
         /// <summary>
         /// Default font used for the generic 'serif' family

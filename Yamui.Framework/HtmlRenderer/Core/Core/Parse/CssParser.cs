@@ -740,7 +740,7 @@ namespace Yamui.Framework.HtmlRenderer.Core.Core.Parse {
             if (!string.IsNullOrEmpty(value)) {
                 int idx = 0;
                 int length;
-                while ((idx = CommonUtils.GetNextSubString(value, idx, out length)) > -1) {
+                while ((idx = value.GetNextSubString(idx, out length)) > -1) {
                     if (width == null)
                         width = ParseBorderWidth(value, idx, length);
                     if (style == null)

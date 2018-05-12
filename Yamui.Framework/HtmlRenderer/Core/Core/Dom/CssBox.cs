@@ -40,6 +40,7 @@ namespace Yamui.Framework.HtmlRenderer.Core.Core.Dom {
     /// http://www.w3.org/TR/CSS21/box.html
     /// </remarks>
     internal class CssBox : CssBoxProperties, IDisposable {
+
         #region Fields and Consts
 
         /// <summary>

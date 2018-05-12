@@ -31,6 +31,7 @@ namespace Yamui.Framework.HtmlRenderer.WinForms.Adapters {
     /// Adapter for WinForms Graphics for core.
     /// </summary>
     internal sealed class GraphicsAdapter : RGraphics {
+
         #region Fields and Consts
 
         /// <summary>

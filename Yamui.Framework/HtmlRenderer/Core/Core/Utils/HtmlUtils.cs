@@ -23,6 +23,7 @@ using System.Collections.Generic;
 
 namespace Yamui.Framework.HtmlRenderer.Core.Core.Utils {
     internal static class HtmlUtils {
+
         #region Fields and Consts
 
         /// <summary>

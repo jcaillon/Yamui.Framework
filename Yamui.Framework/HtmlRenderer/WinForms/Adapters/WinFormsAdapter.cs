@@ -22,8 +22,10 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Windows.Forms;
+using Yamui.Framework.Helper;
 using Yamui.Framework.HtmlRenderer.Core.Adapters;
 using Yamui.Framework.HtmlRenderer.Core.Adapters.Entities;
+using Yamui.Framework.HtmlRenderer.Core.Core;
 using Yamui.Framework.HtmlRenderer.WinForms.Utilities;
 
 namespace Yamui.Framework.HtmlRenderer.WinForms.Adapters {
@@ -44,8 +46,8 @@ namespace Yamui.Framework.HtmlRenderer.WinForms.Adapters {
         /// Init installed font families and set default font families mapping.
         /// </summary>
         private WinFormsAdapter() {
-            AddFontFamilyMapping("monospace", "Courier New");
-            AddFontFamilyMapping("Helvetica", "Arial");
+            AddFontFamilyMapping("monospace", "Consolas");
+            AddFontFamilyMapping("Helvetica", "Segoe UI");
 
             foreach (var family in FontFamily.Families) {
                 AddFontFamily(new FontFamilyAdapter(family));
@@ -135,6 +137,14 @@ namespace Yamui.Framework.HtmlRenderer.WinForms.Adapters {
                     ((ImageAdapter) image).Image.Save(saveDialog.FileName);
                 }
             }
+        }
+        
+        protected override RImage GetTheLoadingImage() {
+            return ConvertImageInt(ImageStorer.Instance.WithDraw(ImageDrawerType.LightningStrike, new Size(12, 12), Color.Black));
+        }
+
+        protected override RImage GetTheLoadingFailedImage() {
+            return ConvertImageInt(ImageStorer.Instance.WithDraw(ImageDrawerType.Close, new Size(12, 12), Color.Red));
         }
     }
 }

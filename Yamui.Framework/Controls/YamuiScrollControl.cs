@@ -1,16 +1,13 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Yamui.Framework.Helper;
 using Yamui.Framework.Themes;
 
 namespace Yamui.Framework.Controls {
-
     public class YamuiScrollControl : YamuiControl {
-
         #region Properties
 
         /// <summary>
@@ -33,7 +30,7 @@ namespace Yamui.Framework.Controls {
         /// </summary>
         [Browsable(false)]
         public YamuiScrollHandler VerticalScroll { get; }
-        
+
         /// <summary>
         /// Access the horizontal scroll
         /// </summary>
@@ -47,12 +44,14 @@ namespace Yamui.Framework.Controls {
         public bool HScroll {
             get { return _hScroll; }
             set {
-                _hScroll = value;
-                HorizontalScroll.Enabled = _hScroll;
-                PerformLayout();
+                if (_hScroll != value) {
+                    _hScroll = value;
+                    HorizontalScroll.Enabled = _hScroll;
+                    RefreshLayout();
+                }
             }
         }
-        
+
         /// <summary>
         /// Can this control have vertical scroll?
         /// </summary>
@@ -60,12 +59,14 @@ namespace Yamui.Framework.Controls {
         public bool VScroll {
             get { return _vScroll; }
             set {
-                _vScroll = value;
-                VerticalScroll.Enabled = _vScroll;
-                PerformLayout();
+                if (_vScroll != value) {
+                    _vScroll = value;
+                    VerticalScroll.Enabled = _vScroll;
+                    RefreshLayout();
+                }
             }
         }
-        
+
         /// <summary>
         /// Can this control have scrolls?
         /// </summary>
@@ -73,11 +74,13 @@ namespace Yamui.Framework.Controls {
         public bool AutoScroll {
             get { return _vScroll || _hScroll; }
             set {
-                _vScroll = value;
-                _hScroll = value;
-                VerticalScroll.Enabled = _vScroll;
-                HorizontalScroll.Enabled = _hScroll;
-                PerformLayout();
+                if ((value && (!_vScroll || !_hScroll)) || (!value && (_vScroll || _hScroll))) {
+                    _vScroll = value;
+                    _hScroll = value;
+                    VerticalScroll.Enabled = _vScroll;
+                    HorizontalScroll.Enabled = _hScroll;
+                    RefreshLayout();
+                }
             }
         }
 
@@ -107,7 +110,7 @@ namespace Yamui.Framework.Controls {
                 VerticalScroll.LengthToRepresentMinSize = value.Height;
             }
         }
-        
+
         /// <summary>
         /// True if the control has at least 1 scoll active
         /// </summary>
@@ -118,9 +121,9 @@ namespace Yamui.Framework.Controls {
         /// Get prefered size, i.e. the size we would need to display all the child controls at the same time
         /// </summary>
         [Browsable(false)]
-        protected Size NaturalSize {
+        protected Size ContentNaturalSize {
             get {
-                _naturalSize = GetNaturalSize();
+                _naturalSize = GetContentNaturalSize();
                 return _naturalSize;
             }
         }
@@ -135,7 +138,7 @@ namespace Yamui.Framework.Controls {
                     OnSizeChanged(Size);
                     VerticalScroll.ParentPadding = BorderPadding;
                     HorizontalScroll.ParentPadding = BorderPadding;
-                    PerformLayout();
+                    RefreshLayout();
                     Invalidate();
                 }
             }
@@ -166,10 +169,10 @@ namespace Yamui.Framework.Controls {
         private int BorderPadding => (HasBorder ? BorderWidth : 0);
 
         #endregion
-        
+
         #region Fields and Consts
-        
-        public const int BorderWidth = 1;   
+
+        public const int BorderWidth = 1;
         private int _scrollBarWidth = 20;
         protected Size _naturalSize;
         private Rectangle _leftoverBar;
@@ -218,9 +221,11 @@ namespace Yamui.Framework.Controls {
             if (HasBorder && e.ClipRectangle.Contains(BorderDrawPath)) {
                 PaintBorder(e);
             }
+
             if (e.ClipRectangle.Contains(ContentRectangle)) {
                 PaintContent(e);
-            }           
+            }
+
             PaintScrollBars(e, null);
         }
 
@@ -239,30 +244,33 @@ namespace Yamui.Framework.Controls {
             if (e.ClipRectangle.Contains(VerticalScroll.BarRect)) {
                 VerticalScroll.Paint(e);
             }
+
             if (_needBothScroll && e.ClipRectangle.Contains(_leftoverBar)) {
                 using (var b = new SolidBrush(YamuiThemeManager.Current.ScrollNormalBack)) {
                     e.Graphics.FillRectangle(b, _leftoverBar);
                 }
             }
+
             if (e.ClipRectangle.Contains(HorizontalScroll.BarRect)) {
                 HorizontalScroll.Paint(e);
             }
         }
 
         #endregion
-        
+
         #region ScrollHandler events
 
         protected virtual void OnScrollValueChanged(object sender, YamuiScrollHandlerValueChangedEventArgs e) {
             Invalidate(ContentRectangle);
         }
-        
+
         protected virtual void OnScrollbarsRedrawNeeded(object sender, EventArgs eventArgs) {
             var scroll = (YamuiScrollHandler) sender;
             var invalidateRectangle = scroll.BarRect;
             if (_needBothScroll && scroll.IsVertical) {
                 invalidateRectangle = Rectangle.Union(invalidateRectangle, _leftoverBar);
             }
+
             Invalidate(invalidateRectangle);
         }
 
@@ -277,7 +285,7 @@ namespace Yamui.Framework.Controls {
             e.IsInputKey = true;
             base.OnPreviewKeyDown(e);
         }
-        
+
         /// <summary>
         /// Handle keydown
         /// </summary>
@@ -287,24 +295,24 @@ namespace Yamui.Framework.Controls {
                 base.OnKeyDown(e);
             }
         }
-        
+
         protected override void OnMouseDown(MouseEventArgs e) {
-            MouseLDownClientArea();
+            MouseLDownClientArea(e);
             base.OnMouseDown(e);
         }
 
         protected override void OnMouseUp(MouseEventArgs e) {
-            MouseLUpClientArea();
+            MouseLUpClientArea(e);
             base.OnMouseUp(e);
         }
 
         protected override void OnMouseMove(MouseEventArgs e) {
-            MouseMoveClientArea();
+            MouseMoveClientArea(e);
             base.OnMouseMove(e);
         }
 
         protected override void OnMouseLeave(EventArgs e) {
-            MouseLeaveClientArea();
+            MouseLeaveClientArea(e);
             base.OnMouseLeave(e);
         }
 
@@ -323,8 +331,9 @@ namespace Yamui.Framework.Controls {
                         var nccsp = (WinApi.NCCALCSIZE_PARAMS) Marshal.PtrToStructure(m.LParam, typeof(WinApi.NCCALCSIZE_PARAMS));
                         if (!nccsp.rectProposed.Size.IsEmpty) {
                             // we are not in this case when the form is minimized
-                            OnSizeChanged(nccsp.rectProposed.Size);
+                            //OnSizeChanged(nccsp.rectProposed.Size);
                         }
+
                         AdjustClientArea(ref nccsp.rectProposed);
                         Marshal.StructureToPtr(nccsp, m.LParam, true);
                     } else {
@@ -332,8 +341,9 @@ namespace Yamui.Framework.Controls {
                         var clnRect = (WinApi.RECT) Marshal.PtrToStructure(m.LParam, typeof(WinApi.RECT));
                         if (!clnRect.Size.IsEmpty) {
                             // we are not in this case when the form is minimized
-                            OnSizeChanged(clnRect.Size);
+                            //OnSizeChanged(clnRect.Size);
                         }
+
                         AdjustClientArea(ref clnRect);
                         Marshal.StructureToPtr(clnRect, m.LParam, true);
                     }
@@ -356,6 +366,7 @@ namespace Yamui.Framework.Controls {
                         // propagate the event
                         base.WndProc(ref m);
                     }
+
                     break;
 
                 /*
@@ -381,6 +392,11 @@ namespace Yamui.Framework.Controls {
             }
         }
 
+        protected override void OnSizeChanged(EventArgs e) {
+            base.OnSizeChanged(e);
+            OnSizeChanged(Size);
+        }
+
         #endregion
 
         #region Methods
@@ -393,25 +409,33 @@ namespace Yamui.Framework.Controls {
             // the whole control is a client area
         }
 
-        protected virtual void MouseMoveClientArea() {
+        protected virtual void MouseMoveClientArea(MouseEventArgs mouseEventArgs) {
             VerticalScroll.HandleMouseMove(null, null);
             HorizontalScroll.HandleMouseMove(null, null);
         }
 
-        protected virtual void MouseLDownClientArea() {
+        protected virtual void MouseLDownClientArea(MouseEventArgs mouseEventArgs) {
             Focus();
             VerticalScroll.HandleMouseDown(null, null);
             HorizontalScroll.HandleMouseDown(null, null);
         }
 
-        protected virtual void MouseLUpClientArea() {
+        protected virtual void MouseLUpClientArea(MouseEventArgs mouseEventArgs) {
             VerticalScroll.HandleMouseUp(null, null);
             HorizontalScroll.HandleMouseUp(null, null);
         }
 
-        protected virtual void MouseLeaveClientArea() {
+        protected virtual void MouseLeaveClientArea(EventArgs eventArgs) {
             VerticalScroll.HandleMouseLeave(null, null);
             HorizontalScroll.HandleMouseLeave(null, null);
+        }
+
+        /// <summary>
+        /// Programatically triggers the OnKeyDown event
+        /// </summary>
+        public bool PerformKeyDown(KeyEventArgs e) {
+            e.Handled = HorizontalScroll.HandleKeyDown(null, e) || VerticalScroll.HandleKeyDown(null, e);
+            return e.Handled;
         }
 
         /// <summary>
@@ -421,34 +445,44 @@ namespace Yamui.Framework.Controls {
         protected virtual void OnSizeChanged(Size newSize) {
             // the (HasBorder && BorderWidth == 1 ? BorderWidth : 0) is there to compensate for an issue in dotnet that will never be fixed
             BorderDrawPath = new Rectangle(0, 0, newSize.Width, newSize.Height);
-            EffectiveClientRectangle = new Rectangle(BorderPadding, BorderPadding, newSize.Width - 2*BorderPadding, newSize.Height - 2*BorderPadding);
-            ComputeScrollbars(_naturalSize, newSize);
+            EffectiveClientRectangle = new Rectangle(BorderPadding, BorderPadding, newSize.Width - 2 * BorderPadding, newSize.Height - 2 * BorderPadding);
+            RefreshLayout();
         }
 
         /// <summary>
         /// Here you should return the size that your control would take if it has an unlimited space available to display itself
+        /// you can and should use ContentRectangle if the displayed content size depends on the available width
         /// </summary>
         /// <remarks>if you specify an empty, the scrollbars will not show since the available space will always be superior to the natural size of the content</remarks>
         /// <returns></returns>
-        protected virtual Size GetNaturalSize() {
+        protected virtual Size GetContentNaturalSize() {
             return new Size(0, 0);
         }
 
         /// <summary>
-        /// Override, called at the end of initializeComponent() in forms made with the designer
-        /// Should be called when your content size (i.e. <see cref="NaturalSize"/>) changes
+        /// Compute the layout of the control, ths position of each component of this control (for instance the scrollbars size/position)
+        /// Called when the content changes or when the size of the control changes
         /// </summary>
-        public new void PerformLayout() {
-            ComputeScrollbars(NaturalSize, Size);
-            base.PerformLayout();
+        public virtual void RefreshLayout() {
+            var initHasVerticalScroll = VerticalScroll.HasScroll;
+            ComputeScrollbars(ContentNaturalSize, Size);
+
+            // as the display of the vertical scroll can reduce the available content width, maybe the content size 
+            // has changed so we need to recompute the correct values for the scrollbars
+            if (initHasVerticalScroll != VerticalScroll.HasScroll) {
+                ComputeScrollbars(ContentNaturalSize, Size);
+            }
         }
-        
+
         /// <summary>
-        /// Programatically triggers the OnKeyDown event
+        /// Translate a content size to control size taking into account stuff like scrollbars and border
         /// </summary>
-        public bool PerformKeyDown(KeyEventArgs e) {
-            e.Handled = HorizontalScroll.HandleKeyDown(null, e) || VerticalScroll.HandleKeyDown(null, e);
-            return e.Handled;
+        /// <param name="contentSize"></param>
+        /// <returns></returns>
+        protected Size GetControlSizeFromContentSize(Size contentSize) {
+            contentSize.Width += (Size.Width - ContentRectangle.Width);
+            contentSize.Height += (Size.Height - ContentRectangle.Height);
+            return contentSize;
         }
 
         protected void ComputeScrollbars(Size naturalSize, Size availableSize) {
@@ -472,6 +506,5 @@ namespace Yamui.Framework.Controls {
         }
 
         #endregion
-
     }
 }

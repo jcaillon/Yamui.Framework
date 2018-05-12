@@ -241,7 +241,7 @@ namespace Yamui.Framework.HtmlRenderer.Core.Core.Utils {
         /// <param name="idx">the index to start substring search from</param>
         /// <param name="length">return the length of the found string</param>
         /// <returns>the index of the substring, -1 if no valid sub-string found</returns>
-        public static int GetNextSubString(string str, int idx, out int length) {
+        public static int GetNextSubString(this string str, int idx, out int length) {
             while (idx < str.Length && Char.IsWhiteSpace(str[idx]))
                 idx++;
             if (idx < str.Length) {
@@ -276,7 +276,7 @@ namespace Yamui.Framework.HtmlRenderer.Core.Core.Utils {
         /// </summary>
         /// <param name="source">The possibly-not-valid filename</param>
         /// <returns>A valid filename.</returns>
-        private static string GetValidFileName(string source) {
+        public static string GetValidFileName(this string source) {
             string retVal = source;
             char[] invalidFileNameChars = Path.GetInvalidFileNameChars();
             foreach (var invalidFileNameChar in invalidFileNameChars) {

@@ -33,6 +33,7 @@ namespace Yamui.Framework.HtmlRenderer.Core.Core.Dom {
     /// It may change for future versions of the library.
     /// </remarks>
     internal abstract class CssRect {
+
         #region Fields and Consts
 
         /// <summary>

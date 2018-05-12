@@ -40,7 +40,6 @@ namespace Yamui.Framework.Controls {
     /// WinForms control that will render html content in it's client rectangle.<br/>
     /// Using <see cref="AutoSize"/> and <see cref="AutoSizeHeightOnly"/> client can control how the html content effects the
     /// size of the label. Either case scrollbars are never shown and html content outside of client bounds will be clipped.
-    /// <see cref="MaximumSize"/> and <see cref="MinimumSize"/> with AutoSize can limit the max/min size of the control<br/>
     /// The control will handle mouse and keyboard events on it to support html text selection, copy-paste and mouse clicks.<br/>
     /// <para>
     /// The major differential to use HtmlPanel or HtmlLabel is size and scrollbars.<br/>
@@ -241,36 +240,7 @@ namespace Yamui.Framework.Controls {
             get { return _htmlContainer.IsContextMenuEnabled; }
             set { _htmlContainer.IsContextMenuEnabled = value; }
         }
-
-        /// <summary>
-        /// Gets or sets the min size the control get be set by <see cref="AutoSize"/> or <see cref="AutoSizeHeightOnly"/>.
-        /// </summary>
-        /// <returns>An ordered pair of type <see cref="T:System.Drawing.Size"/> representing the width and height of a rectangle.</returns>
-        [Description("If AutoSize or AutoSizeHeightOnly is set this will restrict the min size of the control (0 is not restricted)")]
-        public override Size MinimumSize {
-            get { return base.MinimumSize; }
-            set { base.MinimumSize = value; }
-        }
         
-        /// <summary>
-        /// Gets or sets the max size the control get be set by <see cref="AutoSize"/> or <see cref="AutoSizeHeightOnly"/>.
-        /// </summary>
-        /// <returns>An ordered pair of type <see cref="T:System.Drawing.Size"/> representing the width and height of a rectangle.</returns>
-        [Description("If AutoSize or AutoSizeHeightOnly is set this will restrict the max size of the control (0 is not restricted)")]
-        public override Size MaximumSize {
-            get { return base.MaximumSize; }
-            set {
-                if (base.MaximumSize != value) {
-                    base.MaximumSize = value;
-                    if (_htmlContainer != null) {
-                        _htmlContainer.MaxSize = value;
-                        PerformLayout();
-                        Invalidate();
-                    }
-                }
-            }
-        }
-
         /// <summary>
         /// Automatically sets the size of the label by content size
         /// </summary>
@@ -286,7 +256,7 @@ namespace Yamui.Framework.Controls {
                     base.AutoSize = _autoSize;
                     if (value) {
                         _autoSizeHeight = false;
-                        PerformLayout();
+                        RefreshLayout();
                         Invalidate();
                     }
                 }
@@ -306,7 +276,7 @@ namespace Yamui.Framework.Controls {
                     _autoSizeHeight = value;
                     if (value) {
                         _autoSize = false;
-                        PerformLayout();
+                        RefreshLayout();
                         Invalidate();
                     }
                 }
@@ -322,8 +292,18 @@ namespace Yamui.Framework.Controls {
             set {
                 base.Text = value ?? string.Empty;
                 if (!IsDisposed) {
-                    _htmlContainer.SetHtml(base.Text.StartsWith(@"<html") ? base.Text : @"<html><body>" + base.Text + @"</body><html>", YamuiThemeManager.CurrentThemeCss);
-                    PerformLayout();
+                    SetText(base.Text);
+                    if (AutoSize || AutoSizeHeightOnly) {
+                        var newSize = GetControlSizeFromContentSize(GetContentNaturalSize());
+                        if (AutoSizeHeightOnly) {
+                            newSize.Width = Size.Width;
+                        }
+                        if (Size != newSize) {         
+                            Size = newSize;
+                        }
+                    } else {
+                        RefreshLayout();
+                    }
                     Invalidate();
                 }
             }
@@ -347,9 +327,6 @@ namespace Yamui.Framework.Controls {
         /// <returns>generated html</returns>
         public virtual string GetHtml => _htmlContainer.GetHtml();
 
-        private int BorderPadding => HasBorder ? BorderWidth + 1 : 0;
-        private int VerticalScrollThickness => VerticalScroll.HasScroll ? VerticalScroll.BarThickness : 0;
-
         /// <summary>
         /// Get the rectangle of html element as calculated by html layout.<br/>
         /// Element if found by id (id attribute on the html element).<br/>
@@ -364,30 +341,70 @@ namespace Yamui.Framework.Controls {
         /// </summary>
         public void SetNeededSize(string content, int minWidth, int maxWidth, bool dontSquareIt = false) {
 
-            /* _htmlContainer.MaxSize = new SizeF(ClientSize.Width - Padding.Horizontal, 0);
+            SetText(content);
 
-                using (var g = CreateGraphics()) {
-                    _htmlContainer.PerformLayout(g);
-                }
+            // this should retrieve the best width, however it will not be the case if there are some width='100%' for instance
+            //var calcWidth = MeasureContentSize(new RSize(9999, 0)).Width;
+            var calcWidth = MeasureContentSize(RSize.Empty).Width;
 
-                AutoScrollMinSize = Size.Round(new SizeF(_htmlContainer.ActualSize.Width + Padding.Horizontal, _htmlContainer.ActualSize.Height));
-             *
-             *
-             *
-             */
+            if (calcWidth >= 9999) {
+                // get the minimum size required to display everything
+                minWidth = MeasureContentSize(new RSize(10, 0)).Width.Clamp(minWidth, maxWidth);
 
-            Width = Utilities.MeasureHtmlPrefWidth(content, minWidth, maxWidth);
-            Text = content;
+                // set to max Width, get the height at max Width
+                var sizef = MeasureContentSize(new RSize(maxWidth, 0));
+                var prefHeight = sizef.Height;
 
+                // now we got the final height, resize width until height changes
+                int j = 0;
+                int detla = maxWidth/2;
+                calcWidth = maxWidth;
+                do {
+                    calcWidth -= detla;
+                    calcWidth = calcWidth.Clamp(minWidth, maxWidth);
+
+                    sizef = MeasureContentSize(new RSize(calcWidth, 0));
+
+                    if (sizef.Height > prefHeight) {
+                        calcWidth += detla;
+                        detla /= 2;
+                    }
+
+                    if (calcWidth == maxWidth || calcWidth == minWidth)
+                        break;
+
+                    j++;
+                } while (j < 6);
+            }
+
+            Width = GetControlSizeFromContentSize(new Size(calcWidth.Clamp(minWidth, maxWidth), 0)).Width;
+            
             // make it more square shaped if possible
             if (!dontSquareIt && Width > Height) {
                 Width = ((int) Math.Sqrt(Width*Height)).Clamp(minWidth, maxWidth);
-                PerformLayout();
-                Invalidate();
             }
         }
 
+        
+        protected Size MeasureContentSize(RSize maxSizeConstraint) {
+            Size contentSize;
+            using (Graphics g = CreateGraphics()) {
+                using (var ga = new GraphicsAdapter(g, _htmlContainer.UseGdiPlusTextRendering)) {
+                    _htmlContainer.HtmlContainerInt.MaxSize = maxSizeConstraint;
+                    _htmlContainer.HtmlContainerInt.PerformLayout(ga);
+                    contentSize = Utils.ConvertRound(_htmlContainer.HtmlContainerInt.ActualSize);
+                    contentSize.Width += Padding.Horizontal;
+                    contentSize.Height += Padding.Vertical;
+                }
+            }
+            return contentSize;
+        }
+        
         #region Private methods
+        
+        private void SetText(string text) {
+            _htmlContainer.SetHtml(text.StartsWith(@"<html") ? text : @"<html><body>" + text + @"</body><html>", YamuiThemeManager.CurrentThemeCss);
+        }
 
         /// <summary>
         /// Adjust the scrollbar of the panel on html element by the given id.<br/>
@@ -416,76 +433,37 @@ namespace Yamui.Framework.Controls {
             _htmlContainer.HandleMouseMove(this, new MouseEventArgs(MouseButtons.None, 0, mp.X, mp.Y, 0));
         }
         
-        ///// <summary>
-        ///// Perform the layout of the html in the control.
-        ///// </summary>
-        //protected override void OnLayout(LayoutEventArgs levent) {
-        //    ClientSize = GetPreferredSize() ?? ClientSize;
-        //    base.OnLayout(levent);
-        //}
-
         /// <summary>
-        /// Override, called at the end of initializeComponent() in forms made with the designer
+        /// Will return the natural size of the html while trying to constraint its width if AutoSizeHeightOnly or not AutoSize
         /// </summary>
-        public new void PerformLayout() {
-            var newSize = GetPreferredSize() ?? ClientSize;
-            if (ClientSize != newSize) {
-                ClientSize = newSize;
+        /// <returns></returns>
+        protected override Size GetContentNaturalSize() {
+            var naturalSize = MeasureContentSize(AutoSizeHeightOnly || !AutoSize ? new RSize(ContentRectangle.Width - Padding.Horizontal, 0) : new RSize(0, 0));
+            if ((AutoSizeHeightOnly || !AutoSize) && naturalSize.Width > ContentRectangle.Width - Padding.Horizontal) {
+                // we are in a case were the html contains an unbreakable line and thus the needed width is superior to the available width
+                // horizontal scrollbar will be displayed. We compute the natural size from the minimum width so that wrappable lines
+                // dont look too squished compared to the unbreakable line...
+                // UNBREAKABLELINEISHUGE
+                // other
+                // lines 
+                // would 
+                // look
+                // like
+                // this
+                // ----- <- this is ContentRectangle.Width - Padding.Horizontal
+                // --------------------- <- instead we give this minimum to all lines, which is the width of the unbreakable line
+                naturalSize = MeasureContentSize(AutoSizeHeightOnly || !AutoSize ? new RSize(naturalSize.Width, 0) : new RSize(0, 0));
             }
-
-            var initHasVerticalScroll = VerticalScroll.HasScroll;
-            ComputeScrollbars(NaturalSize, Size);
-            if (initHasVerticalScroll != VerticalScroll.HasScroll) {
-                ComputeScrollbars(NaturalSize, Size);
-            }
-            base.PerformLayout();
-        }
-        
-        public override Size GetPreferredSize(Size proposedSize) {
-            return GetPreferredSize() ?? base.GetPreferredSize(proposedSize);
-        }
-
-        private Size? GetPreferredSize() {
-            if (!AutoSize && !AutoSizeHeightOnly) {
-                return null;
-            }
-
-            var naturalSize = NaturalSize;
-            var output = new Size(naturalSize.Width + BorderPadding * 2 + Padding.Horizontal, naturalSize.Height + BorderPadding * 2 + Padding.Vertical);
-            if (MaximumSize.Width > 0) {
-                output.Width = output.Width.ClampMax(MaximumSize.Width);
-            }
-            if (MaximumSize.Height > 0) {
-                output.Height = output.Height.ClampMax(MaximumSize.Height);
-            }
-            if (MinimumSize.Width > 0) {
-                output.Width = output.Width.ClampMin(MinimumSize.Width);
-            }
-            if (MinimumSize.Height > 0) {
-                output.Height = output.Height.ClampMin(MinimumSize.Height);
-            }
-            if (AutoSizeHeightOnly) {
-                output.Width = output.Width.ClampMax(Width);
-            }
-            return output;
-        }
-
-        protected override Size GetNaturalSize() {
-            using (Graphics g = CreateGraphics()) {
-                using (var ga = new GraphicsAdapter(g, _htmlContainer.UseGdiPlusTextRendering)) {
-                    _htmlContainer.HtmlContainerInt.MaxSize = AutoSizeHeightOnly || !AutoSize ? new RSize(ClientSize.Width - VerticalScrollThickness - BorderPadding * 2 - Padding.Horizontal, 0) : new RSize(0, 0);
-                    _htmlContainer.HtmlContainerInt.PerformLayout(ga);
-                    _naturalSize = Utils.ConvertRound(_htmlContainer.HtmlContainerInt.ActualSize);
-                }
-            }
-            return _naturalSize;
+            return naturalSize;
         }
         
         protected override void PaintContent(PaintEventArgs e) {
             base.PaintContent(e);
             if (_htmlContainer != null) {
-                _htmlContainer.ScrollOffset = new Point(BorderPadding + Padding.Left - HorizontalScroll.Value, BorderPadding + Padding.Top - VerticalScroll.Value);
-                e.Graphics.SetClip(ContentRectangle);
+                _htmlContainer.ScrollOffset = new Point(ContentRectangle.Left + Padding.Left - HorizontalScroll.Value, ContentRectangle.Top + Padding.Top - VerticalScroll.Value);
+                var clipRect = new Rectangle(ContentRectangle.X, ContentRectangle.Y, ContentRectangle.Width, ContentRectangle.Height);
+                clipRect.Intersect(e.ClipRectangle);
+                e.Graphics.SetClip(clipRect);
                 _htmlContainer.PerformPaint(e.Graphics);
                 e.Graphics.SetClip(e.ClipRectangle);
 
@@ -589,7 +567,7 @@ namespace Yamui.Framework.Controls {
         /// </summary>
         protected virtual void OnRefresh(HtmlRefreshEventArgs e) {
             if (e.Layout) {
-                PerformLayout();
+                RefreshLayout();
             }
             Invalidate(ContentRectangle);
         }

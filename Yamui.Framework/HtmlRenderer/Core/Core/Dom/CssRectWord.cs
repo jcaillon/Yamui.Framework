@@ -22,6 +22,7 @@ namespace Yamui.Framework.HtmlRenderer.Core.Core.Dom {
     /// Represents a word inside an inline box
     /// </summary>
     internal sealed class CssRectWord : CssRect {
+
         #region Fields and Consts
 
         /// <summary>

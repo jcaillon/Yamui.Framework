@@ -365,8 +365,6 @@
     <Content Include="Resources\MsgBoxAndHtmlImg\MsgToolTip.png" />
     <Content Include="Resources\MsgBoxAndHtmlImg\MsgWarning.png" />
     <Content Include="Resources\BaseStyleSheet.css" />
-    <EmbeddedResource Include="HtmlRenderer\Core\Core\Utils\ImageLoad.png" />
-    <EmbeddedResource Include="HtmlRenderer\Core\Core\Utils\ImageError.png" />
     <None Include="Resources\ApplicationThemes" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
