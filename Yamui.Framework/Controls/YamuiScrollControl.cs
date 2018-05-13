@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Yamui.Framework.Helper;
@@ -117,48 +118,47 @@ namespace Yamui.Framework.Controls {
         [Browsable(false)]
         public bool HasScroll => VerticalScroll.HasScroll || HorizontalScroll.HasScroll;
 
-        /// <summary>
-        /// Get prefered size, i.e. the size we would need to display all the child controls at the same time
-        /// </summary>
-        [Browsable(false)]
-        protected Size ContentNaturalSize {
-            get {
-                _naturalSize = GetContentNaturalSize();
-                return _naturalSize;
-            }
-        }
-
         [Browsable(false)]
         public virtual bool HasBorder {
             get { return _hasBorder; }
             set {
                 if (_hasBorder != value) {
                     _hasBorder = value;
+                    VerticalScroll.Offset = new Point(BorderPadding, BorderPadding);
+                    HorizontalScroll.Offset = new Point(BorderPadding, BorderPadding);
                     // this will change the effective size available for this control
                     OnSizeChanged(Size);
-                    VerticalScroll.ParentPadding = BorderPadding;
-                    HorizontalScroll.ParentPadding = BorderPadding;
-                    RefreshLayout();
-                    Invalidate();
+                    InvalidateBorder();
                 }
             }
         }
 
         /// <summary>
-        /// The rectangle that is really used to display the content (<see cref="EffectiveClientRectangle"/> minus the scrollbars)
+        /// Get the size we would need to draw the whole content without scrollbars
         /// </summary>
         [Browsable(false)]
-        public Rectangle ContentRectangle { get; private set; }
+        protected virtual Size ContentNaturalSize { get; } = Size.Empty;
 
         /// <summary>
-        /// The rectangle within the borders of this control (equals to the client area if there are no borders)
-        /// This is equivalent to the <see cref="ContentRectangle"/> if there are no scrollbars shown
+        /// The surface that is really available to draw the content (<see cref="ContentSurfaceWithScrolls"/> minus the scrollbars)
+        /// </summary>
+        /// <remarks>If this surface is superior or equals to <see cref="ContentNaturalSize"/> then no scrollbars are needed</remarks>
+        [Browsable(false)]
+        public Rectangle ContentSurface { get; private set; }
+
+        /// <summary>
+        /// The rectangle within the borders of this control (equals to the <see cref="WidgetSurface"/> if there are no borders)
+        /// </summary>
+        /// <remarks>This is also equivalent to the <see cref="ContentSurface"/> if there are no scrollbars shown</remarks>
+        [Browsable(false)]
+        public Rectangle ContentSurfaceWithScrolls { get; private set; }
+
+        /// <summary>
+        /// Represents the whole widget surface (=area), the position is relative and thus will always be (0,0)
         /// </summary>
         [Browsable(false)]
-        public Rectangle EffectiveClientRectangle { get; private set; }
+        public Rectangle WidgetSurface { get; private set; }
 
-        [Browsable(false)]
-        public Rectangle BorderDrawPath { get; private set; }
 
         [Browsable(false)]
         public virtual Color BorderColor => YamuiThemeManager.Current.AccentColor;
@@ -173,8 +173,7 @@ namespace Yamui.Framework.Controls {
         #region Fields and Consts
 
         public const int BorderWidth = 1;
-        private int _scrollBarWidth = 20;
-        protected Size _naturalSize;
+        private int _scrollBarWidth = 12;
         private Rectangle _leftoverBar;
         private bool _needBothScroll;
         protected bool _vScroll = true;
@@ -217,42 +216,60 @@ namespace Yamui.Framework.Controls {
 
         #region Paint
 
+        protected bool RectangleIntersectsWithBorder(Rectangle rectangle) {
+            return rectangle.X < BorderWidth || 
+                   rectangle.Y < BorderWidth || 
+                   rectangle.Right > WidgetSurface.Width - BorderWidth || 
+                   rectangle.Bottom > WidgetSurface.Height - BorderWidth;
+        }
+
         protected override void OnPaint(PaintEventArgs e) {
-            if (HasBorder && e.ClipRectangle.Contains(BorderDrawPath)) {
-                PaintBorder(e);
+            // I could use a Graphics.Save() / Restore() but I figure storing only the Clip is more efficient...
+            Region originalRegion = e.Graphics.Clip.Clone();
+            if (HasBorder && RectangleIntersectsWithBorder(e.ClipRectangle)) {
+                e.Graphics.SetClip(ContentSurfaceWithScrolls, CombineMode.Exclude);
+                PaintBorderRegion(e.Graphics);
+                e.Graphics.Clip = originalRegion;
+            }
+            
+            // to be more precise, we could use originalRegion.IsVisible(ContentSurface) here, but the dotnet framework
+            // doesn't actually call GetUpdateRgn to get the real update region. Instead, we just get e.ClipRectangle that is the
+            // bounds of the update region and the e.Graphics.Clip is equals to this ClipRectangle
+            // So... TLDR : we will always get a rectangle to update, never a complex region
+            if (ContentSurface.IntersectsWith(e.ClipRectangle)) {
+                e.Graphics.SetClip(ContentSurface, CombineMode.Intersect);
+                PaintContentSurface(e.Graphics);
+                e.Graphics.Clip = originalRegion;
             }
 
-            if (e.ClipRectangle.Contains(ContentRectangle)) {
-                PaintContent(e);
-            }
-
-            PaintScrollBars(e, null);
+            PaintScrollBars(e, originalRegion);
         }
 
-        protected virtual void PaintBorder(PaintEventArgs e) {
-            e.Graphics.PaintBorder(BorderDrawPath, BorderWidth, BorderColor);
+        protected virtual void PaintBorderRegion(Graphics g) {
+            g.PaintClipRegion(BorderColor);
         }
 
-        protected virtual void PaintContent(PaintEventArgs e) {
-            // paint background
-            using (var b = new SolidBrush(BackColor)) {
-                e.Graphics.FillRectangle(b, ContentRectangle);
-            }
+        protected virtual void PaintContentSurface(Graphics g) {
+            g.PaintClipRegion(BackColor);
         }
 
-        protected virtual void PaintScrollBars(PaintEventArgs e, YamuiScrollHandler yamuiScrollHandler) {
-            if (e.ClipRectangle.Contains(VerticalScroll.BarRect)) {
-                VerticalScroll.Paint(e);
+        protected virtual void PaintScrollBars(PaintEventArgs e, Region originalRegion) {
+            if (VerticalScroll.HasScroll && VerticalScroll.BarRect.IntersectsWith(e.ClipRectangle)) {
+                e.Graphics.SetClip(VerticalScroll.BarRect, CombineMode.Intersect);
+                VerticalScroll.Paint(e.Graphics);
+                e.Graphics.Clip = originalRegion;
             }
 
-            if (_needBothScroll && e.ClipRectangle.Contains(_leftoverBar)) {
-                using (var b = new SolidBrush(YamuiThemeManager.Current.ScrollNormalBack)) {
-                    e.Graphics.FillRectangle(b, _leftoverBar);
-                }
+            if (_needBothScroll && _leftoverBar.IntersectsWith(e.ClipRectangle)) {
+                e.Graphics.SetClip(_leftoverBar, CombineMode.Intersect);
+                e.Graphics.PaintClipRegion(YamuiThemeManager.Current.ScrollNormalBack);
+                e.Graphics.Clip = originalRegion;
             }
 
-            if (e.ClipRectangle.Contains(HorizontalScroll.BarRect)) {
-                HorizontalScroll.Paint(e);
+            if (HorizontalScroll.HasScroll && HorizontalScroll.BarRect.IntersectsWith(e.ClipRectangle)) {
+                e.Graphics.SetClip(HorizontalScroll.BarRect, CombineMode.Intersect);
+                HorizontalScroll.Paint(e.Graphics);
+                e.Graphics.Clip = originalRegion;
             }
         }
 
@@ -261,17 +278,15 @@ namespace Yamui.Framework.Controls {
         #region ScrollHandler events
 
         protected virtual void OnScrollValueChanged(object sender, YamuiScrollHandlerValueChangedEventArgs e) {
-            Invalidate(ContentRectangle);
+            InvalidateContent();
         }
 
         protected virtual void OnScrollbarsRedrawNeeded(object sender, EventArgs eventArgs) {
-            var scroll = (YamuiScrollHandler) sender;
-            var invalidateRectangle = scroll.BarRect;
-            if (_needBothScroll && scroll.IsVertical) {
-                invalidateRectangle = Rectangle.Union(invalidateRectangle, _leftoverBar);
+            if (((YamuiScrollHandler) sender).IsVertical) {
+                InvalidateVerticalScrollbar();
+            } else {
+                InvalidateHorizontalScrollbar();
             }
-
-            Invalidate(invalidateRectangle);
         }
 
         #endregion
@@ -385,6 +400,13 @@ namespace Yamui.Framework.Controls {
 
                     break;
                     */
+                case Window.Msg.WM_NCPAINT:
+                    m.Result = IntPtr.Zero;
+                    break;
+
+                case Window.Msg.WM_ERASEBKGND:
+                    m.Result = IntPtr.Zero;
+                    return;
 
                 default:
                     base.WndProc(ref m);
@@ -401,6 +423,26 @@ namespace Yamui.Framework.Controls {
 
         #region Methods
 
+        public void InvalidateContent() {
+            Invalidate(ContentSurface);
+        }
+
+        public void InvalidateBorder() {
+            // TODO : here we probably want to custom paint only the border outside of the paint event
+            // because we can't invalidate a complex region due to the limitation of the dotnet paint event
+            var borderRegion = new Region(WidgetSurface);
+            borderRegion.Exclude(ContentSurfaceWithScrolls);
+            Invalidate(borderRegion);
+        }
+
+        public void InvalidateVerticalScrollbar() {
+            Invalidate(_needBothScroll ? Rectangle.Union(VerticalScroll.BarRect, _leftoverBar) : VerticalScroll.BarRect);
+        }
+
+        public void InvalidateHorizontalScrollbar() {
+            Invalidate(HorizontalScroll.BarRect);
+        }
+        
         /// <summary>
         /// Modify the input rectangle to adjust the client area from the window size
         /// </summary>
@@ -444,20 +486,14 @@ namespace Yamui.Framework.Controls {
         /// <param name="newSize"></param>
         protected virtual void OnSizeChanged(Size newSize) {
             // the (HasBorder && BorderWidth == 1 ? BorderWidth : 0) is there to compensate for an issue in dotnet that will never be fixed
-            BorderDrawPath = new Rectangle(0, 0, newSize.Width, newSize.Height);
-            EffectiveClientRectangle = new Rectangle(BorderPadding, BorderPadding, newSize.Width - 2 * BorderPadding, newSize.Height - 2 * BorderPadding);
+            WidgetSurface = new Rectangle(0, 0, newSize.Width, newSize.Height);
+            ContentSurfaceWithScrolls = new Rectangle(BorderPadding, BorderPadding, newSize.Width - 2 * BorderPadding, newSize.Height - 2 * BorderPadding);
+
+            // we set the contentsurface taking as an hypothesis that the scrollbars will remain as they are, this is corrected
+            ContentSurface = new Rectangle(ContentSurfaceWithScrolls.X, ContentSurfaceWithScrolls.Y, ContentSurfaceWithScrolls.Width - (VerticalScroll.HasScroll ? VerticalScroll.BarThickness : 0), ContentSurfaceWithScrolls.Height - (HorizontalScroll.HasScroll ? HorizontalScroll.BarThickness : 0));
             RefreshLayout();
         }
 
-        /// <summary>
-        /// Here you should return the size that your control would take if it has an unlimited space available to display itself
-        /// you can and should use ContentRectangle if the displayed content size depends on the available width
-        /// </summary>
-        /// <remarks>if you specify an empty, the scrollbars will not show since the available space will always be superior to the natural size of the content</remarks>
-        /// <returns></returns>
-        protected virtual Size GetContentNaturalSize() {
-            return new Size(0, 0);
-        }
 
         /// <summary>
         /// Compute the layout of the control, ths position of each component of this control (for instance the scrollbars size/position)
@@ -465,12 +501,12 @@ namespace Yamui.Framework.Controls {
         /// </summary>
         public virtual void RefreshLayout() {
             var initHasVerticalScroll = VerticalScroll.HasScroll;
-            ComputeScrollbars(ContentNaturalSize, Size);
+            ComputeScrollbars(ContentNaturalSize, ContentSurfaceWithScrolls.Size);
 
             // as the display of the vertical scroll can reduce the available content width, maybe the content size 
             // has changed so we need to recompute the correct values for the scrollbars
             if (initHasVerticalScroll != VerticalScroll.HasScroll) {
-                ComputeScrollbars(ContentNaturalSize, Size);
+                ComputeScrollbars(ContentNaturalSize, ContentSurfaceWithScrolls.Size);
             }
         }
 
@@ -480,8 +516,8 @@ namespace Yamui.Framework.Controls {
         /// <param name="contentSize"></param>
         /// <returns></returns>
         protected Size GetControlSizeFromContentSize(Size contentSize) {
-            contentSize.Width += (Size.Width - ContentRectangle.Width);
-            contentSize.Height += (Size.Height - ContentRectangle.Height);
+            contentSize.Width += (Size.Width - ContentSurface.Width);
+            contentSize.Height += (Size.Height - ContentSurface.Height);
             return contentSize;
         }
 
@@ -499,10 +535,10 @@ namespace Yamui.Framework.Controls {
             // compute the "left over" rectangle on the bottom right between the 2 scrolls
             _needBothScroll = needVerticalScroll && needHorizontalScroll;
             if (_needBothScroll) {
-                _leftoverBar = new Rectangle(EffectiveClientRectangle.X + EffectiveClientRectangle.Width - VerticalScroll.BarThickness, EffectiveClientRectangle.Y + EffectiveClientRectangle.Height - HorizontalScroll.BarThickness, VerticalScroll.BarThickness, HorizontalScroll.BarThickness);
+                _leftoverBar = new Rectangle(ContentSurfaceWithScrolls.X + ContentSurfaceWithScrolls.Width - VerticalScroll.BarThickness, ContentSurfaceWithScrolls.Y + ContentSurfaceWithScrolls.Height - HorizontalScroll.BarThickness, VerticalScroll.BarThickness, HorizontalScroll.BarThickness);
             }
 
-            ContentRectangle = new Rectangle(EffectiveClientRectangle.X, EffectiveClientRectangle.Y, EffectiveClientRectangle.Width - (needVerticalScroll ? VerticalScroll.BarThickness : 0), EffectiveClientRectangle.Height - (needHorizontalScroll ? HorizontalScroll.BarThickness : 0));
+            ContentSurface = new Rectangle(ContentSurfaceWithScrolls.X, ContentSurfaceWithScrolls.Y, ContentSurfaceWithScrolls.Width - (needVerticalScroll ? VerticalScroll.BarThickness : 0), ContentSurfaceWithScrolls.Height - (needHorizontalScroll ? HorizontalScroll.BarThickness : 0));
         }
 
         #endregion

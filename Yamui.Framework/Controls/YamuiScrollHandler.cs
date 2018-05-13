@@ -36,8 +36,11 @@ namespace Yamui.Framework.Controls {
         public int ThumbPadding {
             get { return _thumbPadding; }
             set {
-                _thumbPadding = value;
-                InvalidateScrollBar();
+                if (_thumbPadding != value) {
+                    _thumbPadding = value;
+                    ComputeScrollFixedValues();
+                    InvalidateScrollBar();
+                }
             }
         }
 
@@ -47,8 +50,11 @@ namespace Yamui.Framework.Controls {
         public bool Enabled {
             get { return _enabled; }
             set {
-                _enabled = value;
-                AnalyzeScrollNeeded();
+                if (_enabled != value) {
+                    _enabled = value;
+                    ComputeScrollFixedValues();
+                    AnalyzeScrollNeeded();
+                }
             }
         }
 
@@ -58,8 +64,11 @@ namespace Yamui.Framework.Controls {
         public bool ScrollButtonEnabled {
             get { return _scrollButtonEnabled; }
             set {
-                _scrollButtonEnabled = value;
-                AnalyzeScrollNeeded();
+                if (_scrollButtonEnabled != value) {
+                    _scrollButtonEnabled = value;
+                    ComputeScrollFixedValues();
+                    InvalidateScrollBar();
+                }
             }
         }
 
@@ -69,10 +78,11 @@ namespace Yamui.Framework.Controls {
         public int BarThickness {
             get { return _barThickness; }
             set {
-                _barThickness = value.ClampMin(5);
-                ComputeScrollFixedValues();
-                AnalyzeScrollNeeded();
-                InvalidateScrollBar();
+                if (_barThickness != value) {
+                    _barThickness = value.ClampMin(5);
+                    ComputeScrollFixedValues();
+                    AnalyzeScrollNeeded();
+                }
             }
         }
 
@@ -105,16 +115,7 @@ namespace Yamui.Framework.Controls {
         /// <summary>
         /// Exposes the state of the scroll buttons, true if displayed
         /// </summary>
-        public bool HasScrollButtons {
-            get { return _hasScrollButtons; }
-            private set {
-                if (_hasScrollButtons != value) {
-                    _hasScrollButtons = value;
-                    // this changes some values so we need to compute them again
-                    ComputeScrollFixedValues();
-                }
-            }
-        }
+        public bool HasScrollButtons { get; private set; }
 
         /// <summary>
         /// Maximum length of this panel if we wanted to show it all w/o scrolls (set with <see cref="UpdateLength"/>)
@@ -221,9 +222,9 @@ namespace Yamui.Framework.Controls {
         }
 
         /// <summary>
-        /// Padding to use when displaying the scrollbars, will be used to not draw the scrollbars over the parent border for instance
+        /// Offsets the rectangle in which the scrollbars are drawn
         /// </summary>
-        public int ParentPadding { get; set; }
+        public Point Offset { get; set; }
 
         /// <summary>
         /// Is the mouse flying over the bar
@@ -299,7 +300,6 @@ namespace Yamui.Framework.Controls {
         private bool _isButtonDownHovered;
         private bool _isButtonUpPressed;
         private bool _isButtonDownPressed;
-        private bool _hasScrollButtons;
 
         public YamuiScrollHandler(bool isVertical, Control parent) {
             IsVertical = isVertical;
@@ -311,27 +311,27 @@ namespace Yamui.Framework.Controls {
         /// <summary>
         /// Paint the scroll bar in the parent client rectangle
         /// </summary>
-        public void Paint(PaintEventArgs e) {
+        public void Paint(Graphics g) {
             if (!HasScroll)
                 return;
-            
+
             Color thumbColor = YamuiThemeManager.Current.ScrollBarsFg(false, IsThumbHovered, IsThumbPressed, Enabled);
             Color barColor = YamuiThemeManager.Current.ScrollBarsBg(false, IsThumbHovered, IsThumbPressed, Enabled);
 
             if (barColor != Color.Transparent) {
-                e.Graphics.PaintRectangle(BarRect, barColor);
+                g.PaintRectangle(BarRect, barColor);
             }
 
             if (CanDisplayThumb) {
-                e.Graphics.PaintRectangle(ThumbRect, thumbColor);
+                g.PaintRectangle(ThumbRect, thumbColor);
             }
 
             if (HasScrollButtons) {
                 Color buttonColor = YamuiThemeManager.Current.ScrollBarsFg(false, IsButtonUpHovered, IsButtonUpPressed, Enabled);
-                e.Graphics.PaintCachedImage(ScrollButtonUp, IsVertical ? ImageDrawerType.ArrowUp : ImageDrawerType.ArrowLeft, new Size(ScrollButtonSize, ScrollButtonSize), buttonColor);
+                g.PaintCachedImage(ScrollButtonUp, IsVertical ? ImageDrawerType.ArrowUp : ImageDrawerType.ArrowLeft, new Size(ScrollButtonSize, ScrollButtonSize), buttonColor);
                 
                 buttonColor = YamuiThemeManager.Current.ScrollBarsFg(false, IsButtonDownHovered, IsButtonDownPressed, Enabled);
-                e.Graphics.PaintCachedImage(ScrollButtonDown, IsVertical ? ImageDrawerType.ArrowDown : ImageDrawerType.ArrowRight, new Size(ScrollButtonSize, ScrollButtonSize), buttonColor);
+                g.PaintCachedImage(ScrollButtonDown, IsVertical ? ImageDrawerType.ArrowDown : ImageDrawerType.ArrowRight, new Size(ScrollButtonSize, ScrollButtonSize), buttonColor);
             }
         }
         
@@ -361,19 +361,18 @@ namespace Yamui.Framework.Controls {
             if (MaximumValue <= 0 || !Enabled || LengthAvailable <= 0) {
                 Value = 0; // no more scrollbar? then reset the view to 0 first
                 HasScroll = false;
-                HasScrollButtons = false;
             } else {
                 HasScroll = true;
-                HasScrollButtons = ScrollButtonEnabled && BarLength > 4 * ScrollButtonSize && BarThickness >= MinimumBarThicknessNeededForButtons;
                 Value = _value; // effectively refresh everything
             }
         }
 
         private void ComputeScrollFixedValues() {
             // compute fixed values
+            HasScrollButtons = HasScroll && ScrollButtonEnabled && BarLength > 4 * ScrollButtonSize && BarThickness >= MinimumBarThicknessNeededForButtons;
             MaximumValue = (LengthToRepresent - LengthAvailable).ClampMin(0);        
-            BarOffset = ParentPadding;
-            BarOpposedOffset = ParentPadding + OpposedDrawLength - BarThickness;
+            BarOffset = IsVertical ? Offset.X : Offset.Y;
+            BarOpposedOffset = (IsVertical ? Offset.Y : Offset.X) + OpposedDrawLength - BarThickness;
             ThumbThickness = BarThickness - ThumbPadding * 2;
             BarLength = DrawLength;        
             ScrollButtonSize = BarThickness;
@@ -409,8 +408,8 @@ namespace Yamui.Framework.Controls {
             if (LengthToRepresentMinSize > 0)
                 LengthToRepresent = LengthToRepresent.ClampMin(LengthToRepresentMinSize);
             LengthAvailable = lengthAvailable ?? drawLength;
-            DrawLength = drawLength - 2*ParentPadding;
-            OpposedDrawLength = opposedDrawLength - 2*ParentPadding;
+            DrawLength = drawLength;
+            OpposedDrawLength = opposedDrawLength;
 
             ComputeScrollFixedValues();
             AnalyzeScrollNeeded();

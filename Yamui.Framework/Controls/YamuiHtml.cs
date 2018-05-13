@@ -294,7 +294,7 @@ namespace Yamui.Framework.Controls {
                 if (!IsDisposed) {
                     SetText(base.Text);
                     if (AutoSize || AutoSizeHeightOnly) {
-                        var newSize = GetControlSizeFromContentSize(GetContentNaturalSize());
+                        var newSize = GetControlSizeFromContentSize(ContentNaturalSize);
                         if (AutoSizeHeightOnly) {
                             newSize.Width = Size.Width;
                         }
@@ -437,36 +437,33 @@ namespace Yamui.Framework.Controls {
         /// Will return the natural size of the html while trying to constraint its width if AutoSizeHeightOnly or not AutoSize
         /// </summary>
         /// <returns></returns>
-        protected override Size GetContentNaturalSize() {
-            var naturalSize = MeasureContentSize(AutoSizeHeightOnly || !AutoSize ? new RSize(ContentRectangle.Width - Padding.Horizontal, 0) : new RSize(0, 0));
-            if ((AutoSizeHeightOnly || !AutoSize) && naturalSize.Width > ContentRectangle.Width - Padding.Horizontal) {
-                // we are in a case were the html contains an unbreakable line and thus the needed width is superior to the available width
-                // horizontal scrollbar will be displayed. We compute the natural size from the minimum width so that wrappable lines
-                // dont look too squished compared to the unbreakable line...
-                // UNBREAKABLELINEISHUGE
-                // other
-                // lines 
-                // would 
-                // look
-                // like
-                // this
-                // ----- <- this is ContentRectangle.Width - Padding.Horizontal
-                // --------------------- <- instead we give this minimum to all lines, which is the width of the unbreakable line
-                naturalSize = MeasureContentSize(AutoSizeHeightOnly || !AutoSize ? new RSize(naturalSize.Width, 0) : new RSize(0, 0));
+        protected override Size ContentNaturalSize {
+            get {
+                var naturalSize = MeasureContentSize(AutoSizeHeightOnly || !AutoSize ? new RSize(ContentSurface.Width - Padding.Horizontal, 0) : new RSize(0, 0));
+                if ((AutoSizeHeightOnly || !AutoSize) && naturalSize.Width > ContentSurface.Width - Padding.Horizontal) {
+                    // we are in a case were the html contains an unbreakable line and thus the needed width is superior to the available width
+                    // horizontal scrollbar will be displayed. We compute the natural size from the minimum width so that wrappable lines
+                    // dont look too squished compared to the unbreakable line...
+                    // UNBREAKABLELINEISHUGE
+                    // other
+                    // lines 
+                    // would 
+                    // look
+                    // like
+                    // this
+                    // ----- <- this is ContentRectangle.Width - Padding.Horizontal
+                    // --------------------- <- instead we give this minimum to all lines, which is the width of the unbreakable line
+                    naturalSize = MeasureContentSize(AutoSizeHeightOnly || !AutoSize ? new RSize(naturalSize.Width - Padding.Horizontal, 0) : new RSize(0, 0));
+                }
+                return naturalSize;
             }
-            return naturalSize;
         }
         
-        protected override void PaintContent(PaintEventArgs e) {
-            base.PaintContent(e);
+        protected override void PaintContentSurface(Graphics g) {
+            base.PaintContentSurface(g);
             if (_htmlContainer != null) {
-                _htmlContainer.ScrollOffset = new Point(ContentRectangle.Left + Padding.Left - HorizontalScroll.Value, ContentRectangle.Top + Padding.Top - VerticalScroll.Value);
-                var clipRect = new Rectangle(ContentRectangle.X, ContentRectangle.Y, ContentRectangle.Width, ContentRectangle.Height);
-                clipRect.Intersect(e.ClipRectangle);
-                e.Graphics.SetClip(clipRect);
-                _htmlContainer.PerformPaint(e.Graphics);
-                e.Graphics.SetClip(e.ClipRectangle);
-
+                _htmlContainer.ScrollOffset = new Point(ContentSurface.Left + Padding.Left - HorizontalScroll.Value, ContentSurface.Top + Padding.Top - VerticalScroll.Value);
+                _htmlContainer.PerformPaint(g);
                 if (!_lastScrollOffset.Equals(_htmlContainer.ScrollOffset)) {
                     _lastScrollOffset = _htmlContainer.ScrollOffset;
                     InvokeMouseMove();
@@ -486,7 +483,7 @@ namespace Yamui.Framework.Controls {
         /// </summary>
         protected override void OnMouseMove(MouseEventArgs e) {
             base.OnMouseMove(e);
-            if (ContentRectangle.Contains(e.Location)) {
+            if (ContentSurface.Contains(e.Location)) {
                 _htmlContainer?.HandleMouseMove(this, e);
             } else {
                 Cursor = DefaultCursor;
@@ -498,7 +495,7 @@ namespace Yamui.Framework.Controls {
         /// </summary>
         protected override void OnMouseDown(MouseEventArgs e) {
             base.OnMouseDown(e);
-            if (ContentRectangle.Contains(e.Location)) {
+            if (ContentSurface.Contains(e.Location)) {
                 _htmlContainer?.HandleMouseDown(this, e);
             }
         }
@@ -515,7 +512,7 @@ namespace Yamui.Framework.Controls {
         /// Handle mouse up to handle selection and link click. 
         /// </summary>
         protected override void OnMouseUp(MouseEventArgs e) {
-            if (ContentRectangle.Contains(e.Location)) {
+            if (ContentSurface.Contains(e.Location)) {
                 OnMouseClick(e);
             }
             _htmlContainer?.HandleMouseUp(this, e);
@@ -527,7 +524,7 @@ namespace Yamui.Framework.Controls {
         /// </summary>
         protected override void OnMouseDoubleClick(MouseEventArgs e) {
             base.OnMouseDoubleClick(e);
-            if (ContentRectangle.Contains(e.Location)) {
+            if (ContentSurface.Contains(e.Location)) {
                 _htmlContainer?.HandleMouseDoubleClick(this, e);
             }
         }
@@ -569,7 +566,7 @@ namespace Yamui.Framework.Controls {
             if (e.Layout) {
                 RefreshLayout();
             }
-            Invalidate(ContentRectangle);
+            Invalidate(ContentSurface);
         }
 
         /// <summary>

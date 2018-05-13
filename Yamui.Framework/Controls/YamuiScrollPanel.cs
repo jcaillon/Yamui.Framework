@@ -214,11 +214,11 @@ namespace Yamui.Framework.Controls {
         }
 
         private void PaintHorizontalScroll(PaintEventArgs e) {
-            HorizontalScroll.Paint(e);
+            HorizontalScroll.Paint(e.Graphics);
         }
 
         private void PaintVerticalScroll(PaintEventArgs e) {
-            VerticalScroll.Paint(e);
+            VerticalScroll.Paint(e.Graphics);
         }
 
         protected void PaintOnRectangle(IntPtr winDc, ref Rectangle rect, Action<PaintEventArgs> paint) {

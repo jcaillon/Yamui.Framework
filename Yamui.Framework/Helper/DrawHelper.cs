@@ -46,7 +46,7 @@ namespace Yamui.Framework.Helper {
     }
 
     public static class DrawHelper {
-        
+       
         /// <summary>
         /// Paint a border (an empty rectangle with the desired border width)
         /// </summary>
@@ -76,6 +76,15 @@ namespace Yamui.Framework.Helper {
         public static void PaintRectangle(this Graphics g, Rectangle rectangle, Color color) {
             using (var b = new SolidBrush(color)) {
                 g.FillRectangle(b, rectangle);
+            }
+        }
+
+        /// <summary>
+        /// Fill a rectangle with the given color
+        /// </summary>
+        public static void PaintClipRegion(this Graphics g, Color color) {
+            using (var b = new SolidBrush(color)) {
+                g.FillRegion(b, g.Clip);
             }
         }
 

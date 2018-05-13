@@ -249,6 +249,8 @@ namespace Yamui.Framework.Forms {
 
         protected override void OnPaint(PaintEventArgs e) {
             e.Graphics.PaintRectangle(ClientRectangle, BackColor);
+
+
             PaintBorder(e);
         }
 
