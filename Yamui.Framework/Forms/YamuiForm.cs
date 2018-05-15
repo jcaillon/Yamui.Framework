@@ -401,6 +401,13 @@ namespace Yamui.Framework.Forms {
                         WinApi.RedrawWindow(new HandleRef(this, Handle), IntPtr.Zero, IntPtr.Zero, WinApi.RedrawWindowFlags.Invalidate);
                     }
                     return;
+
+                case Window.Msg.WM_NCUAHDRAWCAPTION:
+                case Window.Msg.WM_NCUAHDRAWFRAME:
+                    /* These undocumented messages are sent to draw themed window borders
+                       Block them to prevent drawing borders over the client area */
+                    m.Result = IntPtr.Zero;
+                    return;
             }
 
             base.WndProc(ref m);
